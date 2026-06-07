@@ -26,7 +26,11 @@ import { commitCard, canonicalCard, invalidateCommitment, type CommitPick } from
 // every upcoming pick with the new engine (pre-fight, so still honest).
 const MODEL_VERSION = "vex-v3.2-layoff-division-sos";
 const INDEX_KEY = "pred:index";
-const recKey = (boutId: string) => `pred:${boutId}`;
+const recKey = (id: string) => `pred:${id}`;
+// Stored prediction id is namespaced by event slug so positional bout ids (b1..)
+// can't collide across the rolling schedule (a new "event 0" must never overwrite
+// a past card's picks). The Prediction record keeps the plain boutId for display.
+const predId = (eventSlug: string, boutId: string) => `${eventSlug}::${boutId}`;
 
 export const trackingEnabled = authEnabled;
 
@@ -128,7 +132,7 @@ export async function logUpcoming(nowMs: number): Promise<{ logged: number; alre
       // Re-log only when the pick is missing OR was made by an OLDER model
       // version (still pre-fight, so it's honest) — that keeps the public picks
       // in sync with the live engine. A current-version pick is immutable.
-      const raw = await redis<string | null>(["GET", recKey(m.id)]);
+      const raw = await redis<string | null>(["GET", recKey(predId(e.slug, m.id))]);
       if (raw) {
         try { if ((JSON.parse(raw) as Prediction).modelVersion === MODEL_VERSION) { alreadyLogged++; continue; } } catch { /* corrupt → re-log */ }
         relogged.add(e.slug);
@@ -146,8 +150,8 @@ export async function logUpcoming(nowMs: number): Promise<{ logged: number; alre
         modelVersion: MODEL_VERSION,
         loggedAt: new Date(nowMs).toISOString(),
       };
-      await redis(["SET", recKey(m.id), JSON.stringify(pred)]); // overwrite to current model
-      await redis(["SADD", INDEX_KEY, m.id]); logged++;
+      await redis(["SET", recKey(predId(e.slug, m.id)), JSON.stringify(pred)]); // overwrite to current model
+      await redis(["SADD", INDEX_KEY, predId(e.slug, m.id)]); logged++;
     }
   }
   // Re-logged cards must re-anchor their NEW picks in Bitcoin (drop the stale
@@ -163,7 +167,7 @@ export async function logUpcoming(nowMs: number): Promise<{ logged: number; alre
     let allLogged = true;
     for (const m of e.matchups) {
       if (!getFighterById(m.fighterA) || !getFighterById(m.fighterB)) continue; // skip unscorable
-      const raw = await redis<string | null>(["GET", recKey(m.id)]);
+      const raw = await redis<string | null>(["GET", recKey(predId(e.slug, m.id))]);
       if (!raw) { allLogged = false; break; }
       const p = JSON.parse(raw) as Prediction;
       picks.push({ boutId: m.id, side: p.predWinnerSide, probA: p.predProbA, method: p.predMethod });

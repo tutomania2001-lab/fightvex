@@ -49,3 +49,6 @@ MODEL_INTERNAL.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# transient KV migration snapshot
+backtest/_pred-backup.json

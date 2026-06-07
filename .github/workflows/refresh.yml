@@ -2,9 +2,9 @@ name: Auto-refresh & deploy
 
 # Keeps fightvex.com fresh without manual work: every 30 min a lightweight gate
 # checks whether an event just finished (or it's the daily heartbeat). Only then
-# does it pull fresh ESPN data + stats + assets and ship a production deploy.
-# A skipped tick costs a few seconds; a real refresh lands within ~30 min of a
-# card ending.
+# does it pull fresh ESPN data + stats + assets and ship a production deploy
+# (built remotely on Vercel). A skipped tick costs a few seconds; a real refresh
+# lands within ~30 min of a card ending.
 
 on:
   schedule:
@@ -29,15 +29,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      # The refresh scripts use only Node/Python built-ins (+ Pillow), so no
+      # `npm ci` is needed here — the app's own deps are installed by Vercel
+      # during the remote build.
+      - name: Install tooling
         run: |
-          npm ci
           python -m pip install --upgrade pip
           pip install Pillow
           npm i -g vercel@latest
@@ -67,16 +68,9 @@ jobs:
         run: python scripts/fetch_bodies.py
         continue-on-error: true
 
-      - name: Pull Vercel production env
-        if: steps.gate.outputs.proceed == 'true'
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-
-      - name: Build
-        if: steps.gate.outputs.proceed == 'true'
-        run: vercel build --prod --token="$VERCEL_TOKEN"
-
+      # Upload source (including the freshly-fetched data + assets) and let
+      # Vercel build remotely. Simpler and far more robust in CI than uploading
+      # a large prebuilt .next output, which was aborting mid-upload.
       - name: Deploy to production
         if: steps.gate.outputs.proceed == 'true'
-        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
-
-# (re-detect nudge)
+        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"

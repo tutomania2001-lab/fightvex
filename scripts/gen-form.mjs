@@ -23,16 +23,25 @@ const fightMinutes = (b) => b.finished ? (b.endRound - 1) * 5 + 2.5 : b.maxRound
 const byF = new Map();
 for (const b of bouts) for (const s of b.sides) { if (!byF.has(s.id)) byF.set(s.id, []); byF.get(s.id).push(b); }
 
+// Career win% per fighter (over ALL of history, incl. non-roster opponents), for
+// strength-of-schedule. SOS = how good a fighter's recent OPPONENTS were.
+const WP = new Map();
+for (const b of bouts) for (const s of b.sides) { const e = WP.get(s.id) || { w: 0, n: 0 }; e.n++; if (s.winner) e.w++; WP.set(s.id, e); }
+const winpct = (id) => { const e = WP.get(id); return e && e.n ? e.w / e.n : 0.5; };
+
 const FORM = {};
 const LAST = {}; // id -> ISO date (YYYY-MM-DD) of most recent real bout, for real layoff
+const SOS = {}; // id -> strength-of-schedule (decay-weighted avg opponent win%)
 for (const [id, list] of byF) {
   if (!ROSTER.has(id)) continue; // roster-only (production-predictable fighters)
   list.sort((a, b) => new Date(a.date) - new Date(b.date));
   const res = [];
-  for (let i = list.length - 1; i >= 0; i--) { const b = list[i], me = b.sides.find((s) => s.id === id); if (!me) continue; res.push({ won: me.winner, lost: !me.winner && b.sides.some((s) => s.winner), finished: b.finished, mins: fightMinutes(b), t: new Date(b.date).getTime() }); }
+  for (let i = list.length - 1; i >= 0; i--) { const b = list[i], me = b.sides.find((s) => s.id === id); if (!me) continue; res.push({ won: me.winner, lost: !me.winner && b.sides.some((s) => s.winner), finished: b.finished, mins: fightMinutes(b), t: new Date(b.date).getTime(), opp: (b.sides.find((s) => s.id !== id) || {}).id }); }
   // Capture the most recent bout date (res is newest-first) for real layoff —
   // even for 1-fight fighters, who are skipped from the form features below.
   if (res.length) LAST[id] = new Date(res[0].t).toISOString().slice(0, 10);
+  // Strength-of-schedule: decay-weighted avg win% of recent opponents (real).
+  { let ss = 0, sw = 0; res.forEach((r, i) => { if (r.opp) { const wt = 0.85 ** i; ss += wt * winpct(r.opp); sw += wt; } }); if (sw) SOS[id] = +(ss / sw).toFixed(3); }
   if (res.length < 2) continue; // need a couple of fights for meaningful form
   const decay = 0.8; let ws = 0, w = 0; res.forEach((r, i) => { const wt = decay ** i; ws += wt * (r.won ? 1 : 0); w += wt; });
   const recForm = w ? ws / w : 0.5;
@@ -55,5 +64,9 @@ export function formFor(id: string): FormFeat { return FORM[id] || FORM_DEFAULT;
 // runtime (months since this date), replacing the old random placeholder.
 export const LAST_FIGHT: Record<string, string> = ${JSON.stringify(LAST)};
 export function lastFightFor(id: string): string | undefined { return LAST_FIGHT[id]; }
+// id -> strength-of-schedule: decay-weighted average win% of recent opponents
+// (real, from fight history). ~0.5 = average competition; higher = tougher.
+export const SOS: Record<string, number> = ${JSON.stringify(SOS)};
+export function sosFor(id: string): number { return SOS[id] ?? 0.5; }
 `);
-console.log(`wrote form for ${Object.keys(FORM).length} fighters (${Object.keys(LAST).length} with last-fight dates) → src/lib/data/form.generated.ts`);
+console.log(`wrote form for ${Object.keys(FORM).length} fighters (${Object.keys(LAST).length} last-fight, ${Object.keys(SOS).length} SOS) → src/lib/data/form.generated.ts`);

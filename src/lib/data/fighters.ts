@@ -15,7 +15,7 @@ import { REAL_FIGHTERS, type RawFighter } from "./espn.generated";
 import { DIVISION_RANKINGS, P4P_RANKINGS, ROSTER_ADDITIONS } from "./rankings.override";
 import { REAL_AGG, type RealAgg } from "./stats.generated";
 import { portraitFor } from "./portraits";
-import { lastFightFor } from "./form.generated";
+import { lastFightFor, sosFor } from "./form.generated";
 
 // ---- deterministic seeded RNG (stable per fighter) ----
 function seedFrom(s: string): number {
@@ -253,7 +253,15 @@ function enrich(f: RawFighter): Fighter {
   const layoffMonths = lastFight
     ? clamp(Math.round((Date.now() - new Date(lastFight).getTime()) / 2.628e9), 0, 60)
     : 3;
-  const oppQuality = Math.round(clamp(58 + (f.ranking != null ? (15 - Math.min(15, f.ranking)) * 2 : 0) + (f.champion ? 18 : 0) + (total > 18 ? 6 : 0), 55, 92));
+  // Competition (oppQuality): rank/champ/experience guess REFINED by real
+  // strength-of-schedule (avg win% of recent opponents). Centered on the roster
+  // mean SOS (~0.60) so it's an unbiased ±adjustment that only separates tougher
+  // from softer schedules — it doesn't shift the overall distribution. Real data
+  // replacing part of a heuristic; note Competition is structurally untestable in
+  // the leakage-free backtest (historical rankings can't be reconstructed), so
+  // this is an honesty/quality refinement, not a backtest-tuned weight.
+  const sosAdj = (sosFor(f.id) - 0.6) * 30;
+  const oppQuality = Math.round(clamp(58 + (f.ranking != null ? (15 - Math.min(15, f.ranking)) * 2 : 0) + (f.champion ? 18 : 0) + (total > 18 ? 6 : 0) + sosAdj, 55, 92));
 
   return {
     id: f.id,

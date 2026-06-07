@@ -43,7 +43,10 @@ export function eventHero(event: Pick<FightEvent, "slug" | "venue" | "city">): s
 // the heads near the top, so they need a higher focal point or the wide/short
 // banner crop slices the faces off. Default keeps the scenery framing.
 const EVENT_FOCUS: Record<string, string> = {
-  "ufc-329-mcgregor-vs-holloway-2": "center 22%",
+  // Faces/eyes sit ~18% down the image; on the short compact event-row strip the
+  // crop must focus high to center the banner on eye level. (Lower % = more
+  // headroom/heads; higher % = lower toward chest.)
+  "ufc-329-mcgregor-vs-holloway-2": "center 13%",
 };
 
 export function eventFocus(event: Pick<FightEvent, "slug">): string {

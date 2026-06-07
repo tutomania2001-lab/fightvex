@@ -68,6 +68,23 @@ jobs:
         run: python scripts/fetch_bodies.py
         continue-on-error: true
 
+      # Refresh real fight history (incremental — resumes from the committed
+      # backtest/cache, so only NEW bouts are fetched) then regenerate per-fighter
+      # form features: real LAYOFF (months since last bout) and STRENGTH-OF-SCHEDULE.
+      # Best-effort: if the crawl is throttled, keep the existing history.json and
+      # still ship. Runs right after a card ends, so a fighter's just-completed
+      # bout updates their layoff/SOS promptly.
+      - name: Refresh fight history (layoff/SOS)
+        if: steps.gate.outputs.proceed == 'true'
+        run: node scripts/fetch-history.mjs
+        continue-on-error: true
+        timeout-minutes: 15
+
+      - name: Regenerate form features (layoff/SOS/recent form)
+        if: steps.gate.outputs.proceed == 'true'
+        run: node scripts/gen-form.mjs
+        continue-on-error: true
+
       # Upload source (including the freshly-fetched data + assets) and let
       # Vercel build remotely. --archive=tgz bundles the upload into a single
       # tarball instead of thousands of individual files — this project has 300+

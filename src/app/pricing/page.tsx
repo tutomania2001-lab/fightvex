@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
 };
 
-const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlight: boolean; cta: string; features: string[] }[] = [
+type Feature = { label: string; desc?: string };
+const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlight: boolean; cta: string; tagline: string; features: Feature[] }[] = [
   {
     name: "Free",
     plan: "free",
@@ -17,7 +18,14 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     cadence: "forever",
     highlight: false,
     cta: "Create free account",
-    features: ["Fighter profiles (core stats)", "Upcoming fight cards", "Basic odds display", "Preview simulation", "Research feed (delayed)"],
+    tagline: "Browse fighters, cards and odds, and try the simulator.",
+    features: [
+      { label: "Fighter profiles", desc: "Core stats, record and ranking for every fighter." },
+      { label: "Upcoming fight cards", desc: "Full UFC cards with dates, weight classes and the Vex AI pick." },
+      { label: "Real odds", desc: "Live moneyline for every bout on the card." },
+      { label: "Simulator preview", desc: "Watch one sample matchup simulate — the controls are locked." },
+      { label: "Research feed", desc: "Aggregated UFC news, on a short delay." },
+    ],
   },
   {
     name: "Pro",
@@ -26,7 +34,16 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     cadence: "/month",
     highlight: true,
     cta: "Get Pro",
-    features: ["Everything in Free", "Full 40+ metric profiles", "Unlimited simulations", "Line-movement tracker", "EV & implied-prob tools", "Watchlists & alerts", "Real-time research feed"],
+    tagline: "Run the model yourself and find value in the odds.",
+    features: [
+      { label: "Everything in Free" },
+      { label: "Full fighter profiles", desc: "All 40+ metrics per fighter, not just the core stats." },
+      { label: "Unlimited simulations", desc: "Run any matchup, change rounds or short-notice, and re-run freely." },
+      { label: "Line-movement tracker", desc: "See how each fight's odds shifted from open to now." },
+      { label: "EV & no-vig calculators", desc: "Turn any odds into a true win % and expected value." },
+      { label: "Watchlist + email alerts", desc: "Follow fighters and get emailed when they're booked on a card." },
+      { label: "Real-time research feed", desc: "The full news feed, no delay." },
+    ],
   },
   {
     name: "Elite",
@@ -35,7 +52,16 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     cadence: "/month",
     highlight: false,
     cta: "Go Elite",
-    features: ["Everything in Pro", "5,000-run Monte Carlo", "Closing line value tracker", "Market-overreaction detector", "AI bet-slip review", "Priority research + API-lite", "Bankroll management suite"],
+    tagline: "Deeper sims and tools to track and size your bets.",
+    features: [
+      { label: "Everything in Pro" },
+      { label: "5,000-run simulations", desc: "Deeper Monte-Carlo for tighter, steadier probabilities." },
+      { label: "Closing-line-value tracker", desc: "Log your bets and measure each against the closing line." },
+      { label: "Market-overreaction flags", desc: "Bouts where the line moved more than the matchup warrants." },
+      { label: "AI bet-slip review", desc: "The model's read on each leg of a slip and its combined edge." },
+      { label: "Bankroll tools", desc: "Kelly unit-sizing, staking plans and profit/loss tracking." },
+      { label: "Priority + API access", desc: "Earliest research and a lightweight data API." },
+    ],
   },
 ];
 
@@ -69,13 +95,18 @@ export default function PricingPage() {
               <span className="font-display text-5xl font-bold text-fg">{t.price}</span>
               <span className="text-sm text-muted">{t.cadence}</span>
             </div>
-            <div className="mt-6">
+            <p className="mt-3 min-h-[2.5rem] text-sm text-muted">{t.tagline}</p>
+            <div className="mt-5">
               <PlanButton plan={t.plan} label={t.cta} highlight={t.highlight} />
             </div>
-            <ul className="mt-6 space-y-2.5">
+            <ul className="mt-6 space-y-3">
               {t.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-muted">
-                  <span className="mt-0.5 text-edge">✓</span> {f}
+                <li key={f.label} className="flex items-start gap-2 text-sm leading-snug">
+                  <span className="mt-0.5 shrink-0 text-edge">✓</span>
+                  <span>
+                    <span className="font-semibold text-fg">{f.label}</span>
+                    {f.desc && <span className="text-muted"> — {f.desc}</span>}
+                  </span>
                 </li>
               ))}
             </ul>

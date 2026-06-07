@@ -7,6 +7,7 @@ import { Footer } from "@/components/site/Footer";
 import { AgeGate } from "@/components/site/AgeGate";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { FlareBackdrop } from "@/components/site/FlareBackdrop";
+import { PostHogProvider } from "@/components/site/PostHogProvider";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -124,12 +125,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_LD) }} />
         <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
         <FlareBackdrop />
-        <AuthProvider>
-          <AgeGate />
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <PostHogProvider>
+          <AuthProvider>
+            <AgeGate />
+            <Navbar />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

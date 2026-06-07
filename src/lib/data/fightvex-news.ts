@@ -7,6 +7,30 @@ export interface FxNews { date: string; tag: NewsTag; title: string; body: strin
 export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-07",
+    tag: "Transparency",
+    title: "We caught a bug hiding past picks — and restored the full record",
+    body:
+      "Straight talk: as the schedule rolled forward, a card-indexing flaw let an upcoming card's picks overwrite a finished card's in storage, so the Past Picks tab was showing an incomplete record. We fixed the root cause — picks are now stored per-event, so it can't recur — and rebuilt the affected UFC Fight Night: Muhammad vs. Bonfim main-card picks straight from their pre-fight Bitcoin commitment (the immutable proof of exactly what we locked in before the fights), then re-graded them against the real results. The full card is back (10/12 winners), and nothing was back-dated or invented — the commitment is the receipt, and you can still re-hash it yourself. We'd rather tell you about a bug and how we killed it than quietly paper over it.",
+    href: "/accuracy",
+  },
+  {
+    date: "2026-06-07",
+    tag: "Feature",
+    title: "Watchlist alerts are live (Pro)",
+    body:
+      "Follow a fighter and we'll email you when they're booked on an upcoming card — sent from alerts@fightvex.com with the Vex AI read a click away, so you never miss a matchup you care about. Build your watchlist from any fighter page; alerts are a Pro perk.",
+    href: "/pricing",
+  },
+  {
+    date: "2026-06-07",
+    tag: "Transparency",
+    title: "The model now self-corrects against its own public record",
+    body:
+      "We added a calibration layer that tunes Vex AI's confidence using our Bitcoin-verified live results — and, true to form, it does nothing until we have enough graded fights to be meaningful (a no-op today, by design, so we never fit to noise). It's monotonic, so it only sharpens the confidence number, never changes which fighter we favor. As the public record grows, the model gets honestly sharper on its own — earned in the open, card by card.",
+    href: "/accuracy",
+  },
+  {
+    date: "2026-06-07",
     tag: "Feature",
     title: "Accounts are live — watchlists, saved picks and billing",
     body:

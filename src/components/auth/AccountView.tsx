@@ -400,7 +400,7 @@ function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded:
         {error && <p className="mt-2 text-sm text-steel">{error}</p>}
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         {TIERS.map((t) => {
           const current = t.plan === plan;
           const owned = PLAN_RANK[plan] >= PLAN_RANK[t.plan];

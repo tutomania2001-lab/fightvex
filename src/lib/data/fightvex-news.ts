@@ -42,7 +42,7 @@ export const FIGHTVEX_NEWS: FxNews[] = [
     tag: "Feature",
     title: "Accounts are live — watchlists, saved picks and billing",
     body:
-      "You can now create a free FightVex account: save simulations to revisit, build a fighter watchlist, keep your own running prediction record, and manage your plan. Security is built in from the ground up — accounts run on a Postgres database with row-level security, so your data is isolated to you, and sign-in is handled by a managed auth provider (no home-rolled password storage). Free to join; Pro and Elite unlock the advanced tools.",
+      "You can now create a free FightVex account: save simulations to revisit, build a fighter watchlist, keep your own running prediction record, and manage your plan. Security is built in from the ground up — accounts run on a Postgres database with row-level security, so your data is isolated to you, and sign-in is handled by a managed auth provider (no home-rolled password storage). Free to join; Pro unlocks the advanced tools.",
     href: "/login",
   },
   {
@@ -95,7 +95,7 @@ export const FIGHTVEX_NEWS: FxNews[] = [
     tag: "Transparency",
     title: "We tested four ways to make the model smarter — and told you the truth",
     body:
-      "We ran leakage-free backtests on style-matchup features, behavioral mining, an opponent-adjusted Elo rating engine, and round-by-round striking detail (after crawling all 8,693 UFC fights on record). None beat the current model — the honest box-score ceiling sits around 62%. Rather than ship a cosmetic “upgrade,” we kept the validated model and put the new data where it genuinely belongs: as insight. We don't dress up noise as progress.",
+      "We ran leakage-free backtests on style-matchup features, behavioral mining, an opponent-adjusted Elo rating engine, and round-by-round striking detail (after crawling 8,693 UFCStats fights with striking detail). None beat the current model — the honest box-score ceiling sits around 62%. Rather than ship a cosmetic “upgrade,” we kept the validated model and put the new data where it genuinely belongs: as insight. We don't dress up noise as progress.",
   },
   {
     date: "2026-06-06",

@@ -146,3 +146,23 @@ The backtest sits at ~61–62% accuracy, well-calibrated (ECE ~2%). Per prior te
 - Home hero now shows **Topuria vs Gaethje** (split the supplied transparent asset into `public/ui/event-topuria.png` / `event-gaethje.png`; swapped `EVENT_LAYERS` in [HeroFightAnimation.tsx](src/components/site/HeroFightAnimation.tsx#L265)).
 - Hovering hero stats now derive from the real Topuria/Gaethje featured matchup (automatic once `nextEvent()` rolled by date).
 - Fixed the **Edge Desk** showing a completed card: [betting/page.tsx](src/app/betting/page.tsx) now uses `upcomingEvents()` (date-based rolling) instead of `allEvents()`.
+- **Auto-refresh CI**: [.github/workflows/refresh.yml](.github/workflows/refresh.yml) + [scripts/should-refresh.mjs](scripts/should-refresh.mjs) — every 30 min, refresh ESPN data/stats/assets and deploy to prod only when a card just finished (start +3–9h) or the daily 12:00 UTC heartbeat. Solves "the site didn't roll to the next event on its own." (Needs: GitHub repo + `VERCEL_TOKEN` secret.)
+
+---
+
+## Stack & infrastructure decisions (2026-06-07)
+
+Adopting a managed-SaaS stack. Key rulings:
+
+- **Forget Azure.** These are independent SaaS, each on its own cloud — they are *not* hosted "in Azure." Self-hosting all of this in Azure would be a heavier, different architecture with no benefit at this scale.
+- **One auth system, not three.** Current custom auth (scrypt + opaque sessions on Upstash) works. Do **not** run it alongside Clerk *and* Supabase Auth. Decision pending: (A) Clerk now, (B) Supabase + Supabase Auth, or (C) keep custom auth for now and migrate later. The additive services below don't depend on this.
+- **Supabase vs Upstash = distinct roles.** If/when Supabase (Postgres) is adopted: durable/relational/queryable data (bet history, bankroll, CLV). Upstash (Redis): cache, rate-limit, sessions, ephemeral KV. Never duplicate data across both.
+- **Drop Pinecone for now.** No embedding/RAG feature exists. If AI search/chat is built later, start with **pgvector in Supabase**; Pinecone only at real scale.
+- **Solid as-is:** Vercel (host) + Namecheap (registrar) + Cloudflare (DNS, grey-cloud/DNS-only to Vercel) + GitHub (VCS) + Stripe (payments) + Upstash (Redis).
+
+**Adoption tiers**
+- **Now (additive, low-risk, high-value — independent of the auth decision):** Stripe **live keys** (B1), **PostHog** analytics (B2), **Sentry** error tracking (C2-adjacent), **Resend** email for watchlist/line-move alerts (B3), GitHub + auto-refresh CI.
+- **Deliberate, when needed:** Supabase (Postgres) once bet/bankroll data needs SQL — and pick **its** auth, or Clerk if Supabase is skipped.
+- **Cut:** Pinecone, Azure.
+
+Each service is gated on the owner creating the account + providing keys (env vars in Vercel; secrets in GitHub for CI).

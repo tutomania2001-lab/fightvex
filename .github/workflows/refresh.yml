@@ -85,6 +85,19 @@ jobs:
         run: node scripts/gen-form.mjs
         continue-on-error: true
 
+      # Recalibrate from the live graded record (needs KV creds → vercel pull).
+      # Writes identity until ≥20 graded picks, then a sample-size-shrunk Platt fit,
+      # so the model self-corrects against its own public record as it grows.
+      - name: Pull production env (KV for calibration)
+        if: steps.gate.outputs.proceed == 'true'
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        continue-on-error: true
+
+      - name: Recalibrate from live record
+        if: steps.gate.outputs.proceed == 'true'
+        run: node scripts/gen-calibration.mjs
+        continue-on-error: true
+
       # Upload source (including the freshly-fetched data + assets) and let
       # Vercel build remotely. --archive=tgz bundles the upload into a single
       # tarball instead of thousands of individual files — this project has 300+

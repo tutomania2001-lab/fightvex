@@ -18,6 +18,7 @@
 // ============================================================
 import type { Fighter } from "./types";
 import { gbmProbA } from "./gbm";
+import { applyCalibration } from "./calibration";
 
 export interface SimParams {
   rounds: 3 | 5;
@@ -392,7 +393,10 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   // both accuracy (~62%→64%) and log-loss (bootstrap-significant). The
   // transparent model still drives the radar / method / round / explanations.
   const gbmP = gbmProbA(a, b, subA, subB, mcProbA, rA, rB);
-  const finalProbA = clamp(0.5 * transparentProbA + 0.5 * gbmP, 0.07, 0.93);
+  // Live-record calibration: a monotonic Platt correction fit on our own graded
+  // picks (sample-size shrunk → identity until the record is large enough). It
+  // only nudges confidence, never the favored side. Default fit is a no-op.
+  const finalProbA = clamp(applyCalibration(0.5 * transparentProbA + 0.5 * gbmP), 0.07, 0.93);
 
   // CI from a logistic spread around the gap (transparent, monotone in the gap).
   const sigma = 9 + (1 - completeness) * 8 + (variance === "HIGH" ? 6 : variance === "MEDIUM" ? 3 : 0);

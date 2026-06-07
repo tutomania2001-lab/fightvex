@@ -24,11 +24,15 @@ const byF = new Map();
 for (const b of bouts) for (const s of b.sides) { if (!byF.has(s.id)) byF.set(s.id, []); byF.get(s.id).push(b); }
 
 const FORM = {};
+const LAST = {}; // id -> ISO date (YYYY-MM-DD) of most recent real bout, for real layoff
 for (const [id, list] of byF) {
   if (!ROSTER.has(id)) continue; // roster-only (production-predictable fighters)
   list.sort((a, b) => new Date(a.date) - new Date(b.date));
   const res = [];
   for (let i = list.length - 1; i >= 0; i--) { const b = list[i], me = b.sides.find((s) => s.id === id); if (!me) continue; res.push({ won: me.winner, lost: !me.winner && b.sides.some((s) => s.winner), finished: b.finished, mins: fightMinutes(b), t: new Date(b.date).getTime() }); }
+  // Capture the most recent bout date (res is newest-first) for real layoff —
+  // even for 1-fight fighters, who are skipped from the form features below.
+  if (res.length) LAST[id] = new Date(res[0].t).toISOString().slice(0, 10);
   if (res.length < 2) continue; // need a couple of fights for meaningful form
   const decay = 0.8; let ws = 0, w = 0; res.forEach((r, i) => { const wt = decay ** i; ws += wt * (r.won ? 1 : 0); w += wt; });
   const recForm = w ? ws / w : 0.5;
@@ -47,5 +51,9 @@ export interface FormFeat { recForm: number; streak: number; activity: number; r
 export const FORM_DEFAULT: FormFeat = { recForm: 0.5, streak: 0, activity: 1, recFinish: 0.5, avgDur: 12.5 };
 export const FORM: Record<string, FormFeat> = ${JSON.stringify(FORM)};
 export function formFor(id: string): FormFeat { return FORM[id] || FORM_DEFAULT; }
+// id -> ISO date of most recent real bout. Used to derive REAL layoff months at
+// runtime (months since this date), replacing the old random placeholder.
+export const LAST_FIGHT: Record<string, string> = ${JSON.stringify(LAST)};
+export function lastFightFor(id: string): string | undefined { return LAST_FIGHT[id]; }
 `);
-console.log(`wrote form for ${Object.keys(FORM).length} fighters → src/lib/data/form.generated.ts`);
+console.log(`wrote form for ${Object.keys(FORM).length} fighters (${Object.keys(LAST).length} with last-fight dates) → src/lib/data/form.generated.ts`);

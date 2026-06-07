@@ -15,6 +15,7 @@ import { REAL_FIGHTERS, type RawFighter } from "./espn.generated";
 import { DIVISION_RANKINGS, P4P_RANKINGS, ROSTER_ADDITIONS } from "./rankings.override";
 import { REAL_AGG, type RealAgg } from "./stats.generated";
 import { portraitFor } from "./portraits";
+import { lastFightFor } from "./form.generated";
 
 // ---- deterministic seeded RNG (stable per fighter) ----
 function seedFrom(s: string): number {
@@ -243,7 +244,15 @@ function enrich(f: RawFighter): Fighter {
       ? `${f.name} is a grappling-first fighter (${f.record.sub} submission wins) who chains level changes into control time and submission threats, and is most beatable when kept standing.`
       : `${f.name} is a well-rounded fighter who blends striking and grappling without a single dominant mode — a high-floor profile that wins rounds across phases.`;
 
-  const layoffMonths = clamp(2 + Math.floor(makeRng(seedFrom(f.id + "L"))() * 12), 2, 16);
+  // REAL layoff: months since the fighter's most recent bout (from history.json
+  // via form.generated). Replaces a seeded-random placeholder that was feeding a
+  // real rating penalty as noise. The layoff penalty only bites past ~9 months,
+  // so a missing date defaults to a neutral "recently active" value (3) rather
+  // than risking a phantom penalty.
+  const lastFight = lastFightFor(f.id);
+  const layoffMonths = lastFight
+    ? clamp(Math.round((Date.now() - new Date(lastFight).getTime()) / 2.628e9), 0, 60)
+    : 3;
   const oppQuality = Math.round(clamp(58 + (f.ranking != null ? (15 - Math.min(15, f.ranking)) * 2 : 0) + (f.champion ? 18 : 0) + (total > 18 ? 6 : 0), 55, 92));
 
   return {

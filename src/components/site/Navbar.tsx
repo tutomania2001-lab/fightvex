@@ -11,20 +11,20 @@ import { useAuth } from "@/components/auth/AuthProvider";
 // Plan mark in the nav corner: red fist for Elite, blue fist for Pro
 // (public/plan-elite.png / public/plan-pro.png). Falls back to a coloured
 // text badge if the image is missing, so it never shows a broken icon.
-function PlanMark({ plan }: { plan: "pro" | "elite" }) {
+function PlanMark() {
   const [ok, setOk] = useState(true);
   if (!ok)
     return (
-      <span className={classnames("rounded-md border px-3 py-2 text-sm font-semibold uppercase tracking-wide", plan === "elite" ? "border-blood text-blood" : "border-blue text-blue")}>
-        {plan === "elite" ? "Elite" : "Pro"}
+      <span className="rounded-md border border-blue px-3 py-2 text-sm font-semibold uppercase tracking-wide text-blue">
+        Full Access
       </span>
     );
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={plan === "elite" ? "/plan-elite.png" : "/plan-pro.png"}
-      alt={`${plan === "elite" ? "Elite" : "Pro"} plan`}
-      title={`${plan === "elite" ? "Elite" : "Pro"} plan`}
+      src="/plan-pro.png"
+      alt="Full Access plan"
+      title="Full Access plan"
       width={34}
       height={34}
       className="h-[34px] w-[34px] object-contain"
@@ -74,10 +74,10 @@ export function Navbar() {
             <>
               <Link href="/account" className="text-sm font-medium text-muted hover:text-fg">{user.name.split(" ")[0] || "Account"}</Link>
               {user.plan !== "free" ? (
-                <PlanMark plan={user.plan === "elite" ? "elite" : "pro"} />
+                <PlanMark />
               ) : (
                 <Link href="/pricing" className="btn-flare rounded-md px-4 py-2 text-sm font-semibold uppercase tracking-wide">
-                  Get Pro
+                  Get Full Access
                 </Link>
               )}
             </>
@@ -85,11 +85,11 @@ export function Navbar() {
             <>
               <Link href="/login" className="text-sm font-medium text-muted hover:text-fg">Log in</Link>
               <Link href="/pricing" className="btn-flare rounded-md px-4 py-2 text-sm font-semibold uppercase tracking-wide">
-                Get Pro
+                Get Full Access
               </Link>
             </>
           )}
-          {/* Theme toggle sits to the right of the Get Pro / account actions. */}
+          {/* Theme toggle sits to the right of the Get Full Access / account actions. */}
           <ThemeToggle />
         </div>
         <div className="flex items-center gap-2 lg:hidden">
@@ -123,12 +123,12 @@ export function Navbar() {
             {user ? (
               <>
                 <Link href="/account" onClick={() => setOpen(false)} className="flex-1 rounded-md border border-line py-2 text-center text-sm">Account</Link>
-                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">{user.plan !== "free" ? (user.plan === "elite" ? "Elite" : "Pro") : "Get Pro"}</Link>
+                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">{user.plan !== "free" ? "Full Access" : "Get Full Access"}</Link>
               </>
             ) : (
               <>
                 <Link href="/login" onClick={() => setOpen(false)} className="flex-1 rounded-md border border-line py-2 text-center text-sm">Log in</Link>
-                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">Get Pro</Link>
+                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">Get Full Access</Link>
               </>
             )}
           </div>

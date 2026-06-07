@@ -71,9 +71,9 @@ export default function DashboardPage() {
             <RelatedNews limit={4} />
           </Panel>
           <Panel className="reveal p-5">
-            <h2 className="mb-2 font-display text-lg font-bold uppercase">Upgrade to Elite</h2>
-            <p className="text-sm text-muted">Closing-line-value tool, bankroll calculator, and more Elite betting tools.</p>
-            <Link href="/pricing" className="btn-flare mt-3 inline-block rounded-md px-4 py-2 text-xs font-bold uppercase">See Elite →</Link>
+            <h2 className="mb-2 font-display text-lg font-bold uppercase">Go Full Access</h2>
+            <p className="text-sm text-muted">One plan unlocks everything — unlimited simulations, all betting tools and watchlist alerts. £10/mo.</p>
+            <Link href="/pricing" className="btn-flare mt-3 inline-block rounded-md px-4 py-2 text-xs font-bold uppercase">See Full Access →</Link>
           </Panel>
         </aside>
       </div>

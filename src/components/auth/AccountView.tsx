@@ -329,9 +329,8 @@ function ToolsSection({ plan }: { plan: Plan }) {
 
 // ---------------------------------------------------------------------------
 const TIERS: { plan: Plan; price: string; cadence: string; blurb: string }[] = [
-  { plan: "free", price: "£0", cadence: "forever", blurb: "Core profiles, fight cards and limited simulations." },
-  { plan: "pro", price: "£10", cadence: "/mo", blurb: "Unlimited sims, full metrics, line movement and EV tools." },
-  { plan: "elite", price: "£20", cadence: "/mo", blurb: "Closing-line-value tool, bankroll calculator and Elite betting tools." },
+  { plan: "free", price: "£0", cadence: "forever", blurb: "Browse fighters, cards, real odds and a simulator preview." },
+  { plan: "pro", price: "£10", cadence: "/mo", blurb: "Everything unlocked — unlimited sims, full profiles, all betting tools and watchlist alerts." },
 ];
 
 function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded: boolean }) {
@@ -390,7 +389,7 @@ function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded:
         </div>
         <p className="mt-3 text-sm text-muted">
           {plan === "free"
-            ? "You're on the free plan. Upgrade to unlock Pro and Elite tools."
+            ? "You're on the free plan. Upgrade to unlock Full Access tools."
             : `Thanks for subscribing to ${PLAN_LABEL[plan]}.`}
         </p>
         {plan !== "free" && (

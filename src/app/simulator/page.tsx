@@ -26,7 +26,7 @@ const SIM_LD = {
 const FAQ: { q: string; a: string }[] = [
   {
     q: "Is the FightVex UFC fight simulator free?",
-    a: "There's a free live preview simulation so you can see exactly how Vex AI works. Running your own custom matchups, with any two fighters, your parameters and unlimited runs, is part of a Pro plan, which also unlocks the advanced betting tools.",
+    a: "There's a free live preview simulation so you can see exactly how Vex AI works. Running your own custom matchups, with any two fighters, your parameters and unlimited runs, is part of a Full Access plan, which also unlocks the advanced betting tools.",
   },
   {
     q: "How does the AI predict who will win a fight?",

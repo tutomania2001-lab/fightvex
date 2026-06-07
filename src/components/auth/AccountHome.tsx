@@ -286,7 +286,7 @@ export function AccountHome({
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-faint">Free plan</p>
           <h3 className="mt-1.5 font-display text-xl font-bold uppercase">Unlock the full arsenal</h3>
           <p className="mt-2 max-w-lg text-sm text-muted">
-            You&apos;re on the preview. Pro unlocks unlimited custom simulations, full fighter metrics, the line-movement tracker, EV tools and watchlist alerts.
+            You&apos;re on the preview. Full Access unlocks unlimited custom simulations, full fighter metrics, the line-movement tracker, EV tools and watchlist alerts.
           </p>
           <button onClick={() => go("subscription")} className={`mt-4 ${primaryBtn}`}>
             See plans <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>

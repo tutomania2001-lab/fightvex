@@ -4,8 +4,8 @@ import { PlanButton } from "@/components/billing/PlanButton";
 import type { Plan } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free, Pro & Elite UFC Betting Tools",
-  description: "FightVex plans: a free tier plus Pro and Elite upgrades for AI UFC fight intelligence, unlimited simulations and advanced betting tools. Cancel anytime. 21+.",
+  title: "Pricing — Free & Full Access",
+  description: "FightVex Full Access: one plan unlocks everything — unlimited AI fight simulations, betting tools and watchlist alerts. Free tier to browse. Cancel anytime. 21+.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -28,36 +28,22 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     ],
   },
   {
-    name: "Pro",
+    name: "Full Access",
     plan: "pro",
     price: "£10",
     cadence: "/month",
     highlight: true,
-    cta: "Get Pro",
-    tagline: "Run the model yourself and find value in the odds.",
+    cta: "Get Full Access",
+    tagline: "One plan. Everything unlocked. Cancel anytime.",
     features: [
       { label: "Everything in Free" },
-      { label: "Full fighter profiles", desc: "Every tracked metric per fighter, not just the core stats." },
       { label: "Unlimited 50,000-run simulations", desc: "Run any matchup at full depth — change rounds or short-notice and re-run freely." },
+      { label: "Full fighter profiles", desc: "Every tracked metric, trajectory and risk flag per fighter." },
       { label: "Line-movement tracker", desc: "See how each fight's odds shifted from open to now." },
       { label: "EV & no-vig calculators", desc: "Turn any odds into a true win % and expected value." },
-      { label: "Watchlist + email alerts", desc: "Follow fighters and get emailed when they're booked on a card." },
-    ],
-  },
-  {
-    name: "Elite",
-    plan: "elite",
-    price: "£20",
-    cadence: "/month",
-    highlight: false,
-    cta: "Go Elite",
-    tagline: "Deeper sims and tools to track and size your bets.",
-    features: [
-      { label: "Everything in Pro" },
       { label: "Closing-line-value tool", desc: "Compare each bout's opening line to the latest market line." },
       { label: "Bankroll calculator", desc: "Fractional-Kelly unit sizing with a sensible stake cap." },
-      { label: "Market-overreaction flags", desc: "Bouts where the line moved more than the matchup warrants. (Coming soon)" },
-      { label: "AI bet-slip review", desc: "The model's read on each leg of a slip and its combined edge. (Coming soon)" },
+      { label: "Watchlist + email alerts", desc: "Follow fighters and get emailed when they're booked on a card." },
       { label: "Priority access", desc: "Earliest access to new tools and research." },
     ],
   },
@@ -67,14 +53,14 @@ export default function PricingPage() {
   return (
     <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6">
       <div className="reveal mb-10 text-center">
-        <h1 className="font-display text-4xl font-bold uppercase sm:text-5xl">Pick your plan</h1>
+        <h1 className="font-display text-4xl font-bold uppercase sm:text-5xl">Simple pricing</h1>
         <p className="mx-auto mt-2 max-w-xl text-muted">
-          Transparent analytics at every tier. We monetize depth and tooling — never
-          guaranteed picks. Cancel anytime.
+          Browse free. One plan unlocks everything — no tiers, no add-ons. We sell tools and
+          analytics, never guaranteed picks. Cancel anytime.
         </p>
       </div>
 
-      <div className="reveal-stagger grid gap-6 lg:grid-cols-3">
+      <div className="reveal-stagger mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
         {TIERS.map((t) => {
           // Plan identity colours: Pro = blue, Elite = red, Free = neutral.
           const accent =

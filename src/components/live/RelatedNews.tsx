@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { SortToggle } from "./SortToggle";
 
 // Real UFC/MMA news. General feed (no athleteId) is aggregated from many trusted
 // outlets via /api/news/ufc (Google News, MMA Fighting, Sherdog, MMA Mania, ESPN);
@@ -38,6 +39,7 @@ export function RelatedNews({ athleteId, limit = 6, feed = false }: { athleteId?
   const [items, setItems] = useState<NewsItem[]>([]);
   const [src, setSrc] = useState<string>("All");
   const [showAll, setShowAll] = useState(false);
+  const [newestFirst, setNewestFirst] = useState(true);
 
   useEffect(() => {
     let alive = true;
@@ -88,13 +90,19 @@ export function RelatedNews({ athleteId, limit = 6, feed = false }: { athleteId?
 
   // ---- Feed mode: filterable, scannable headline rows ----
   if (feed) {
-    const filtered = src === "All" ? items : items.filter((n) => (n.source || "ESPN") === src);
+    const filtered = (src === "All" ? items : items.filter((n) => (n.source || "ESPN") === src))
+      .slice()
+      .sort((a, b) => {
+        const ta = a.published ? new Date(a.published).getTime() : 0;
+        const tb = b.published ? new Date(b.published).getTime() : 0;
+        return (ta - tb) * (newestFirst ? -1 : 1);
+      });
     const shown = showAll ? filtered : filtered.slice(0, INITIAL);
     return (
       <div className="space-y-3">
-        {sources.length > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap gap-2">
-            {["All", ...sources].map((s) => (
+            {sources.length > 1 && ["All", ...sources].map((s) => (
               <button
                 key={s}
                 onClick={() => { setSrc(s); setShowAll(false); }}
@@ -105,7 +113,8 @@ export function RelatedNews({ athleteId, limit = 6, feed = false }: { athleteId?
               </button>
             ))}
           </div>
-        )}
+          <SortToggle newestFirst={newestFirst} onToggle={() => setNewestFirst((v) => !v)} />
+        </div>
         <div className="space-y-2">
           {shown.map((n, i) => {
             const row = (

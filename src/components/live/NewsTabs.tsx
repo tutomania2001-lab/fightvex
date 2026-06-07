@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FIGHTVEX_NEWS, type NewsTag } from "@/lib/data/fightvex-news";
+import { SortToggle } from "./SortToggle";
 
 const TAG_STYLE: Record<NewsTag, string> = {
   Milestone: "border-amber/50 text-amber",
@@ -19,24 +20,29 @@ type Filter = (typeof FILTERS)[number];
 function FightVexFeed() {
   const [filter, setFilter] = useState<Filter>("All");
   const [open, setOpen] = useState<Record<number, boolean>>({ 0: true });
+  const [newestFirst, setNewestFirst] = useState(true);
 
   const items = FIGHTVEX_NEWS
     .map((n, i) => ({ n, i }))
-    .filter(({ n }) => filter === "All" || n.tag === filter);
+    .filter(({ n }) => filter === "All" || n.tag === filter)
+    .sort((a, b) => (new Date(a.n.date).getTime() - new Date(b.n.date).getTime()) * (newestFirst ? -1 : 1));
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setFilter(t)}
-            aria-pressed={filter === t}
-            className={`btn-toggle rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wide ${filter === t ? "is-on" : ""}`}
-          >
-            {t}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
+          {FILTERS.map((t) => (
+            <button
+              key={t}
+              onClick={() => setFilter(t)}
+              aria-pressed={filter === t}
+              className={`btn-toggle rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wide ${filter === t ? "is-on" : ""}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <SortToggle newestFirst={newestFirst} onToggle={() => setNewestFirst((v) => !v)} />
       </div>
 
       <div className="space-y-2.5">

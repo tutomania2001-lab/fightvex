@@ -69,8 +69,9 @@ jobs:
         continue-on-error: true
 
       # Upload source (including the freshly-fetched data + assets) and let
-      # Vercel build remotely. Simpler and far more robust in CI than uploading
-      # a large prebuilt .next output, which was aborting mid-upload.
+      # Vercel build remotely. --archive=tgz bundles the upload into a single
+      # tarball instead of thousands of individual files — this project has 300+
+      # static assets, and per-file uploads blow the free-tier 5000/24h cap.
       - name: Deploy to production
         if: steps.gate.outputs.proceed == 'true'
-        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+        run: vercel deploy --prod --yes --archive=tgz --token="$VERCEL_TOKEN"

@@ -16,15 +16,15 @@ function PlanMark() {
   if (!ok)
     return (
       <span className="rounded-md border border-blue px-3 py-2 text-sm font-semibold uppercase tracking-wide text-blue">
-        Full Access
+        Pro
       </span>
     );
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/plan-pro.png"
-      alt="Full Access plan"
-      title="Full Access plan"
+      alt="Pro plan"
+      title="Pro plan"
       width={34}
       height={34}
       className="h-[34px] w-[34px] object-contain"
@@ -77,7 +77,7 @@ export function Navbar() {
                 <PlanMark />
               ) : (
                 <Link href="/pricing" className="btn-flare rounded-md px-4 py-2 text-sm font-semibold uppercase tracking-wide">
-                  Get Full Access
+                  Get Pro
                 </Link>
               )}
             </>
@@ -85,11 +85,11 @@ export function Navbar() {
             <>
               <Link href="/login" className="text-sm font-medium text-muted hover:text-fg">Log in</Link>
               <Link href="/pricing" className="btn-flare rounded-md px-4 py-2 text-sm font-semibold uppercase tracking-wide">
-                Get Full Access
+                Get Pro
               </Link>
             </>
           )}
-          {/* Theme toggle sits to the right of the Get Full Access / account actions. */}
+          {/* Theme toggle sits to the right of the Get Pro / account actions. */}
           <ThemeToggle />
         </div>
         <div className="flex items-center gap-2 lg:hidden">
@@ -123,12 +123,12 @@ export function Navbar() {
             {user ? (
               <>
                 <Link href="/account" onClick={() => setOpen(false)} className="flex-1 rounded-md border border-line py-2 text-center text-sm">Account</Link>
-                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">{user.plan !== "free" ? "Full Access" : "Get Full Access"}</Link>
+                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">{user.plan !== "free" ? "Pro" : "Get Pro"}</Link>
               </>
             ) : (
               <>
                 <Link href="/login" onClick={() => setOpen(false)} className="flex-1 rounded-md border border-line py-2 text-center text-sm">Log in</Link>
-                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">Get Full Access</Link>
+                <Link href="/pricing" onClick={() => setOpen(false)} className="btn-flare flex-1 rounded-md py-2 text-center text-sm font-semibold">Get Pro</Link>
               </>
             )}
           </div>

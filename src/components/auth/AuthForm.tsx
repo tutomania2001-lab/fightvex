@@ -56,7 +56,7 @@ export function AuthForm() {
       </h1>
       <p className="mt-1 text-sm text-muted">
         {mode === "signup"
-          ? "Free to join. Upgrade to a plan anytime to unlock Full Access tools."
+          ? "Free to join. Upgrade to a plan anytime to unlock Pro tools."
           : "Welcome back. Sign in to your account."}
       </p>
 

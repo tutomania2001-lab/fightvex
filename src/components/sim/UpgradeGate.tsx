@@ -31,7 +31,7 @@ export function UpgradeGate({ loggedIn, onClose }: { loggedIn: boolean; onClose:
         </svg>
         <h2 className="font-display text-2xl font-bold uppercase">Upgrade your plan</h2>
         <p className="mt-2 text-sm text-muted">
-          Running your own fight simulations is a Full Access feature. The free preview shows one
+          Running your own fight simulations is a Pro feature. The free preview shows one
           sample matchup. Upgrade to simulate any fight, re-run with custom parameters and
           save your insights.
         </p>

@@ -1,18 +1,18 @@
 // ============================================================
 // FightVex — plan & tool entitlements (shared, client + server safe).
 //
-// Model: a free browse tier + ONE paid plan ("Full Access") that unlocks
-// everything. Internal plan id stays "pro" (= Full Access); "elite" is a
+// Model: a free browse tier + ONE paid plan ("Pro") that unlocks
+// everything. Internal plan id stays "pro" (= Pro); "elite" is a
 // legacy id kept only so any existing Elite subscriber still gets full access.
 // No server-only imports, so this can run in client components too.
 // ============================================================
 
 export type Plan = "free" | "pro" | "elite";
 
-// Higher = more access. "pro" (Full Access) and legacy "elite" both = full.
+// Higher = more access. "pro" (Pro) and legacy "elite" both = full.
 export const PLAN_RANK: Record<Plan, number> = { free: 0, pro: 1, elite: 1 };
 
-export const PLAN_LABEL: Record<Plan, string> = { free: "Free", pro: "Full Access", elite: "Full Access" };
+export const PLAN_LABEL: Record<Plan, string> = { free: "Free", pro: "Pro", elite: "Pro" };
 
 export type Tool = {
   id: string;
@@ -24,7 +24,7 @@ export type Tool = {
 };
 
 // Tools surfaced in the account hub's "Tools & access" matrix. Everything beyond
-// the free browse tier unlocks with Full Access (minPlan: "pro").
+// the free browse tier unlocks with Pro (minPlan: "pro").
 export const TOOLS: Tool[] = [
   { id: "fighter-profiles", name: "Fighter Profiles", description: "Core stats, records and matchup context for every fighter.", href: "/fighters", minPlan: "free", category: "Analysis" },
   { id: "fight-cards", name: "Fight Cards", description: "Upcoming UFC cards with countdowns and bout breakdowns.", href: "/events", minPlan: "free", category: "Analysis" },

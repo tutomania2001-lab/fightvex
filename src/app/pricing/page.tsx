@@ -4,8 +4,8 @@ import { PlanButton } from "@/components/billing/PlanButton";
 import type { Plan } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free & Full Access",
-  description: "FightVex Full Access: one plan unlocks everything — unlimited AI fight simulations, betting tools and watchlist alerts. Free tier to browse. Cancel anytime. 21+.",
+  title: "Pricing — Free & Pro",
+  description: "FightVex Pro: one plan unlocks everything — unlimited AI fight simulations, betting tools and watchlist alerts. Free tier to browse. Cancel anytime. 21+.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -28,12 +28,12 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     ],
   },
   {
-    name: "Full Access",
+    name: "Pro",
     plan: "pro",
     price: "£10",
     cadence: "/month",
     highlight: true,
-    cta: "Get Full Access",
+    cta: "Get Pro",
     tagline: "One plan. Everything unlocked. Cancel anytime.",
     features: [
       { label: "Everything in Free" },

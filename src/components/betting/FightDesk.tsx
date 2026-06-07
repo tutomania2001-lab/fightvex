@@ -158,22 +158,22 @@ export function FightDesk({ fights, openSource, curSource, live }: {
       {/* ---- 2×2 tools, all auto-filled from the selected fight + side ---- */}
       <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[repeat(4,1fr)] gap-3 sm:grid-cols-2 sm:grid-rows-2">
         <div className="min-h-0">
-          <FeatureGate minPlan="pro" title="Line Movement Tracker" description="Opening → current moneyline drift for the selected bout. A Full Access tool.">
+          <FeatureGate minPlan="pro" title="Line Movement Tracker" description="Opening → current moneyline drift for the selected bout. A Pro tool.">
             <LineMovementPanel f={f} side={side} live={live} openSource={openSource} curSource={curSource} />
           </FeatureGate>
         </div>
         <div className="min-h-0">
-          <FeatureGate minPlan="pro" title="Expected Value (EV) Calculator" description="Vex AI win probability vs the real market price for the selected fighter. A Full Access tool.">
+          <FeatureGate minPlan="pro" title="Expected Value (EV) Calculator" description="Vex AI win probability vs the real market price for the selected fighter. A Pro tool.">
             <EVPanel me={me} odds={curOdds} vexProb={vexProb} marketImplied={marketImplied} stake={stake} setStake={setStake} />
           </FeatureGate>
         </div>
         <div className="min-h-0">
-          <FeatureGate minPlan="pro" title="Closing Line Value (CLV) Tracker" description="How the opening line compares to the current market for the selected fighter. A Full Access tool.">
+          <FeatureGate minPlan="pro" title="Closing Line Value (CLV) Tracker" description="How the opening line compares to the current market for the selected fighter. A Pro tool.">
             <CLVPanel me={me} openOdds={openOdds} curOdds={curOdds} curSource={curSource} />
           </FeatureGate>
         </div>
         <div className="min-h-0">
-          <FeatureGate minPlan="pro" title="Bankroll / Kelly Suite" description="Kelly stake from the Vex AI edge at the real market price. A Full Access tool.">
+          <FeatureGate minPlan="pro" title="Bankroll / Kelly Suite" description="Kelly stake from the Vex AI edge at the real market price. A Pro tool.">
             <BankrollPanel me={me} odds={curOdds} vexProb={vexProb} bankroll={bankroll} setBankroll={setBankroll} frac={frac} setFrac={setFrac} />
           </FeatureGate>
         </div>

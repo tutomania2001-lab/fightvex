@@ -35,7 +35,7 @@ export function SimTabs({ children }: { children: ReactNode }) {
         <FeatureGate
           minPlan="pro"
           title="Upcoming Picks"
-          description="Vex AI's locked-in, Bitcoin-timestamped picks for every upcoming card, in advance. A Full Access tool."
+          description="Vex AI's locked-in, Bitcoin-timestamped picks for every upcoming card, in advance. A Pro tool."
         >
           <UpcomingPicks />
         </FeatureGate>

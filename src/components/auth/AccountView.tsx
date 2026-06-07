@@ -389,7 +389,7 @@ function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded:
         </div>
         <p className="mt-3 text-sm text-muted">
           {plan === "free"
-            ? "You're on the free plan. Upgrade to unlock Full Access tools."
+            ? "You're on the free plan. Upgrade to unlock Pro tools."
             : `Thanks for subscribing to ${PLAN_LABEL[plan]}.`}
         </p>
         {plan !== "free" && (

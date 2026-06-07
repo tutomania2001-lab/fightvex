@@ -90,7 +90,7 @@ export default function AboutPage() {
       <Section title="Plans">
         <p>
           You can browse and try a live preview for free. A <b>free account</b> unlocks personalisation, and one
-          <b> Full Access</b> plan unlocks everything — unlimited custom simulations, full fighter profiles and all the
+          <b> Pro</b> plan unlocks everything — unlimited custom simulations, full fighter profiles and all the
           betting tools (line movement, EV, closing-line value and bankroll/Kelly). Payments are handled by Stripe and
           you can cancel anytime from your account. See{" "}
           <Link href="/pricing" className="text-blood hover:underline">pricing</Link> for current details.

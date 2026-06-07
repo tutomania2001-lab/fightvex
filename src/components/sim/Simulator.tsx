@@ -182,7 +182,7 @@ export function Simulator({
         <div className="ml-auto flex items-center gap-3">
           {!canSimulate && (
             <span className="hidden items-center gap-1 rounded-md border border-line px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-steel sm:inline-flex">
-              🔒 Full Access
+              🔒 Pro
             </span>
           )}
           <button

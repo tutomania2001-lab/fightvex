@@ -8,9 +8,9 @@ export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-08",
     tag: "Feature",
-    title: "Simpler pricing: one Full Access plan at £10/mo",
+    title: "Simpler pricing: one Pro plan at £10/mo",
     body:
-      "We scrapped the tiers. Browse free, and a single Full Access plan — £10/month — unlocks everything: unlimited 50,000-run simulations, full fighter profiles, the line-movement tracker, EV and no-vig calculators, the closing-line-value tool, the bankroll (Kelly) calculator and watchlist alerts. No Pro/Elite split, no add-ons. Cancel anytime. Anyone already subscribed keeps full access.",
+      "We scrapped the tiers. Browse free, and a single Pro plan — £10/month — unlocks everything: unlimited 50,000-run simulations, full fighter profiles, the line-movement tracker, EV and no-vig calculators, the closing-line-value tool, the bankroll (Kelly) calculator and watchlist alerts. No Pro/Elite split, no add-ons. Cancel anytime. Anyone already subscribed keeps full access.",
     href: "/pricing",
   },
   {

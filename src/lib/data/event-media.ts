@@ -37,3 +37,15 @@ export function eventHero(event: Pick<FightEvent, "slug" | "venue" | "city">): s
   for (const v of VENUE_HERO) if (v.test.test(where)) return v.img;
   return undefined;
 }
+
+// Per-event vertical focal point (CSS object-position) for the banner crop.
+// Scenery backdrops look best centered low (~36%); fighter face-off images have
+// the heads near the top, so they need a higher focal point or the wide/short
+// banner crop slices the faces off. Default keeps the scenery framing.
+const EVENT_FOCUS: Record<string, string> = {
+  "ufc-329-mcgregor-vs-holloway-2": "center 22%",
+};
+
+export function eventFocus(event: Pick<FightEvent, "slug">): string {
+  return EVENT_FOCUS[event.slug] ?? "center 36%";
+}

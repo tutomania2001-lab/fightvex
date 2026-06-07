@@ -30,7 +30,7 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
   {
     name: "Pro",
     plan: "pro",
-    price: "£20",
+    price: "£10",
     cadence: "/month",
     highlight: true,
     cta: "Get Pro",
@@ -47,7 +47,7 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
   {
     name: "Elite",
     plan: "elite",
-    price: "£40",
+    price: "£20",
     cadence: "/month",
     highlight: false,
     cta: "Go Elite",

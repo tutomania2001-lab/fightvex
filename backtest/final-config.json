@@ -1,0 +1,16 @@
+{
+  "weights": {
+    "Striking": 0.14905000000000002,
+    "Wrestling": 0.14275,
+    "Grappling": 0.11624999999999999,
+    "Cardio": 0.065,
+    "Durability": 0.19605,
+    "Form": 0.1204,
+    "Competition": 0.07,
+    "Submission": 0.0484,
+    "Physical": 0.09210000000000002
+  },
+  "k": 0.12,
+  "wMC": 0,
+  "calib": 1
+}

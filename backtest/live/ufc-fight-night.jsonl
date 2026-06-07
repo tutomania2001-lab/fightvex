@@ -1,0 +1,95 @@
+{"ts":"2026-06-06T17:07:57.499Z","kind":"start","event":"UFC Fight Night: Muhammad vs. Bonfim","id":"600058949","date":"2026-06-06T21:00Z","bouts":12,"picksLoaded":30}
+{"ts":"2026-06-06T17:07:57.500Z","kind":"status","bout":"Ariane Carnelossi vs Ketlen Souza","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.500Z","kind":"status","bout":"Yuneisy Duben vs Jeisla Chaves","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.501Z","kind":"status","bout":"Joanderson Brito vs Jordan Leavitt","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.501Z","kind":"status","bout":"Priscila Cachoeira vs Chelsea Chandler","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.502Z","kind":"status","bout":"Bruno Silva vs Édgar Cháirez","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.503Z","kind":"status","bout":"Marcus McGhee vs John Yannis","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.503Z","kind":"status","bout":"Matt Schnell vs Alessandro Costa","state":"pre","detail":"Sat, June 6th at 5:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.504Z","kind":"status","bout":"Junior Tafa vs Iwo Baraniewski","state":"pre","detail":"Sat, June 6th at 8:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.504Z","kind":"status","bout":"Bryce Mitchell vs Santiago Luna","state":"pre","detail":"Sat, June 6th at 8:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.504Z","kind":"status","bout":"Farés Ziam vs Tom Nolan","state":"pre","detail":"Sat, June 6th at 8:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.505Z","kind":"status","bout":"Brendan Allen vs Edmen Shahbazyan","state":"pre","detail":"Sat, June 6th at 8:00 PM EDT"}
+{"ts":"2026-06-06T17:07:57.505Z","kind":"status","bout":"Belal Muhammad vs Gabriel Bonfim","state":"pre","detail":"Sat, June 6th at 8:00 PM EDT"}
+{"ts":"2026-06-06T21:02:10.342Z","kind":"status","bout":"Ariane Carnelossi vs Ketlen Souza","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T21:17:43.009Z","kind":"status","bout":"Ariane Carnelossi vs Ketlen Souza","state":"post","detail":"Final"}
+{"ts":"2026-06-06T21:17:43.010Z","kind":"result","boutId":"b12","a":"Ariane Carnelossi","b":"Ketlen Souza","actualWinner":"Ketlen Souza","method":"Final","round":1,"time":"3:26","rawDetail":"Final","pick":{"name":"Ketlen Souza","prob":0.5842,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-06T21:17:43.011Z","kind":"status","bout":"Yuneisy Duben vs Jeisla Chaves","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T21:50:49.360Z","kind":"status","bout":"Yuneisy Duben vs Jeisla Chaves","state":"post","detail":"Final"}
+{"ts":"2026-06-06T21:50:49.360Z","kind":"result","boutId":"b11","a":"Yuneisy Duben","b":"Jeisla Chaves","actualWinner":"Jeisla Chaves","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Jeisla Chaves","prob":0.5633,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-06T21:50:49.361Z","kind":"status","bout":"Joanderson Brito vs Jordan Leavitt","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T22:04:51.333Z","kind":"status","bout":"Joanderson Brito vs Jordan Leavitt","state":"post","detail":"Final"}
+{"ts":"2026-06-06T22:04:51.335Z","kind":"result","boutId":"b10","a":"Joanderson Brito","b":"Jordan Leavitt","actualWinner":"Joanderson Brito","method":"Final","round":1,"time":"4:19","rawDetail":"Final","pick":{"name":"Joanderson Brito","prob":0.5915,"predMethod":"Submission"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-06T22:04:51.336Z","kind":"status","bout":"Priscila Cachoeira vs Chelsea Chandler","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T22:20:53.706Z","kind":"status","bout":"Priscila Cachoeira vs Chelsea Chandler","state":"post","detail":"Final"}
+{"ts":"2026-06-06T22:20:53.706Z","kind":"result","boutId":"b9","a":"Priscila Cachoeira","b":"Chelsea Chandler","actualWinner":"Chelsea Chandler","method":"Final","round":1,"time":"1:17","rawDetail":"Final","pick":{"name":"Chelsea Chandler","prob":0.5114000000000001,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-06T22:20:53.707Z","kind":"status","bout":"Bruno Silva vs Édgar Cháirez","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T22:43:27.459Z","kind":"status","bout":"Bruno Silva vs Édgar Cháirez","state":"post","detail":"Final"}
+{"ts":"2026-06-06T22:43:27.460Z","kind":"result","boutId":"b8","a":"Bruno Silva","b":"Édgar Cháirez","actualWinner":"Édgar Cháirez","method":"Final","round":1,"time":"0:47","rawDetail":"Final","pick":{"name":"Bruno Silva","prob":0.581,"predMethod":"KO/TKO"},"correctWinner":false,"correctMethod":false}
+{"ts":"2026-06-06T22:43:27.460Z","kind":"status","bout":"Marcus McGhee vs John Yannis","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T23:26:03.498Z","kind":"status","bout":"Marcus McGhee vs John Yannis","state":"post","detail":"Final"}
+{"ts":"2026-06-06T23:26:03.499Z","kind":"result","boutId":"b7","a":"Marcus McGhee","b":"John Yannis","actualWinner":null,"method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Marcus McGhee","prob":0.692,"predMethod":"KO/TKO"},"correctWinner":null,"correctMethod":null}
+{"ts":"2026-06-06T23:26:03.499Z","kind":"status","bout":"Matt Schnell vs Alessandro Costa","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-06T23:44:36.496Z","kind":"status","bout":"Matt Schnell vs Alessandro Costa","state":"post","detail":"Final"}
+{"ts":"2026-06-06T23:44:36.497Z","kind":"result","boutId":"b6","a":"Matt Schnell","b":"Alessandro Costa","actualWinner":"Alessandro Costa","method":"Final","round":1,"time":"2:28","rawDetail":"Final","pick":{"name":"Alessandro Costa","prob":0.6508,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T00:00:37.207Z","kind":"status","bout":"Junior Tafa vs Iwo Baraniewski","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-07T00:20:39.968Z","kind":"status","bout":"Junior Tafa vs Iwo Baraniewski","state":"post","detail":"Final"}
+{"ts":"2026-06-07T00:20:39.969Z","kind":"result","boutId":"b5","a":"Junior Tafa","b":"Iwo Baraniewski","actualWinner":"Iwo Baraniewski","method":"Final","round":1,"time":"3:35","rawDetail":"Final","pick":{"name":"Iwo Baraniewski","prob":0.5650999999999999,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T00:20:39.969Z","kind":"status","bout":"Bryce Mitchell vs Santiago Luna","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-07T00:53:44.504Z","kind":"status","bout":"Bryce Mitchell vs Santiago Luna","state":"post","detail":"Final"}
+{"ts":"2026-06-07T00:53:44.505Z","kind":"result","boutId":"b4","a":"Bryce Mitchell","b":"Santiago Luna","actualWinner":"Bryce Mitchell","method":"Final","round":3,"time":"0:08","rawDetail":"Final","pick":{"name":"Bryce Mitchell","prob":0.6423,"predMethod":"Submission"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T00:55:44.582Z","kind":"status","bout":"Farés Ziam vs Tom Nolan","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-07T01:30:19.106Z","kind":"status","bout":"Farés Ziam vs Tom Nolan","state":"post","detail":"Final"}
+{"ts":"2026-06-07T01:30:19.107Z","kind":"result","boutId":"b3","a":"Farés Ziam","b":"Tom Nolan","actualWinner":"Tom Nolan","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Farés Ziam","prob":0.6893,"predMethod":"Decision"},"correctWinner":false,"correctMethod":false}
+{"ts":"2026-06-07T01:30:19.107Z","kind":"status","bout":"Brendan Allen vs Edmen Shahbazyan","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-07T02:10:17.275Z","kind":"start","event":"UFC Fight Night: Muhammad vs. Bonfim","id":"600058949","date":"2026-06-06T21:00Z","bouts":12,"picksLoaded":30}
+{"ts":"2026-06-07T02:10:17.276Z","kind":"status","bout":"Ariane Carnelossi vs Ketlen Souza","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.277Z","kind":"result","boutId":"b12","a":"Ariane Carnelossi","b":"Ketlen Souza","actualWinner":"Ketlen Souza","method":"Final","round":1,"time":"1:34","rawDetail":"Final","pick":{"name":"Ketlen Souza","prob":0.5842,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.277Z","kind":"status","bout":"Yuneisy Duben vs Jeisla Chaves","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.278Z","kind":"result","boutId":"b11","a":"Yuneisy Duben","b":"Jeisla Chaves","actualWinner":"Jeisla Chaves","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Jeisla Chaves","prob":0.5633,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.278Z","kind":"status","bout":"Joanderson Brito vs Jordan Leavitt","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.278Z","kind":"result","boutId":"b10","a":"Joanderson Brito","b":"Jordan Leavitt","actualWinner":"Joanderson Brito","method":"Final","round":1,"time":"4:19","rawDetail":"Final","pick":{"name":"Joanderson Brito","prob":0.5915,"predMethod":"Submission"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.279Z","kind":"status","bout":"Priscila Cachoeira vs Chelsea Chandler","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.279Z","kind":"result","boutId":"b9","a":"Priscila Cachoeira","b":"Chelsea Chandler","actualWinner":"Chelsea Chandler","method":"Final","round":1,"time":"3:42","rawDetail":"Final","pick":{"name":"Chelsea Chandler","prob":0.5114000000000001,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.279Z","kind":"status","bout":"Bruno Silva vs Édgar Cháirez","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.280Z","kind":"result","boutId":"b8","a":"Bruno Silva","b":"Édgar Cháirez","actualWinner":"Édgar Cháirez","method":"Final","round":1,"time":"4:13","rawDetail":"Final","pick":{"name":"Bruno Silva","prob":0.581,"predMethod":"KO/TKO"},"correctWinner":false,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.280Z","kind":"status","bout":"Marcus McGhee vs John Yannis","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.281Z","kind":"result","boutId":"b7","a":"Marcus McGhee","b":"John Yannis","actualWinner":"Marcus McGhee","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Marcus McGhee","prob":0.692,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.281Z","kind":"status","bout":"Matt Schnell vs Alessandro Costa","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.281Z","kind":"result","boutId":"b6","a":"Matt Schnell","b":"Alessandro Costa","actualWinner":"Alessandro Costa","method":"Final","round":1,"time":"2:28","rawDetail":"Final","pick":{"name":"Alessandro Costa","prob":0.6508,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.282Z","kind":"status","bout":"Junior Tafa vs Iwo Baraniewski","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.282Z","kind":"result","boutId":"b5","a":"Junior Tafa","b":"Iwo Baraniewski","actualWinner":"Iwo Baraniewski","method":"Final","round":1,"time":"1:25","rawDetail":"Final","pick":{"name":"Iwo Baraniewski","prob":0.5650999999999999,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.282Z","kind":"status","bout":"Bryce Mitchell vs Santiago Luna","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.283Z","kind":"result","boutId":"b4","a":"Bryce Mitchell","b":"Santiago Luna","actualWinner":"Bryce Mitchell","method":"Final","round":3,"time":"4:52","rawDetail":"Final","pick":{"name":"Bryce Mitchell","prob":0.6423,"predMethod":"Submission"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.283Z","kind":"status","bout":"Farés Ziam vs Tom Nolan","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.283Z","kind":"result","boutId":"b3","a":"Farés Ziam","b":"Tom Nolan","actualWinner":"Tom Nolan","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Farés Ziam","prob":0.6893,"predMethod":"Decision"},"correctWinner":false,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.284Z","kind":"status","bout":"Brendan Allen vs Edmen Shahbazyan","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:10:17.284Z","kind":"result","boutId":"b2","a":"Brendan Allen","b":"Edmen Shahbazyan","actualWinner":"Brendan Allen","method":"Final","round":3,"time":"-","rawDetail":"Final","pick":{"name":"Brendan Allen","prob":0.6155,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:10:17.284Z","kind":"status","bout":"Belal Muhammad vs Gabriel Bonfim","state":"in","detail":"Pre-fight"}
+{"ts":"2026-06-07T02:16:27.591Z","kind":"start","event":"UFC Fight Night: Muhammad vs. Bonfim","id":"600058949","date":"2026-06-06T21:00Z","bouts":12,"picksLoaded":30}
+{"ts":"2026-06-07T02:16:27.591Z","kind":"status","bout":"Ariane Carnelossi vs Ketlen Souza","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.592Z","kind":"result","boutId":"b12","a":"Ariane Carnelossi","b":"Ketlen Souza","actualWinner":"Ketlen Souza","method":"Final","round":1,"time":"1:34","rawDetail":"Final","pick":{"name":"Ketlen Souza","prob":0.5842,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.593Z","kind":"status","bout":"Yuneisy Duben vs Jeisla Chaves","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.593Z","kind":"result","boutId":"b11","a":"Yuneisy Duben","b":"Jeisla Chaves","actualWinner":"Jeisla Chaves","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Jeisla Chaves","prob":0.5633,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.593Z","kind":"status","bout":"Joanderson Brito vs Jordan Leavitt","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.594Z","kind":"result","boutId":"b10","a":"Joanderson Brito","b":"Jordan Leavitt","actualWinner":"Joanderson Brito","method":"Final","round":1,"time":"4:19","rawDetail":"Final","pick":{"name":"Joanderson Brito","prob":0.5915,"predMethod":"Submission"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.594Z","kind":"status","bout":"Priscila Cachoeira vs Chelsea Chandler","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.595Z","kind":"result","boutId":"b9","a":"Priscila Cachoeira","b":"Chelsea Chandler","actualWinner":"Chelsea Chandler","method":"Final","round":1,"time":"3:42","rawDetail":"Final","pick":{"name":"Chelsea Chandler","prob":0.5114000000000001,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.595Z","kind":"status","bout":"Bruno Silva vs Édgar Cháirez","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.595Z","kind":"result","boutId":"b8","a":"Bruno Silva","b":"Édgar Cháirez","actualWinner":"Édgar Cháirez","method":"Final","round":1,"time":"4:13","rawDetail":"Final","pick":{"name":"Bruno Silva","prob":0.581,"predMethod":"KO/TKO"},"correctWinner":false,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.596Z","kind":"status","bout":"Marcus McGhee vs John Yannis","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.596Z","kind":"result","boutId":"b7","a":"Marcus McGhee","b":"John Yannis","actualWinner":"Marcus McGhee","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Marcus McGhee","prob":0.692,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.596Z","kind":"status","bout":"Matt Schnell vs Alessandro Costa","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.597Z","kind":"result","boutId":"b6","a":"Matt Schnell","b":"Alessandro Costa","actualWinner":"Alessandro Costa","method":"Final","round":1,"time":"2:28","rawDetail":"Final","pick":{"name":"Alessandro Costa","prob":0.6508,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.597Z","kind":"status","bout":"Junior Tafa vs Iwo Baraniewski","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.597Z","kind":"result","boutId":"b5","a":"Junior Tafa","b":"Iwo Baraniewski","actualWinner":"Iwo Baraniewski","method":"Final","round":1,"time":"1:25","rawDetail":"Final","pick":{"name":"Iwo Baraniewski","prob":0.5650999999999999,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.598Z","kind":"status","bout":"Bryce Mitchell vs Santiago Luna","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.598Z","kind":"result","boutId":"b4","a":"Bryce Mitchell","b":"Santiago Luna","actualWinner":"Bryce Mitchell","method":"Final","round":3,"time":"4:52","rawDetail":"Final","pick":{"name":"Bryce Mitchell","prob":0.6423,"predMethod":"Submission"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.599Z","kind":"status","bout":"Farés Ziam vs Tom Nolan","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.599Z","kind":"result","boutId":"b3","a":"Farés Ziam","b":"Tom Nolan","actualWinner":"Tom Nolan","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Farés Ziam","prob":0.6893,"predMethod":"Decision"},"correctWinner":false,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.599Z","kind":"status","bout":"Brendan Allen vs Edmen Shahbazyan","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:16:27.600Z","kind":"result","boutId":"b2","a":"Brendan Allen","b":"Edmen Shahbazyan","actualWinner":"Brendan Allen","method":"Final","round":3,"time":"5:00","rawDetail":"Final","pick":{"name":"Brendan Allen","prob":0.6155,"predMethod":"Decision"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:16:27.600Z","kind":"status","bout":"Belal Muhammad vs Gabriel Bonfim","state":"in","detail":"Walkouts"}
+{"ts":"2026-06-07T02:57:03.158Z","kind":"status","bout":"Belal Muhammad vs Gabriel Bonfim","state":"post","detail":"Final"}
+{"ts":"2026-06-07T02:57:03.158Z","kind":"result","boutId":"b1","a":"Belal Muhammad","b":"Gabriel Bonfim","actualWinner":"Gabriel Bonfim","method":"Final","round":5,"time":"5:00","rawDetail":"Final","pick":{"name":"Gabriel Bonfim","prob":0.5915,"predMethod":"KO/TKO"},"correctWinner":true,"correctMethod":false}
+{"ts":"2026-06-07T02:57:03.159Z","kind":"complete"}

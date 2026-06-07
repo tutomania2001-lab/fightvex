@@ -1,0 +1,7 @@
+# FightVex responsible disclosure
+# If you find a security issue, please tell us before disclosing it publicly.
+Contact: mailto:security@fightvex.com
+Preferred-Languages: en
+Canonical: https://fightvex.com/.well-known/security.txt
+Policy: https://fightvex.com/security
+Expires: 2027-01-01T00:00:00.000Z

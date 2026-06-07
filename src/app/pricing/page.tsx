@@ -1,32 +1,37 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge } from "@/components/ui/Badge";
+import { PlanButton } from "@/components/billing/PlanButton";
+import type { Plan } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
-  title: "Pricing",
-  description: "FightVector plans — Free, Pro and Elite Bettor tiers for AI MMA fight intelligence.",
+  title: "Pricing — Free, Pro & Elite UFC Betting Tools",
+  description: "FightVex plans: a free tier plus Pro and Elite upgrades for AI UFC fight intelligence, unlimited simulations and advanced betting tools. Cancel anytime. 21+.",
+  alternates: { canonical: "/pricing" },
 };
 
-const TIERS = [
+const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlight: boolean; cta: string; features: string[] }[] = [
   {
     name: "Free",
-    price: "$0",
+    plan: "free",
+    price: "£0",
     cadence: "forever",
     highlight: false,
-    cta: "Start free",
-    features: ["Fighter profiles (core stats)", "Upcoming fight cards", "Basic odds display", "3 simulations / month", "Research feed (delayed)"],
+    cta: "Create free account",
+    features: ["Fighter profiles (core stats)", "Upcoming fight cards", "Basic odds display", "Preview simulation", "Research feed (delayed)"],
   },
   {
     name: "Pro",
-    price: "$19",
+    plan: "pro",
+    price: "£20",
     cadence: "/month",
     highlight: true,
     cta: "Get Pro",
     features: ["Everything in Free", "Full 40+ metric profiles", "Unlimited simulations", "Line-movement tracker", "EV & implied-prob tools", "Watchlists & alerts", "Real-time research feed"],
   },
   {
-    name: "Elite Bettor",
-    price: "$49",
+    name: "Elite",
+    plan: "elite",
+    price: "£40",
     cadence: "/month",
     highlight: false,
     cta: "Go Elite",
@@ -36,30 +41,37 @@ const TIERS = [
 
 export default function PricingPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-      <div className="mb-10 text-center">
-        <Badge variant="blood">Pricing</Badge>
-        <h1 className="mt-3 font-display text-4xl font-bold uppercase sm:text-5xl">Pick your edge</h1>
+    <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <div className="reveal mb-10 text-center">
+        <h1 className="font-display text-4xl font-bold uppercase sm:text-5xl">Pick your plan</h1>
         <p className="mx-auto mt-2 max-w-xl text-muted">
           Transparent analytics at every tier. We monetize depth and tooling — never
           guaranteed picks. Cancel anytime.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {TIERS.map((t) => (
-          <div key={t.name} className={`panel relative rounded-2xl p-7 ${t.highlight ? "border-blood glow-blood" : ""}`}>
+      <div className="reveal-stagger grid gap-6 lg:grid-cols-3">
+        {TIERS.map((t) => {
+          // Plan identity colours: Pro = blue, Elite = red, Free = neutral.
+          const accent =
+            t.plan === "pro"
+              ? { ring: "border-blue/70 glow-blue", title: "text-blue", badge: "bg-blue" }
+              : t.plan === "elite"
+                ? { ring: "border-blood/70 glow-blood", title: "text-blood-dim", badge: "bg-blood" }
+                : { ring: "", title: "text-fg", badge: "bg-fg/80" };
+          return (
+          <div key={t.name} className={`reveal panel relative rounded-2xl p-7 ${accent.ring}`}>
             {t.highlight && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blood px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">Most popular</span>
+              <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white`}>Most popular</span>
             )}
-            <h2 className="font-display text-2xl font-bold uppercase">{t.name}</h2>
+            <h2 className={`font-display text-2xl font-bold uppercase ${accent.title}`}>{t.name}</h2>
             <div className="mt-3 flex items-baseline gap-1">
               <span className="font-display text-5xl font-bold text-fg">{t.price}</span>
               <span className="text-sm text-muted">{t.cadence}</span>
             </div>
-            <Link href="/login" className={`mt-6 block rounded-md py-3 text-center text-sm font-bold uppercase tracking-wide ${t.highlight ? "bg-blood text-white hover:bg-blood-dim" : "border border-line text-fg hover:border-steel"}`}>
-              {t.cta}
-            </Link>
+            <div className="mt-6">
+              <PlanButton plan={t.plan} label={t.cta} highlight={t.highlight} />
+            </div>
             <ul className="mt-6 space-y-2.5">
               {t.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm text-muted">
@@ -68,11 +80,12 @@ export default function PricingPage() {
               ))}
             </ul>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* B2B / analyst */}
-      <div className="panel mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl p-7 sm:flex-row">
+      <div className="reveal panel mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl p-7 sm:flex-row">
         <div>
           <h3 className="font-display text-xl font-bold uppercase">Analyst & B2B</h3>
           <p className="mt-1 text-sm text-muted">Data licensing, embeddable widgets, and an analyst/admin dashboard for media and sportsbook partners.</p>

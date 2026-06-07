@@ -39,7 +39,7 @@ export function AgeGate() {
           </button>
           <button
             onClick={() => { localStorage.setItem("fv-age-ok", "1"); setOk(true); }}
-            className="flex-1 rounded-md bg-blood py-3 text-sm font-semibold uppercase tracking-wide text-white hover:bg-blood-dim"
+            className="btn-flare flex-1 rounded-md py-3 text-sm font-semibold uppercase tracking-wide"
           >
             I am 21+
           </button>

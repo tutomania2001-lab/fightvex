@@ -1,38 +1,44 @@
 import type { Metadata } from "next";
-import { fightersByClass } from "@/lib/data/fighters";
-import { FighterCard } from "@/components/fighter/FighterCard";
-import { SectionHeading } from "@/components/ui/Panel";
-import { Badge } from "@/components/ui/Badge";
+import { fightersByClass, P4P_DIVISIONS } from "@/lib/data/fighters";
+import { DivisionAccordion } from "@/components/fighter/DivisionAccordion";
 
 export const metadata: Metadata = {
-  title: "Fighter Database",
-  description: "Searchable MMA fighter directory with 40+ analytics metrics per fighter.",
+  title: "UFC Fighter Stats, Records & Rankings — The Roster",
+  description:
+    "Real UFC fighter profiles, records, rankings and per-fight stats by division — striking, grappling and finishing metrics for every champion and contender.",
+  alternates: { canonical: "/fighters" },
 };
+
+// Standard UFC division order; any other ESPN-returned class is appended.
+const ORDER = [
+  "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight",
+  "Middleweight", "Light Heavyweight", "Heavyweight",
+  "Women's Strawweight", "Women's Flyweight", "Women's Bantamweight",
+];
 
 export default function FightersPage() {
   const byClass = fightersByClass();
-  const classes = Object.keys(byClass);
+  const keys = Object.keys(byClass);
+  const weightDivisions = keys
+    .map((wc) => ({ wc, count: byClass[wc].length }))
+    .sort((a, b) => {
+      const ia = ORDER.indexOf(a.wc); const ib = ORDER.indexOf(b.wc);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  // Pound-for-pound ladders sit at the top, above the weight divisions.
+  const divisions = [...P4P_DIVISIONS, ...weightDivisions];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-      <div className="mb-8">
-        <Badge variant="blood">Fighter Database</Badge>
-        <h1 className="mt-3 font-display text-4xl font-bold uppercase sm:text-5xl">The Roster</h1>
+      <div className="reveal mb-8">
+        <h1 className="font-display text-4xl font-bold uppercase sm:text-5xl">Fighters</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Deep analytics on every fighter — striking, grappling, cardio, durability,
-          opponent quality and AI style summaries. All data shown here is fictional
-          sample data for demonstration.
+          Real fighters, records and bios from UFC, organized by division. Pick a
+          division to open it.
         </p>
       </div>
 
-      {classes.map((c) => (
-        <section key={c} className="mb-12">
-          <SectionHeading kicker={`${byClass[c].length} fighters`} title={c} />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {byClass[c].map((f) => (<FighterCard key={f.id} fighter={f} />))}
-          </div>
-        </section>
-      ))}
+      <DivisionAccordion divisions={divisions} />
     </div>
   );
 }

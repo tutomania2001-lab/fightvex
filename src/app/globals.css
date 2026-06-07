@@ -17,8 +17,12 @@
   --color-blood: #e10600;
   --color-blood-dim: #9c0a08;
   --color-amber: #ffb000;
-  --color-edge: #00e0b8;
-  --color-edge-dim: #0a8f78;
+  --color-edge: #3fdd80;
+  --color-edge-dim: #22a35a;
+  /* Blue corner — fighter B identity (UFC red vs blue corners). Green/red is
+     reserved for positive/negative values, NOT fighter sides. */
+  --color-blue: #2e90ff;
+  --color-blue-dim: #1c5fa8;
 
   /* Text */
   --color-fg: #f5f6f8;
@@ -61,6 +65,50 @@
   ::-webkit-scrollbar-thumb:hover { background: #30343c; }
 }
 
+/* Brunson display font for main TITLE headings only (kept off numbers/labels —
+   they stay in legible Oswald). Unlayered so it overrides the font-display
+   utility + any tracking-* utility on the headings. Wider letter-spacing so the
+   tight Brunson glyphs stay legible. */
+h1, h2 {
+  font-family: var(--font-brunson), var(--font-oswald), "Arial Narrow", sans-serif;
+  letter-spacing: 0.08em;
+}
+
+/* ── Metal titles (gradient fill + bevel/emboss) — HERO PAGE ONLY. ──────────────
+   Scoped to .metal-titles so every other page's titles stay flat Brunson. */
+.metal-titles h1, .metal-titles h2 {
+  /* Bevel / emboss depth (dark drop below; no light halo around glyphs) */
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+/* Silver brushed-metal fill — white titles (h2) and silver title parts. */
+.metal-titles h2, .metal-titles .title-silver {
+  background-image: linear-gradient(180deg, #ffffff 0%, #e2e6ea 32%, #9aa0a6 50%, #c9ced4 60%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+/* Red title parts → button-style outline: white stroke, hollow centre (the
+   background shows through), with a red-left / blue-right flare glow. */
+.metal-titles h1 .text-blood, .metal-titles h2 .text-blood, .metal-titles .title-red {
+  background-image: none;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.6px rgba(255, 255, 255, 0.92);
+  filter: drop-shadow(-7px 0 12px rgba(225, 6, 0, 0.6)) drop-shadow(7px 0 12px rgba(46, 144, 255, 0.55));
+}
+/* Italic title glyphs overshoot the clip box (top + right) — pad the gradient
+   spans so the fill covers the slant and the corners aren't cut off. */
+.metal-titles h1 .title-silver,
+.metal-titles h1 .text-blood {
+  display: inline-block;
+  padding: 0.08em 0.2em 0 0;
+}
+/* Red CTA buttons — red gradient with only a subtle top highlight, then dark. */
+a.bg-blood, button.bg-blood {
+  background-image: linear-gradient(180deg, #fb4d45 0%, #ec1a13 38%, #a8110b 72%, #6b0804 100%);
+}
+
 @layer utilities {
   .bg-cage {
     background-image:
@@ -77,12 +125,57 @@
   .spotlight {
     background:
       radial-gradient(1200px 600px at 50% -10%, rgba(225, 6, 0, 0.18), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(0, 224, 184, 0.06), transparent 55%);
+      radial-gradient(900px 500px at 100% 0%, rgba(63, 221, 128, 0.06), transparent 55%);
   }
   .panel {
     background: linear-gradient(180deg, rgba(24, 27, 33, 0.9), rgba(19, 21, 25, 0.9));
     border: 1px solid var(--color-line);
     backdrop-filter: blur(6px);
+  }
+  /* Stat-panel backdrop: red flair from the left (corner A), blue from the
+     right (corner B) — corner-colour coding behind every comparison frame. */
+  .flair-rb {
+    background-color: var(--color-panel);
+    background-image:
+      radial-gradient(440px 260px at -6% 50%, rgba(225, 6, 0, 0.13), transparent 72%),
+      radial-gradient(440px 260px at 106% 50%, rgba(46, 144, 255, 0.13), transparent 72%);
+  }
+  /* Larger flair for big surfaces (e.g. the fighter-selector modal) — the red
+     and blue cones spread across most of the background. */
+  .flair-rb-lg {
+    background-color: #070809;
+    background-image:
+      radial-gradient(70% 90% at -8% 50%, rgba(225, 6, 0, 0.16), transparent 72%),
+      radial-gradient(70% 90% at 108% 50%, rgba(46, 144, 255, 0.16), transparent 72%);
+  }
+  /* Selected/active chip — "lit" red-left / blue-right flair with a dual glow,
+     matching the UI vibe instead of a flat red button. */
+  .chip-active {
+    color: #fff;
+    background-color: rgba(20, 22, 27, 0.92);
+    background-image:
+      radial-gradient(96px 72px at 0% 50%, rgba(225, 6, 0, 0.55), transparent 72%),
+      radial-gradient(96px 72px at 100% 50%, rgba(46, 144, 255, 0.55), transparent 72%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: -7px 0 16px -8px rgba(225, 6, 0, 0.65), 7px 0 16px -8px rgba(46, 144, 255, 0.65);
+  }
+  .chip-active:hover { border-color: rgba(255, 255, 255, 0.28); }
+  /* Outline button: no fill + white stroke at rest, lights up with the red/blue
+     flare on hover (same look as a selected .chip-active). */
+  .flare-btn {
+    color: var(--color-fg);
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .flare-btn:hover {
+    color: #fff;
+    background-color: rgba(20, 22, 27, 0.92);
+    background-image:
+      radial-gradient(96px 72px at 0% 50%, rgba(225, 6, 0, 0.55), transparent 72%),
+      radial-gradient(96px 72px at 100% 50%, rgba(46, 144, 255, 0.55), transparent 72%);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: -7px 0 16px -8px rgba(225, 6, 0, 0.65), 7px 0 16px -8px rgba(46, 144, 255, 0.65);
   }
   .panel-hover {
     transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
@@ -114,7 +207,80 @@
     color: transparent;
   }
   .glow-blood { box-shadow: 0 0 24px -6px rgba(225, 6, 0, 0.55); }
-  .glow-edge { box-shadow: 0 0 24px -6px rgba(0, 224, 184, 0.45); }
+  .glow-blue { box-shadow: 0 0 24px -6px rgba(46, 144, 255, 0.5); }
+  .glow-edge { box-shadow: 0 0 24px -6px rgba(63, 221, 128, 0.45); }
+
+  /* Site-wide primary CTA — luxury-minimal glass with a red-left / blue-right
+     corner flare (UFC corners). Subtle at rest, lifts on hover. Replaces the
+     old flat red buttons. Keep the element's rounded-* class so the flare
+     (clipped by overflow) follows the corner radius. */
+  .btn-flare {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-fg);
+    backdrop-filter: blur(6px);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  .btn-flare::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.65;
+    transition: opacity 0.3s ease;
+    background:
+      radial-gradient(80% 140% at 0% 50%, rgba(225, 6, 0, 0.30), transparent 58%),
+      radial-gradient(80% 140% at 100% 50%, rgba(46, 144, 255, 0.27), transparent 58%);
+  }
+  .btn-flare:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: -12px 0 34px -14px rgba(225, 6, 0, 0.7), 12px 0 34px -14px rgba(46, 144, 255, 0.65);
+  }
+  .btn-flare:hover::before { opacity: 1; }
+  /* Persistent "selected/on" state for toggle buttons (e.g. simulator chips). */
+  .btn-flare-active {
+    border-color: rgba(255, 255, 255, 0.30);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: -12px 0 34px -14px rgba(225, 6, 0, 0.7), 12px 0 34px -14px rgba(46, 144, 255, 0.65);
+  }
+  .btn-flare-active::before { opacity: 1; }
+
+  /* Toggle variant (simulator control bar): NO flare at rest — the red/blue
+     background only appears on hover or when selected (.is-on). */
+  .btn-toggle {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background-color: transparent;
+    color: var(--color-fg);
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .btn-toggle::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    background:
+      radial-gradient(80% 140% at 0% 50%, rgba(225, 6, 0, 0.30), transparent 58%),
+      radial-gradient(80% 140% at 100% 50%, rgba(46, 144, 255, 0.27), transparent 58%);
+  }
+  .btn-toggle:hover { border-color: rgba(255, 255, 255, 0.22); }
+  .btn-toggle:hover::before { opacity: 1; }
+  .btn-toggle.is-on {
+    border-color: rgba(255, 255, 255, 0.30);
+    background-color: rgba(255, 255, 255, 0.06);
+    box-shadow: -12px 0 34px -14px rgba(225, 6, 0, 0.7), 12px 0 34px -14px rgba(46, 144, 255, 0.65);
+  }
+  .btn-toggle.is-on::before { opacity: 1; }
 }
 
 @keyframes fv-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -123,13 +289,118 @@
 @keyframes fv-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(225, 6, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(225, 6, 0, 0); } }
 @keyframes fv-grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes fv-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes fv-in-left { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
+@keyframes fv-in-right { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes fv-pop { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
+@keyframes fv-radar { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+/* Page-transition "surge" — content slides up + fades on every tab change.
+   Ends on transform:none so fixed/sticky descendants are unaffected at rest. */
+@keyframes fv-surge { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 
 .animate-rise { animation: fv-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-fade { animation: fv-fade 0.8s ease both; }
 .animate-streak { animation: fv-streak 3.5s ease-in-out infinite; }
 .animate-pulse-ring { animation: fv-pulse-ring 2s ease-out infinite; }
 .animate-blink { animation: fv-blink 1.4s ease-in-out infinite; }
+.animate-in-left { animation: fv-in-left 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-in-right { animation: fv-in-right 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pop { animation: fv-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.radar-grow { animation: fv-radar 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-surge { animation: fv-surge 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .bar-grow { transform-origin: left; animation: fv-grow-x 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.bar-grow-r { transform-origin: right; animation: fv-grow-x 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ── Animated brand flares (FlareBackdrop) ─────────────────────────────────
+   Two big soft radial blobs that drift forever behind all content — red around
+   the upper-left, blue around the lower-right, on different periods so they
+   never sync. Transform/opacity only, so it stays GPU-cheap. The global
+   prefers-reduced-motion rule below freezes them at their resting position. */
+.fv-flare {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120vw;
+  height: 110vh;
+  margin-left: -60vw;
+  margin-top: -55vh;
+  border-radius: 50%;
+  filter: blur(40px);
+  will-change: transform;
+}
+.fv-flare-red {
+  background: radial-gradient(closest-side, rgba(225, 6, 0, 0.17), transparent 70%);
+  animation: fv-flare-red 11s ease-in-out infinite alternate;
+}
+.fv-flare-blue {
+  background: radial-gradient(closest-side, rgba(46, 144, 255, 0.15), transparent 70%);
+  animation: fv-flare-blue 11s ease-in-out infinite alternate;
+}
+/* Each flare just bobs up and down on its own side — red anchored left, blue
+   anchored right (constant X), only Y changes. Opposite start phases so one
+   rises while the other falls. */
+@keyframes fv-flare-red {
+  from { transform: translate3d(-42vw, -30vh, 0); }
+  to   { transform: translate3d(-42vw, 30vh, 0); }
+}
+@keyframes fv-flare-blue {
+  from { transform: translate3d(42vw, 30vh, 0); }
+  to   { transform: translate3d(42vw, -30vh, 0); }
+}
+
+/* ── Skeleton shimmer ──────────────────────────────────────────────────────
+   Loading placeholders: a base block with a highlight sweeping across, so the
+   skeleton reads as actively loading rather than a frozen grey box. */
+.fv-skel {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-panel-2);
+}
+.fv-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09), transparent);
+  animation: fv-shimmer 1.3s ease-in-out infinite;
+}
+html.light .fv-skel::after { background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.06), transparent); }
+@keyframes fv-shimmer { 100% { transform: translateX(100%); } }
+
+/* Staggered reveal — direct children rise in sequence (used on panel grids). */
+.stagger > * { animation: fv-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.07s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.17s; }
+.stagger > *:nth-child(5) { animation-delay: 0.22s; }
+.stagger > *:nth-child(6) { animation-delay: 0.27s; }
+.stagger > *:nth-child(7) { animation-delay: 0.32s; }
+.stagger > *:nth-child(8) { animation-delay: 0.37s; }
+.stagger > *:nth-child(9) { animation-delay: 0.42s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise, .animate-fade, .animate-in-left, .animate-in-right, .animate-pop,
+  .radar-grow, .bar-grow, .bar-grow-r, .animate-surge, .stagger > * { animation: none !important; }
+}
+
+/* ── Global scroll-reveal ──────────────────────────────────────────────────
+   Elements with `.reveal` fade + rise in when scrolled into view. The hidden
+   state only applies once JS adds `reveal-ready` to <html> (before first paint),
+   so no-JS users always see content and there is never a flash. */
+.reveal { transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-ready .reveal:not(.reveal-in) { opacity: 0; transform: translateY(22px); }
+.reveal-ready .reveal-in { opacity: 1; transform: none; }
+/* Staggered children (e.g. a row of cards) cascade in. */
+.reveal-ready .reveal-stagger > *:nth-child(2) { transition-delay: 0.06s; }
+.reveal-ready .reveal-stagger > *:nth-child(3) { transition-delay: 0.12s; }
+.reveal-ready .reveal-stagger > *:nth-child(4) { transition-delay: 0.18s; }
+.reveal-ready .reveal-stagger > *:nth-child(5) { transition-delay: 0.24s; }
+.reveal-ready .reveal-stagger > *:nth-child(6) { transition-delay: 0.30s; }
+.reveal-ready .reveal-stagger > *:nth-child(7) { transition-delay: 0.36s; }
+.reveal-ready .reveal-stagger > *:nth-child(8) { transition-delay: 0.42s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready .reveal:not(.reveal-in) { opacity: 1; transform: none; }
+}
 
 .delay-1 { animation-delay: 0.08s; }
 .delay-2 { animation-delay: 0.16s; }
@@ -144,4 +415,153 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================================
+   LIGHT MODE — toggled by `html.light` (ThemeToggle + no-flash
+   script in layout.tsx). Flips the semantic colour tokens, then
+   patches the hardcoded white-on-dark utilities (panels, glass
+   buttons, hero metal titles, cage grid, logo) so they read on a
+   light surface. The red/blue brand flares are kept — they tint
+   nicely over a light background. These rules are UNLAYERED so
+   they win over the @layer utilities they override.
+   ============================================================ */
+html.light {
+  --color-bg: #eceef1;
+  --color-panel: #ffffff;
+  --color-panel-2: #f3f5f8;
+  --color-line: #d3d8df;
+  --color-line-soft: #e4e7eb;
+  --color-fg: #14161a;
+  --color-muted: #586069;
+  --color-faint: #8b929b;
+  --color-steel: #4a535d;
+}
+
+/* The wordmark asset is pure white → render it black on light surfaces. */
+html.light .fv-logo { filter: brightness(0); }
+
+/* Steel gradient text (e.g. account "{name} HQ", "Welcome back, {name}") is a
+   white→grey gradient built for dark mode — invisible on light surfaces. Flip
+   it to a dark slate→grey gradient so it stays legible in light mode. */
+html.light .text-gradient-steel {
+  background: linear-gradient(180deg, #1f2937, #5b636f);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+html.light ::-webkit-scrollbar-track { background: var(--color-bg); }
+html.light ::-webkit-scrollbar-thumb { background: #c4cad2; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #aab2bc; }
+
+/* Panels → light glass. */
+html.light .panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 245, 248, 0.96));
+  border-color: var(--color-line);
+}
+html.light .panel-hover:hover {
+  border-color: #b7bec8;
+  box-shadow: 0 12px 40px -14px rgba(15, 23, 42, 0.22);
+}
+
+/* Red/blue flair surfaces → light base, keep the corner tint. */
+html.light .flair-rb { background-color: var(--color-panel); }
+html.light .flair-rb-lg { background-color: #eef1f5; }
+
+/* Simulator broadcast plates (supplied dark PNGs behind the fighters/winner).
+   In light mode, invert the plate ART so its dark fill becomes a light surface
+   while the red/blue glow is kept (invert flips luminance; hue-rotate 180 puts
+   the hue back). Only the .sim-frame art layer is filtered — the .sim-plate-text
+   above it uses theme tokens, so the text flips with the plate. */
+html.light .sim-frame { filter: invert(1) hue-rotate(180deg); }
+.sim-plate-text { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9); }
+html.light .sim-plate-text { text-shadow: 0 1px 6px rgba(255, 255, 255, 0.7); }
+/* Fighter/winner names on the light plates: a strong slate rather than pure
+   near-black, which reads as too heavy/harsh on the bright broadcast plates. */
+html.light .sim-name { color: #3a4150; }
+
+/* "Select Fighter" placeholder silhouette: solid black + faint white edge on the
+   dark theme; a soft grey on light, so it doesn't read as a harsh black cut-out
+   clashing with the bright page. */
+.sim-silhouette { filter: brightness(0) drop-shadow(0 0 2px rgba(255, 255, 255, 0.35)); }
+html.light .sim-silhouette { filter: brightness(0) invert(0.66); }
+/* Solid black body used as the default for fighters with no photo — same
+   technique as the simulator placeholder but with NO outline glow. */
+.pick-silhouette { filter: brightness(0); }
+html.light .pick-silhouette { filter: brightness(0) invert(0.66); }
+
+/* Animated background flares on light mode: additive transparency over a near-
+   white page reads as a pasty pink/blue wash. Multiply blend instead tints the
+   light surface like absorbed colour, and a lower alpha keeps it a subtle glow. */
+html.light .fv-flare { mix-blend-mode: multiply; }
+html.light .fv-flare-red { background: radial-gradient(closest-side, rgba(225, 6, 0, 0.12), transparent 70%); }
+html.light .fv-flare-blue { background: radial-gradient(closest-side, rgba(46, 144, 255, 0.12), transparent 70%); }
+
+/* Elite-tier red text (e.g. the Elite plan title) was the dark blood-dim, which
+   turns muddy on a light surface. Use a vivid red that stays readable on white. */
+html.light .text-blood-dim { color: #d4140a; }
+
+/* Glass / flare buttons used white borders for a dark bg → ink borders on light. */
+html.light .btn-flare { border-color: rgba(15, 23, 42, 0.14); background-color: rgba(15, 23, 42, 0.035); color: var(--color-fg); }
+html.light .btn-flare:hover { border-color: rgba(15, 23, 42, 0.22); background-color: rgba(15, 23, 42, 0.06); }
+html.light .btn-flare-active { border-color: rgba(15, 23, 42, 0.28); background-color: rgba(15, 23, 42, 0.06); }
+html.light .btn-toggle { border-color: rgba(15, 23, 42, 0.14); color: var(--color-fg); }
+html.light .btn-toggle:hover { border-color: rgba(15, 23, 42, 0.24); }
+html.light .btn-toggle.is-on { border-color: rgba(15, 23, 42, 0.30); background-color: rgba(15, 23, 42, 0.05); }
+html.light .flare-btn { color: var(--color-fg); border-color: rgba(15, 23, 42, 0.22); }
+html.light .flare-btn:hover { color: #0a0b0d; background-color: rgba(255, 255, 255, 0.92); border-color: rgba(15, 23, 42, 0.16); }
+html.light .chip-active {
+  color: #14161a;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: -7px 0 16px -8px rgba(225, 6, 0, 0.40), 7px 0 16px -8px rgba(46, 144, 255, 0.40);
+}
+
+/* Cage grid lines: white hairlines → ink hairlines. */
+html.light .bg-cage {
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+}
+html.light .bg-cage-fine {
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+}
+
+/* Hero metal titles: silver fill + white stroke vanish on light → ink them. */
+html.light .metal-titles h1, html.light .metal-titles h2 { filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.18)); }
+html.light .metal-titles h2, html.light .metal-titles .title-silver {
+  background-image: linear-gradient(180deg, #3a3f47 0%, #20242b 45%, #4b5560 60%, #20242b 100%);
+}
+html.light .metal-titles h1 .text-blood, html.light .metal-titles h2 .text-blood, html.light .metal-titles .title-red {
+  -webkit-text-stroke: 1.6px rgba(18, 20, 24, 0.92);
+  filter: drop-shadow(-7px 0 12px rgba(225, 6, 0, 0.42)) drop-shadow(7px 0 12px rgba(46, 144, 255, 0.38));
+}
+
+/* ---- Theme swap animation ----------------------------------------------- */
+/* The new theme is cross-faded gently over the old one (View Transitions API,
+   triggered from ThemeToggle). A slow ease-in-out opacity fade is easy on the
+   eyes — no hard sweeping edge, no harsh luminance jump. The old snapshot holds
+   underneath while the new one fades in on top. */
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) {
+  animation: fv-theme-fade 0.7s ease-in-out both;
+  mix-blend-mode: normal;
+}
+@keyframes fv-theme-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Sun/moon icon eases in on each swap (and on the no-VT fallback) — a gentle
+   quarter-turn + fade, not a hard spin. */
+.theme-icon { animation: theme-icon-in 0.55s ease-out both; }
+@keyframes theme-icon-in {
+  from { transform: rotate(-35deg) scale(0.85); opacity: 0; }
+  to   { transform: rotate(0) scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-icon { animation: none; }
+  ::view-transition-new(root) { animation: none; }
 }

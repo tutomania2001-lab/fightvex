@@ -1,0 +1,8 @@
+{
+  "event": "ufc-fight-night",
+  "finals": 33,
+  "gradedVsPick": 32,
+  "correctWinners": 26,
+  "accuracy": 0.813,
+  "methodHits": 0
+}

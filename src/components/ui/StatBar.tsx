@@ -13,10 +13,10 @@ export function StatBar({
   max?: number;
   suffix?: string;
   compare?: number;
-  tone?: "blood" | "edge" | "amber";
+  tone?: "blood" | "edge" | "amber" | "blue";
 }) {
   const pctVal = Math.max(0, Math.min(100, (value / max) * 100));
-  const toneClass = tone === "edge" ? "bg-edge" : tone === "amber" ? "bg-amber" : "bg-blood";
+  const toneClass = tone === "edge" ? "bg-edge" : tone === "amber" ? "bg-amber" : tone === "blue" ? "bg-blue" : "bg-blood";
 
   return (
     <div className="space-y-1">

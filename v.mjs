@@ -1,0 +1,13 @@
+import pw from "file:///C:/Users/Admin/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright/index.js";
+const { chromium } = pw;
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport:{width:1366,height:820}, deviceScaleFactor:1.25 });
+await ctx.addInitScript(()=>{ try{localStorage.setItem("fv-age-ok","1");}catch{} });
+const p = await ctx.newPage();
+const errs=[]; p.on("pageerror",e=>errs.push(String(e).slice(0,100)));
+await p.goto("https://www.fightvex.com/",{waitUntil:"networkidle",timeout:60000});
+await p.waitForTimeout(3000);
+const bg = await p.evaluate(()=>{ const i=[...document.querySelectorAll('img')].find(x=>x.src.includes('bg-octagon')); return i? {ok:i.complete && i.naturalWidth>0, src:i.src.split('/').pop().split('?')[0]} : null; });
+await p.screenshot({ path:"shots/audit/home-after.png" });
+console.log("bg-octagon:", JSON.stringify(bg), "errors:", errs.length);
+await b.close();

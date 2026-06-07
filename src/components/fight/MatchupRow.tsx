@@ -1,24 +1,27 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Matchup } from "@/lib/types";
 import { getFighterById } from "@/lib/data/fighters";
+import { getMatchup } from "@/lib/data/events";
 import { simulate } from "@/lib/sim";
-import { FighterAvatar } from "../fighter/FighterAvatar";
 import { Badge } from "../ui/Badge";
-import { Sparkline } from "../ui/Sparkline";
-import { recordString, impliedProb, noVigProbA, bestPrice, fmtOdds, pct, lastName } from "@/lib/format";
+import { Flag } from "../ui/Flag";
+import { ModelTag } from "../ui/ModelTag";
+import { recordString, impliedProb, noVigProbA, bestPrice, fmtOdds, pct, lastName, signClass } from "@/lib/format";
 
 export function MatchupRow({ matchup }: { matchup: Matchup }) {
   const a = getFighterById(matchup.fighterA)!;
   const b = getFighterById(matchup.fighterB)!;
-  const sim = simulate(a, b, { rounds: matchup.rounds, runs: 600 });
+  const sim = simulate(a, b, { rounds: matchup.rounds, runs: 600, shortNoticeA: matchup.shortNoticeA, shortNoticeB: matchup.shortNoticeB });
 
   const bestA = bestPrice(matchup.odds.map((o) => o.priceA));
   const bestB = bestPrice(matchup.odds.map((o) => o.priceB));
   const fairA = noVigProbA(bestA, bestB);
-  const edge = sim.probA - fairA; // model vs market
+  const edge = sim.probA - fairA; // Vex AI vs market
+  const eventSlug = getMatchup(matchup.id)?.event.slug ?? "";
 
   return (
-    <Link href={`/events/${"vanguard-fc-14"}#${matchup.id}`} className="block">
+    <Link href={`/events/${eventSlug}#${matchup.id}`} className="block">
       <div id={matchup.id} className="panel panel-hover rounded-xl p-4 sm:p-5">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -26,25 +29,26 @@ export function MatchupRow({ matchup }: { matchup: Matchup }) {
             <Badge variant="steel">{matchup.weightClass}</Badge>
             <Badge variant="neutral">{matchup.rounds} rounds</Badge>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-muted">
-            <span>Line</span>
-            <Sparkline points={matchup.lineHistory.map((p) => p.impliedA)} tone="amber" width={64} height={20} />
-          </div>
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-3">
           {/* Fighter A */}
-          <div className="flex items-center gap-3">
-            <FighterAvatar fighter={a} size="md" />
-            <div className="min-w-0">
+          <div className="flex min-w-0 items-end gap-2 sm:gap-3">
+            <div className="relative h-[68px] w-12 shrink-0">
+              <Image src={a.image ?? "/fighters/unknown-v5.png"} alt={a.image ? a.name : ""} fill sizes="56px" className="object-contain object-bottom" />
+              <span className="absolute right-0 top-0 z-10">
+                <Flag emoji={a.flag} country={a.country} className="h-2.5 w-4 rounded-[1px] border border-black/40" />
+              </span>
+            </div>
+            <div className="min-w-0 pb-1">
               <p className="truncate font-display text-base font-bold uppercase leading-tight">{a.name}</p>
               <p className="tnum text-xs text-muted">{recordString(a.record)}</p>
-              <p className="tnum mt-0.5 text-sm font-semibold text-blood">{fmtOdds(bestA)}</p>
+              <p className={`tnum mt-0.5 text-sm font-semibold ${signClass(bestA)}`}>{fmtOdds(bestA)}</p>
             </div>
           </div>
 
           {/* Center */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center pb-1">
             <span className="font-display text-xs font-bold text-muted">VS</span>
             <div className="mt-1 rounded-md border border-line bg-bg px-2 py-1 text-center">
               <p className="text-[9px] uppercase tracking-wider text-muted">AI Conf.</p>
@@ -53,21 +57,26 @@ export function MatchupRow({ matchup }: { matchup: Matchup }) {
           </div>
 
           {/* Fighter B */}
-          <div className="flex items-center justify-end gap-3 text-right">
-            <div className="min-w-0">
+          <div className="flex min-w-0 items-end justify-end gap-2 text-right sm:gap-3">
+            <div className="min-w-0 pb-1">
               <p className="truncate font-display text-base font-bold uppercase leading-tight">{b.name}</p>
               <p className="tnum text-xs text-muted">{recordString(b.record)}</p>
-              <p className="tnum mt-0.5 text-sm font-semibold text-edge">{fmtOdds(bestB)}</p>
+              <p className={`tnum mt-0.5 text-sm font-semibold ${signClass(bestB)}`}>{fmtOdds(bestB)}</p>
             </div>
-            <FighterAvatar fighter={b} size="md" />
+            <div className="relative h-[68px] w-12 shrink-0">
+              <Image src={b.image ?? "/fighters/unknown-v5.png"} alt={b.image ? b.name : ""} fill sizes="56px" className={b.image ? "object-contain object-bottom" : "-scale-x-100 object-contain object-bottom"} />
+              <span className="absolute left-0 top-0 z-10">
+                <Flag emoji={b.flag} country={b.country} className="h-2.5 w-4 rounded-[1px] border border-black/40" />
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Value indicator */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
-          <p className="text-[11px] text-muted">
-            Model: <span className="tnum text-blood">{pct(sim.probA)}</span> {lastName(a.name)} · Market (no-vig):{" "}
-            <span className="tnum text-fg">{pct(fairA)}</span>
+        {/* Value indicator — odds & probabilities are model-implied, not ESPN/real lines */}
+        <div className="mt-0 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
+          <p className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
+            <span>Vex AI: <span className="tnum text-blood">{pct(sim.probA)}</span> {lastName(a.name)} · Market (no-vig): <span className="tnum text-fg">{pct(fairA)}</span></span>
+            <ModelTag kind="odds" />
           </p>
           {Math.abs(edge) >= 0.04 ? (
             <Badge variant={edge > 0 ? "edge" : "neutral"}>

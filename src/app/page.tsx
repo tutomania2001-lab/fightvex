@@ -1,16 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
 import { nextEvent } from "@/lib/data/events";
-import { allFighters, getFighterById } from "@/lib/data/fighters";
-import { allInsights } from "@/lib/data/research";
+import { getFighterById } from "@/lib/data/fighters";
 import { simulate } from "@/lib/sim";
-import { Countdown } from "@/components/fight/Countdown";
+import { RelatedNews } from "@/components/live/RelatedNews";
 import { MatchupRow } from "@/components/fight/MatchupRow";
-import { FighterCard } from "@/components/fighter/FighterCard";
-import { SectionHeading } from "@/components/ui/Panel";
-import { Badge } from "@/components/ui/Badge";
-import { ProbBar } from "@/components/ui/ProbBar";
-import { Disclaimer } from "@/components/ui/Disclaimer";
-import { lastName } from "@/lib/format";
+import { lastName, recordString, pct, fmtOdds, bestPrice, signClass } from "@/lib/format";
+import { HeroFightAnimation } from "@/components/site/HeroFightAnimation";
+import { HeroKeyFactors } from "@/components/site/HeroKeyFactors";
+
+// Revalidate hourly so the rolling "next event" hero advances after a card
+// passes (Date.now() is only re-evaluated when the page regenerates).
+export const revalidate = 3600;
 
 export default function Home() {
   const event = nextEvent();
@@ -18,178 +19,130 @@ export default function Home() {
   const featured = event.matchups[0];
   const fa = getFighterById(featured.fighterA)!;
   const fb = getFighterById(featured.fighterB)!;
-  const featSim = simulate(fa, fb, { rounds: featured.rounds, runs: 800 });
-  const fighters = allFighters().filter((f) => f.champion || (f.ranking ?? 9) <= 3).slice(0, 4);
-  const insights = allInsights().slice(0, 3);
+  const featSim = simulate(fa, fb, { rounds: featured.rounds, runs: 800, shortNoticeA: featured.shortNoticeA, shortNoticeB: featured.shortNoticeB });
+
+  // Real info for the MATCH 2 hero tab — the featured event matchup.
+  const featBestA = bestPrice(featured.odds.map((o) => o.priceA));
+  const featBestB = bestPrice(featured.odds.map((o) => o.priceB));
+  const featWinner = featSim.probA >= featSim.probB ? fa : fb;
+  const featConf = Math.max(featSim.probA, featSim.probB);
+  const featWinnerOdds = featWinner === fa ? featBestA : featBestB;
+
+  // Real, data-driven numbers for the hero match-2 (Muhammad vs Bonfim) showcase.
+  const abbrev = (n: string) => `${n.charAt(0)}. ${lastName(n)}`;
+  const clamp01 = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  const strikeTrend = (slpm: number, primary: boolean) => {
+    const v = Math.round(clamp01(slpm * 13, 22, 100));
+    return primary
+      ? [Math.round(v * 0.55), Math.round(v * 0.82), Math.round(v * 0.72), v, Math.round(v * 0.9)]
+      : [Math.round(v * 0.5), Math.round(v * 0.46), Math.round(v * 0.62), Math.round(v * 0.56), Math.round(v * 0.5)];
+  };
+  const match2Stats = {
+    winner: abbrev(featWinner.name),
+    winnerPct: Math.round(featConf * 100),
+    confidence: `${clamp01(6 + (featConf - 0.5) * 8, 5.5, 9.5).toFixed(1)}/10`,
+    aStrAcc: fa.stats.strAcc,
+    aTdDef: fa.stats.tdDef,
+    bStrAcc: fb.stats.strAcc,
+    bTdDef: fb.stats.tdDef,
+    s1: strikeTrend(fa.stats.slpm, true),
+    s2: strikeTrend(fb.stats.slpm, false),
+    sigDelta: Math.max(1, Math.round(Math.abs(fa.stats.slpm - fb.stats.slpm) * 10)),
+  };
+
+  // Same fonts/classes as the Bet Smarter block — just real matchup content.
+  const match2Info = (
+    <div data-hero-scroll className="max-h-[calc(100svh-1rem)] max-w-[520px] overflow-y-auto overscroll-contain pb-10 pt-20 sm:pt-16 lg:max-h-none lg:overflow-visible lg:pt-24">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">
+        {featured.isTitle ? "Title Bout" : "Main Event"} · {event.name}
+      </p>
+      <h2 className="mt-2 font-display text-4xl font-black uppercase italic leading-[0.92] tracking-tight sm:text-6xl lg:text-[72px]">
+        <span className="title-silver">{lastName(fa.name)}</span><br />
+        <span className="whitespace-nowrap italic text-blood">vs {lastName(fb.name)}.</span>
+      </h2>
+      <p className="mt-4 max-w-[400px] text-sm leading-relaxed text-muted sm:text-base">
+        {fa.name} ({recordString(fa.record)}) meets {fb.name} ({recordString(fb.record)}) in the{" "}
+        {featured.weightClass} {featured.rounds}-round {featured.isMain ? "main event" : "bout"}. Vex AI
+        favors {lastName(featWinner.name)} at {pct(featConf)}.
+      </p>
+      <div className="mt-7 flex flex-wrap items-center gap-3">
+        <Link href={`/events/${event.slug}#${featured.id}`} className="btn-flare flex items-center gap-2 rounded-md px-6 py-3 text-sm font-bold uppercase tracking-wide">
+          <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor" aria-hidden><path d="M1 1l8 5-8 5V1z"/></svg>
+          View Matchup
+        </Link>
+        <Link href={`/compare?a=${fa.slug}&b=${fb.slug}`} className="rounded-md border border-line bg-transparent px-6 py-3 text-sm font-bold uppercase tracking-wide text-fg hover:border-steel">
+          Compare
+        </Link>
+      </div>
+      <HeroKeyFactors factors={featured.keyFactors.slice(0, 4)} />
+      <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { v: recordString(fa.record), l: `${lastName(fa.name)} Record`, c: "text-fg" },
+          { v: recordString(fb.record), l: `${lastName(fb.name)} Record`, c: "text-fg" },
+          { v: pct(featConf), l: "AI Confidence", c: "text-fg" },
+          { v: fmtOdds(featWinnerOdds), l: `${lastName(featWinner.name)} Best Price`, c: signClass(featWinnerOdds) },
+        ].map((s) => (
+          <div key={s.l} className="rounded-lg border border-line/60 bg-bg/70 px-3 py-3 backdrop-blur-sm">
+            <p className={`font-display text-xl font-bold ${s.c}`}>{s.v}</p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted">{s.l}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-[10px] uppercase tracking-widest text-faint">
+        Probabilities are Vex AI estimates. 21+ · Not betting advice.
+      </p>
+    </div>
+  );
 
   return (
-    <div>
-      {/* ============ HERO ============ */}
-      <section className="relative overflow-hidden border-b border-line">
-        <div className="bg-cage spotlight absolute inset-0 opacity-90" />
-        <div className="absolute inset-0">
-          <div className="animate-streak absolute left-0 top-1/3 h-px w-1/2 bg-gradient-to-r from-transparent via-blood to-transparent" />
-          <div className="animate-streak absolute right-0 top-2/3 h-px w-1/3 bg-gradient-to-r from-transparent via-edge to-transparent" style={{ animationDelay: "1.5s" }} />
+    <div className="metal-titles">
+      {/* SEO: the root URL needs one descriptive H1 (the hero copy is all H2). */}
+      <h1 className="sr-only">FightVex — AI UFC Fight Simulator, Predictions &amp; Betting Tools</h1>
+      {/* Single fixed octagon bg — persists behind hero AND all scroll sections.
+          The opaque bg base covers the full viewport so the global animated
+          flare (a separate fixed layer) is hidden on the home page: the octagon
+          backdrop is this page's own ambiance, and letting the flare show only
+          on the left half left a hard vertical seam at the octagon's edge. The
+          flare still animates on every other (plain-background) page. */}
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-bg">
+        <div className="absolute right-0 top-0 h-full w-[65%]">
+          <Image src="/bg-octagon.jpg" alt="" fill className="object-cover object-center opacity-40" sizes="65vw" priority />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to right, var(--color-bg) 0%, color-mix(in srgb, var(--color-bg) 40%, transparent) 40%, transparent 100%)" }} />
         </div>
+      </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-          <div className="max-w-3xl">
-            <div className="animate-rise">
-              <Badge variant="blood">AI MMA Fight Intelligence</Badge>
-            </div>
-            <h1 className="animate-rise delay-1 mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-tight sm:text-7xl">
-              Read the fight
-              <br />
-              <span className="text-gradient-blood">before it happens.</span>
-            </h1>
-            <p className="animate-rise delay-2 mt-6 max-w-xl text-lg text-muted">
-              Deep fighter analytics, transparent AI simulations and real-time odds
-              intelligence for serious MMA bettors. Every stat weighted. Every
-              prediction explained. Probabilities, not promises.
-            </p>
-            <div className="animate-rise delay-3 mt-8 flex flex-wrap gap-3">
-              <Link href="/events" className="rounded-md bg-blood px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-blood-dim glow-blood">
-                Explore the Next Card
-              </Link>
-              <Link href="/simulator" className="rounded-md border border-line bg-panel px-6 py-3 text-sm font-bold uppercase tracking-wide text-fg hover:border-steel">
-                Run a Simulation
-              </Link>
-            </div>
-            <p className="animate-fade delay-4 mt-6 text-[11px] uppercase tracking-widest text-faint">
-              21+ · For entertainment &amp; research · Not betting advice · No guaranteed outcomes
-            </p>
-          </div>
+      {/* Single pinned stage: the hero (Bet Smarter + fighters) and these
+          sections share ONE background; each section replaces the previous in
+          the same left region as you scroll. */}
+      <HeroFightAnimation match2Info={match2Info} match2={match2Stats} sections={[
 
-          <div className="animate-rise delay-5 mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {[
-              { k: "Fighters tracked", v: "40+ metrics" },
-              { k: "Model", v: "v1.3 · calibrated" },
-              { k: "Monte Carlo", v: "up to 5k runs" },
-              { k: "Data sources", v: "licensed only" },
-            ].map((s) => (
-              <div key={s.k} className="panel rounded-lg p-4">
-                <p className="font-display text-xl font-bold text-fg">{s.v}</p>
-                <p className="text-[11px] uppercase tracking-wider text-muted">{s.k}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ NEXT EVENT STRIP ============ */}
-      <section className="border-b border-line bg-panel/30">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-8 sm:px-6 lg:flex-row">
+        /* ── 1: Fight Card ── */
+        <div key="fight-card" className="space-y-4">
           <div>
-            <Badge variant="blood">Next Event</Badge>
-            <h2 className="mt-2 font-display text-2xl font-bold uppercase sm:text-3xl">{event.name}</h2>
-            <p className="mt-1 text-sm text-muted">
-              {new Date(event.date).toUTCString().slice(0, 16)} · {event.venue}, {event.city} · {event.broadcast}
-            </p>
-          </div>
-          <Countdown iso={event.date} />
-          <Link href={`/events/${event.slug}`} className="rounded-md border border-line bg-panel px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:border-steel">
-            Full Card →
-          </Link>
-        </div>
-      </section>
-
-      {/* ============ FEATURED MATCHUP ============ */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <SectionHeading kicker="Main Event Breakdown" title="Featured Matchup" />
-        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-          <div className="panel rounded-xl p-6">
-            <ProbBar probA={featSim.probA} labelA={lastName(fa.name)} labelB={lastName(fb.name)} ciLow={featSim.ciLow} ciHigh={featSim.ciHigh} />
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-blood/30 bg-blood/5 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-blood">Why {lastName(fa.name)} can win</p>
-                <ul className="space-y-1 text-sm text-muted">
-                  {fa.strengths.slice(0, 3).map((s) => (<li key={s}>• {s}</li>))}
-                </ul>
-              </div>
-              <div className="rounded-lg border border-edge/30 bg-edge/5 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-edge">Why {lastName(fb.name)} can win</p>
-                <ul className="space-y-1 text-sm text-muted">
-                  {fb.strengths.slice(0, 3).map((s) => (<li key={s}>• {s}</li>))}
-                </ul>
-              </div>
-            </div>
-            <div className="mt-4">
-              <Disclaimer />
-            </div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">Fight Card</p>
+            <h2 className="mt-1 font-display text-4xl font-bold uppercase sm:text-5xl">Main Card</h2>
           </div>
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">Key matchup factors</p>
-            {featured.keyFactors.map((k) => (
-              <div key={k} className="panel rounded-lg p-3 text-sm text-fg">
-                <span className="mr-2 text-blood">▸</span>{k}
-              </div>
-            ))}
-            <Link href={`/simulator?a=${fa.id}&b=${fb.id}`} className="block rounded-md bg-blood px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white hover:bg-blood-dim">
-              Simulate this fight →
-            </Link>
+            {main.map((m) => <MatchupRow key={m.id} matchup={m} />)}
           </div>
-        </div>
-      </section>
+          <Link href={`/events/${event.slug}`} className="inline-block text-sm font-semibold text-blood hover:underline">
+            View full card →
+          </Link>
+        </div>,
 
-      {/* ============ MAIN CARD PREVIEW ============ */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <SectionHeading kicker="Fight Card" title="Main Card" action={<Link href={`/events/${event.slug}`} className="text-sm font-semibold text-blood hover:underline">View all →</Link>} />
-        <div className="space-y-4">
-          {main.map((m) => (<MatchupRow key={m.id} matchup={m} />))}
-        </div>
-      </section>
-
-      {/* ============ FIGHTERS SHOWCASE ============ */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <SectionHeading kicker="Fighter Analytics" title="Top Ranked" action={<Link href="/fighters" className="text-sm font-semibold text-blood hover:underline">Full database →</Link>} />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {fighters.map((f) => (<FighterCard key={f.id} fighter={f} />))}
-        </div>
-      </section>
-
-      {/* ============ RESEARCH FEED ============ */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <SectionHeading kicker="AI Research Engine" title="Latest Intelligence" action={<Link href="/research" className="text-sm font-semibold text-blood hover:underline">Full feed →</Link>} />
-        <div className="grid gap-4 md:grid-cols-3">
-          {insights.map((i) => (
-            <div key={i.id} className="panel panel-hover rounded-xl p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <Badge variant="steel">{i.type}</Badge>
-                <span className="text-[10px] text-muted">{i.recency}</span>
-              </div>
-              <h3 className="font-display text-base font-bold leading-tight text-fg">{i.headline}</h3>
-              <p className="mt-2 line-clamp-3 text-sm text-muted">{i.summary}</p>
-              <div className="mt-3 flex items-center justify-between border-t border-line pt-2 text-[10px] text-muted">
-                <span>{i.source}</span>
-                <span className="text-edge">Conf: {i.confidence}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ============ WHY / TRUST ============ */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="panel bg-cage-fine rounded-2xl p-8 sm:p-12">
-          <div className="grid gap-8 md:grid-cols-3">
-            {[
-              { t: "Depth", d: "40+ tracked metrics per fighter, opponent-quality ratings, and AI style breakdowns most platforms never surface." },
-              { t: "Transparency", d: "Every model weight is published. Explainable factor contributions show exactly what moved each prediction." },
-              { t: "Honesty", d: "Probability ranges, calibrated confidence, and uncertainty inflation. We never sell guaranteed picks." },
-            ].map((c) => (
-              <div key={c.t}>
-                <div className="mb-3 inline-block h-1 w-10 bg-blood" />
-                <h3 className="font-display text-xl font-bold uppercase">{c.t}</h3>
-                <p className="mt-2 text-sm text-muted">{c.d}</p>
-              </div>
-            ))}
+        /* ── 4: Latest Intelligence — REAL ESPN news ── */
+        <div key="research" className="space-y-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">UFC News · ESPN</p>
+            <h2 className="mt-1 font-display text-4xl font-bold uppercase sm:text-5xl">Latest Intelligence</h2>
           </div>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/methodology" className="rounded-md border border-line px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:border-steel">How our model works</Link>
-            <Link href="/pricing" className="rounded-md bg-blood px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-blood-dim">See plans</Link>
-          </div>
-        </div>
-      </section>
+          <RelatedNews limit={4} />
+          <Link href="/research" className="inline-block text-sm font-semibold text-blood hover:underline">
+            Full feed →
+          </Link>
+        </div>,
+
+      ]} />
     </div>
   );
 }

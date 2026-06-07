@@ -1,8 +1,10 @@
 // ============================================================
-// FightVector — Core domain types
-// NOTE: All fighter data in this project is FICTIONAL sample
-// data used to demonstrate the product. A production build
-// would source stats from licensed/official/compliant feeds.
+// FightVex — Core domain types
+// NOTE: Fighter identity, bios, records, events and cards are
+// REAL, sourced from the ESPN public MMA API. Deep analytics
+// (SLpM, TD%, control, etc.) and betting lines are transparent
+// MODEL ESTIMATES — ESPN does not expose granular MMA stats or
+// odds for most cards. Not betting advice. 21+.
 // ============================================================
 
 export type WeightClass =
@@ -15,6 +17,7 @@ export type WeightClass =
   | "Light Heavyweight"
   | "Heavyweight"
   | "Women's Strawweight"
+  | "Women's Flyweight"
   | "Women's Bantamweight";
 
 export type Stance = "Orthodox" | "Southpaw" | "Switch";
@@ -77,10 +80,16 @@ export interface Fighter {
   stance: Stance;
   weightClass: WeightClass;
   gym?: string;
+  /** Optional real portrait (transparent PNG in /public/fighters). Falls back to the silhouette. */
+  image?: string;
   ranking?: number;
   champion?: boolean;
+  /** Real championship title from ESPN rankings, e.g. "UFC Welterweight Champion". Undefined if not a champion. */
+  title?: string;
   record: FightRecord;
   stats: FighterStats;
+  /** True when striking/grappling stats are computed from REAL ESPN per-fight statistics (statsFromAgg); false when model-estimated (no ESPN fight data). */
+  statsReal: boolean;
   strengths: string[];
   weaknesses: string[];
   styleSummary: string;
@@ -107,7 +116,12 @@ export interface Matchup {
   isMain: boolean;
   isTitle?: boolean;
   boutOrder: number;
+  /** Fighter took the bout on short notice (fed from fight-week news, not the data feed) → prep debuff in the sim. */
+  shortNoticeA?: boolean;
+  shortNoticeB?: boolean;
   odds: OddsLine[];
+  /** Set when `odds` are REAL web-sourced market lines (e.g. "Market consensus · Jun 2026"). Undefined => model-implied. */
+  oddsSource?: string;
   lineHistory: { t: string; impliedA: number }[];
   publicSentimentA?: number;
   keyFactors: string[];

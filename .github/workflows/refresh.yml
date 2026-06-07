@@ -1,0 +1,80 @@
+name: Auto-refresh & deploy
+
+# Keeps fightvex.com fresh without manual work: every 30 min a lightweight gate
+# checks whether an event just finished (or it's the daily heartbeat). Only then
+# does it pull fresh ESPN data + stats + assets and ship a production deploy.
+# A skipped tick costs a few seconds; a real refresh lands within ~30 min of a
+# card ending.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {} # manual "Run workflow" button — always refreshes
+
+concurrency:
+  group: refresh-deploy
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      # Project identifiers (not secrets — they appear in every deployment URL).
+      VERCEL_ORG_ID: team_7VPhkhoe1yWQRl7D01LMevTr
+      VERCEL_PROJECT_ID: prj_CmpajoulbsJz1DxIbVDfnuxAiWZC
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          python -m pip install --upgrade pip
+          pip install Pillow
+          npm i -g vercel@latest
+
+      - name: Decide whether to refresh
+        id: gate
+        run: node scripts/should-refresh.mjs
+
+      - name: Refresh ESPN cards & results
+        if: steps.gate.outputs.proceed == 'true'
+        run: node scripts/fetch-espn.mjs
+        env:
+          ESPN_FORCE: "1"
+
+      - name: Refresh fighter stats (model inputs)
+        if: steps.gate.outputs.proceed == 'true'
+        run: python scripts/fetch_stats.py
+        continue-on-error: true
+
+      - name: Refresh headshots
+        if: steps.gate.outputs.proceed == 'true'
+        run: python scripts/fetch_headshots.py
+        continue-on-error: true
+
+      - name: Refresh body images
+        if: steps.gate.outputs.proceed == 'true'
+        run: python scripts/fetch_bodies.py
+        continue-on-error: true
+
+      - name: Pull Vercel production env
+        if: steps.gate.outputs.proceed == 'true'
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build
+        if: steps.gate.outputs.proceed == 'true'
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy to production
+        if: steps.gate.outputs.proceed == 'true'
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

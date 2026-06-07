@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
 
-export const metadata: Metadata = { title: "Responsible Gambling" };
+export const metadata: Metadata = {
+  title: "Responsible Gambling",
+  description: "FightVex is an analytics platform, not a sportsbook. Bet within your means — bankroll guidance, warning signs and where to get help. 21+.",
+  alternates: { canonical: "/responsible-gambling" },
+};
 
 export default function ResponsibleGamblingPage() {
   return (
@@ -14,7 +18,7 @@ export default function ResponsibleGamblingPage() {
         tools are designed to inform decisions, never to pressure you into them.
       </p>
 
-      <Panel className="mt-6 p-6">
+      <Panel className="reveal mt-6 p-6">
         <h2 className="mb-3 font-display text-xl font-bold uppercase">Our commitments</h2>
         <ul className="list-disc space-y-2 pl-5 text-sm text-muted">
           <li>We never promise guaranteed profits or &quot;locks.&quot;</li>
@@ -25,12 +29,12 @@ export default function ResponsibleGamblingPage() {
         </ul>
       </Panel>
 
-      <Panel className="mt-6 p-6">
+      <Panel className="reveal mt-6 p-6">
         <h2 className="mb-3 font-display text-xl font-bold uppercase">Warning signs</h2>
         <p className="text-sm text-muted">Betting more than you can afford, chasing losses, borrowing to bet, hiding betting from family, or feeling anxious about it are all signs to step back. Set deposit and time limits, and treat any betting budget as entertainment money you can afford to lose.</p>
       </Panel>
 
-      <Panel className="mt-6 p-6">
+      <Panel className="reveal mt-6 p-6">
         <h2 className="mb-3 font-display text-xl font-bold uppercase">Get help</h2>
         <ul className="space-y-2 text-sm text-muted">
           <li><b className="text-fg">US:</b> Call or text 1-800-GAMBLER · <span className="text-edge">ncpgambling.org</span></li>

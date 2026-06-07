@@ -10,11 +10,14 @@ export function Radar({
   size = 260,
   labelA = "A",
   labelB = "B",
+  animate = false,
 }: {
   data: RadarDatum[];
   size?: number;
   labelA?: string;
   labelB?: string;
+  /** Grow the data polygons out from the centre on mount. */
+  animate?: boolean;
 }) {
   const cx = size / 2;
   const cy = size / 2;
@@ -62,13 +65,23 @@ export function Radar({
           </g>
         );
       })}
-      {hasB && <polygon points={polygon("b")} fill="rgba(0,224,184,0.16)" stroke="#00e0b8" strokeWidth={1.5} />}
-      <polygon points={polygon("a")} fill="rgba(225,6,0,0.18)" stroke="#e10600" strokeWidth={1.5} />
+      {hasB && (
+        <polygon
+          points={polygon("b")} fill="rgba(46,144,255,0.16)" stroke="#2e90ff" strokeWidth={1.5}
+          className={animate ? "radar-grow" : undefined}
+          style={animate ? { transformBox: "view-box", transformOrigin: `${cx}px ${cy}px` } : undefined}
+        />
+      )}
+      <polygon
+        points={polygon("a")} fill="rgba(225,6,0,0.18)" stroke="#e10600" strokeWidth={1.5}
+        className={animate ? "radar-grow" : undefined}
+        style={animate ? { transformBox: "view-box", transformOrigin: `${cx}px ${cy}px`, animationDelay: "0.1s" } : undefined}
+      />
       {hasB && (
         <g>
           <rect x={8} y={size - 16} width={8} height={8} fill="#e10600" />
           <text x={20} y={size - 9} fontSize={9} fill="#8a909a">{labelA}</text>
-          <rect x={size - 70} y={size - 16} width={8} height={8} fill="#00e0b8" />
+          <rect x={size - 70} y={size - 16} width={8} height={8} fill="#2e90ff" />
           <text x={size - 58} y={size - 9} fontSize={9} fill="#8a909a">{labelB}</text>
         </g>
       )}

@@ -29,6 +29,10 @@ export function toDecimal(american: number): number {
 export function fmtOdds(american: number): string {
   return american > 0 ? `+${american}` : `${american}`;
 }
+/** Sign semantics used site-wide: positive (+) reads green/good, negative (−) red/bad. */
+export function signClass(n: number): string {
+  return n >= 0 ? "text-edge" : "text-blood";
+}
 export function expectedValue(modelProb: number, american: number): number {
   const dec = toDecimal(american);
   return modelProb * (dec - 1) - (1 - modelProb);

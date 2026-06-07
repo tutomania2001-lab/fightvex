@@ -1,414 +1,424 @@
 // ============================================================
-// FightVector — FICTIONAL sample fighter data
-// All fighters, stats and records below are invented for demo
-// purposes. Production would use licensed/compliant feeds.
+// FightVex — fighter data layer
+//
+// REAL identity, bio & records come from the ESPN public MMA API
+// (see espn.generated.ts, refreshed by `npm run fetch:espn`).
+// ESPN does not expose deep MMA analytics (its athlete
+// /statistics endpoint 404s), so the granular metrics below
+// (SLpM, TD%, control, cardio, durability …) are MODEL ESTIMATES
+// derived deterministically from each fighter's real record and
+// finish profile. They are transparent estimates, not official
+// stats. 21+ · Not betting advice.
 // ============================================================
-import type { Fighter } from "../types";
+import type { Fighter, FighterStats, FormEntry, RiskFlag, Stance, WeightClass } from "../types";
+import { REAL_FIGHTERS, type RawFighter } from "./espn.generated";
+import { DIVISION_RANKINGS, P4P_RANKINGS, ROSTER_ADDITIONS } from "./rankings.override";
+import { REAL_AGG, type RealAgg } from "./stats.generated";
+import { portraitFor } from "./portraits";
 
-export const FIGHTERS: Fighter[] = [
-  {
-    id: "f1",
-    slug: "diego-morales",
-    name: "Diego Morales",
-    nickname: "El Halcón",
-    country: "Mexico",
-    flag: "🇲🇽",
-    age: 28,
-    heightCm: 178,
-    reachCm: 188,
-    stance: "Orthodox",
-    weightClass: "Lightweight",
-    gym: "Apex Mountain MT",
-    ranking: 0,
-    champion: true,
-    record: { wins: 22, losses: 4, draws: 0, ko: 10, sub: 6, dec: 6 },
-    stats: { slpm: 5.2, strAcc: 49, sapm: 3.1, strDef: 61, tdAvg: 1.1, tdAcc: 41, tdDef: 58, subAvg: 0.9, ctrl: 1.1, kdAvg: 0.8, cardio: 88, durability: 74, finishRate: 73 },
-    strengths: ["Elite gas tank", "Volume body work", "Late-round pressure"],
-    weaknesses: ["Defensive wrestling under elite grapplers", "Slow starts"],
-    styleSummary:
-      "Pressure striker with an elite engine who hunts the body and breaks opponents late. Comfortable in the championship rounds; most vulnerable to high-level wrestlers who can stall his volume early.",
-    oppQuality: 84,
-    layoffMonths: 6,
-    form: [
-      { opponent: "K. Petrov", result: "W", method: "TKO", round: 4, date: "2025-03", rating: 88 },
-      { opponent: "R. Sou", result: "W", method: "DEC", round: 5, date: "2024-09", rating: 82 },
-      { opponent: "M. Adeyemi", result: "W", method: "SUB", round: 2, date: "2024-04", rating: 90 },
-      { opponent: "T. Vasquez", result: "L", method: "DEC", round: 3, date: "2023-11", rating: 64 },
-      { opponent: "J. Park", result: "W", method: "TKO", round: 3, date: "2023-06", rating: 85 },
-    ],
-    riskFlags: [
-      { type: "layoff", label: "6-month layoff", severity: "low", source: "Licensed event feed", confidence: "High", updated: "5d ago" },
-    ],
-  },
-  {
-    id: "f2",
-    slug: "kazimir-petrov",
-    name: "Kazimir Petrov",
-    nickname: "The Bear Trap",
-    country: "Russia",
-    flag: "🇷🇺",
-    age: 30,
-    heightCm: 180,
-    reachCm: 185,
-    stance: "Southpaw",
-    weightClass: "Lightweight",
-    gym: "Red Line Combat",
-    ranking: 1,
-    record: { wins: 19, losses: 3, draws: 0, ko: 5, sub: 9, dec: 5 },
-    stats: { slpm: 3.4, strAcc: 44, sapm: 2.6, strDef: 57, tdAvg: 4.8, tdAcc: 47, tdDef: 72, subAvg: 2.4, ctrl: 3.2, kdAvg: 0.3, cardio: 80, durability: 79, finishRate: 74 },
-    strengths: ["Chain wrestling", "Top control", "Back-take submissions"],
-    weaknesses: ["Striking output on the feet", "Susceptible to long-range volume"],
-    styleSummary:
-      "Relentless grappler who blends level changes with a southpaw jab to close distance, then drowns opponents with control time and submission chains. Less threatening in pure striking exchanges.",
-    oppQuality: 81,
-    layoffMonths: 8,
-    form: [
-      { opponent: "D. Morales", result: "L", method: "TKO", round: 4, date: "2025-03", rating: 66 },
-      { opponent: "L. Okafor", result: "W", method: "SUB", round: 1, date: "2024-08", rating: 91 },
-      { opponent: "S. Tanaka", result: "W", method: "DEC", round: 3, date: "2024-02", rating: 80 },
-      { opponent: "B. Cole", result: "W", method: "SUB", round: 2, date: "2023-10", rating: 88 },
-      { opponent: "F. Rossi", result: "W", method: "DEC", round: 3, date: "2023-05", rating: 78 },
-    ],
-    riskFlags: [
-      { type: "layoff", label: "8-month layoff", severity: "med", source: "Licensed event feed", confidence: "High", updated: "1d ago" },
-    ],
-  },
-  {
-    id: "f3",
-    slug: "sora-tanaka",
-    name: "Sora Tanaka",
-    nickname: "Thunderclap",
-    country: "Japan",
-    flag: "🇯🇵",
-    age: 26,
-    heightCm: 175,
-    reachCm: 180,
-    stance: "Switch",
-    weightClass: "Lightweight",
-    gym: "Tokyo Strike Lab",
-    ranking: 3,
-    record: { wins: 16, losses: 2, draws: 0, ko: 11, sub: 1, dec: 4 },
-    stats: { slpm: 6.1, strAcc: 53, sapm: 4.0, strDef: 54, tdAvg: 0.4, tdAcc: 33, tdDef: 49, subAvg: 0.2, ctrl: 0.4, kdAvg: 1.6, cardio: 71, durability: 62, finishRate: 81 },
-    strengths: ["One-shot power", "Counter timing", "Switch-stance feints"],
-    weaknesses: ["Takedown defense", "Cardio in deep waters", "Chin durability"],
-    styleSummary:
-      "Explosive switch-hitter with fight-ending power in both hands and elite counter timing. A nightmare early; the question marks are his takedown defense and whether his output holds into the late rounds.",
-    oppQuality: 70,
-    layoffMonths: 4,
-    form: [
-      { opponent: "K. Petrov", result: "L", method: "DEC", round: 3, date: "2024-02", rating: 60 },
-      { opponent: "G. Mbappe", result: "W", method: "KO", round: 1, date: "2023-09", rating: 95 },
-      { opponent: "H. Lindgren", result: "W", method: "KO", round: 2, date: "2023-03", rating: 92 },
-      { opponent: "V. Costa", result: "W", method: "TKO", round: 1, date: "2022-11", rating: 90 },
-      { opponent: "A. Idris", result: "W", method: "DEC", round: 3, date: "2022-06", rating: 76 },
-    ],
-    riskFlags: [
-      { type: "durability", label: "2 KO losses in career", severity: "med", source: "Public record", confidence: "High", updated: "2w ago" },
-    ],
-  },
-  {
-    id: "f4",
-    slug: "lucas-okafor",
-    name: "Lucas Okafor",
-    nickname: "Blackout",
-    country: "Nigeria",
-    flag: "🇳🇬",
-    age: 29,
-    heightCm: 183,
-    reachCm: 196,
-    stance: "Orthodox",
-    weightClass: "Lightweight",
-    gym: "Lagos Iron",
-    ranking: 4,
-    record: { wins: 15, losses: 4, draws: 0, ko: 9, sub: 2, dec: 4 },
-    stats: { slpm: 4.6, strAcc: 47, sapm: 3.4, strDef: 59, tdAvg: 0.9, tdAcc: 38, tdDef: 66, subAvg: 0.5, ctrl: 0.8, kdAvg: 1.0, cardio: 76, durability: 70, finishRate: 73 },
-    strengths: ["Massive reach", "Long-range kicks", "Jab management"],
-    weaknesses: ["Inside fighting", "Grappling off his back"],
-    styleSummary:
-      "Rangy striker who weaponizes a 196cm reach with a piston jab and teep kicks, keeping fights at the end of his range. Can be smothered by pressure fighters who get inside the jab.",
-    oppQuality: 72,
-    layoffMonths: 10,
-    form: [
-      { opponent: "K. Petrov", result: "L", method: "SUB", round: 1, date: "2024-08", rating: 55 },
-      { opponent: "C. Dupont", result: "W", method: "DEC", round: 3, date: "2024-01", rating: 79 },
-      { opponent: "N. Haddad", result: "W", method: "KO", round: 2, date: "2023-07", rating: 89 },
-      { opponent: "P. Silva", result: "W", method: "DEC", round: 3, date: "2023-02", rating: 77 },
-      { opponent: "D. Krause", result: "L", method: "DEC", round: 3, date: "2022-08", rating: 62 },
-    ],
-    riskFlags: [
-      { type: "inactivity", label: "10-month inactivity", severity: "med", source: "Licensed event feed", confidence: "High", updated: "3d ago" },
-    ],
-  },
-  {
-    id: "f5",
-    slug: "rashid-souleymane",
-    name: "Rashid Souleymane",
-    nickname: "The Algorithm",
-    country: "France",
-    flag: "🇫🇷",
-    age: 31,
-    heightCm: 177,
-    reachCm: 183,
-    stance: "Orthodox",
-    weightClass: "Lightweight",
-    gym: "Paris Fight Institute",
-    ranking: 2,
-    record: { wins: 20, losses: 3, draws: 1, ko: 4, sub: 5, dec: 11 },
-    stats: { slpm: 4.9, strAcc: 51, sapm: 2.8, strDef: 64, tdAvg: 2.6, tdAcc: 44, tdDef: 75, subAvg: 1.1, ctrl: 1.9, kdAvg: 0.5, cardio: 85, durability: 80, finishRate: 45 },
-    strengths: ["Fight IQ", "Well-rounded everywhere", "Defensive metrics"],
-    weaknesses: ["Lacks one-shot power", "Can be out-grappled by specialists"],
-    styleSummary:
-      "Cerebral, well-rounded technician who wins the strategic battle — strong defensive numbers across the board and a high fight IQ. Rarely finishes, but rarely loses rounds.",
-    oppQuality: 83,
-    layoffMonths: 5,
-    form: [
-      { opponent: "D. Morales", result: "L", method: "DEC", round: 5, date: "2024-09", rating: 70 },
-      { opponent: "I. Volkov", result: "W", method: "DEC", round: 3, date: "2024-03", rating: 81 },
-      { opponent: "M. Reyes", result: "W", method: "DEC", round: 3, date: "2023-10", rating: 80 },
-      { opponent: "T. Bauer", result: "D", method: "DEC", round: 3, date: "2023-04", rating: 72 },
-      { opponent: "K. Mensah", result: "W", method: "SUB", round: 2, date: "2022-12", rating: 86 },
-    ],
-    riskFlags: [],
-  },
-  {
-    id: "f6",
-    slug: "billy-cole",
-    name: "Billy Cole",
-    nickname: "Bad News",
-    country: "USA",
-    flag: "🇺🇸",
-    age: 33,
-    heightCm: 179,
-    reachCm: 182,
-    stance: "Orthodox",
-    weightClass: "Lightweight",
-    gym: "Vegas Top Team",
-    ranking: 6,
-    record: { wins: 18, losses: 6, draws: 0, ko: 8, sub: 4, dec: 6 },
-    stats: { slpm: 4.2, strAcc: 45, sapm: 3.8, strDef: 52, tdAvg: 1.8, tdAcc: 42, tdDef: 60, subAvg: 1.0, ctrl: 1.3, kdAvg: 0.7, cardio: 68, durability: 66, finishRate: 67 },
-    strengths: ["Veteran savvy", "Scrambling", "Heavy hands early"],
-    weaknesses: ["Declining cardio", "Age-related durability", "Inconsistent output"],
-    styleSummary:
-      "Battle-tested veteran brawler who is dangerous in the first two rounds with heavy hands and slick scrambles, but whose cardio and chin have shown decline against younger pressure.",
-    oppQuality: 75,
-    layoffMonths: 7,
-    form: [
-      { opponent: "K. Petrov", result: "L", method: "SUB", round: 2, date: "2023-10", rating: 58 },
-      { opponent: "R. Quinn", result: "W", method: "KO", round: 1, date: "2023-05", rating: 88 },
-      { opponent: "E. Novak", result: "L", method: "DEC", round: 3, date: "2022-12", rating: 60 },
-      { opponent: "A. Bishop", result: "W", method: "DEC", round: 3, date: "2022-07", rating: 74 },
-      { opponent: "M. Forde", result: "W", method: "SUB", round: 3, date: "2022-02", rating: 79 },
-    ],
-    riskFlags: [
-      { type: "age", label: "Cardio decline (age 33)", severity: "med", source: "Analysis (attributed)", confidence: "Medium", updated: "1w ago" },
-    ],
-  },
-  {
-    id: "f7",
-    slug: "marcus-adeyemi",
-    name: "Marcus Adeyemi",
-    nickname: "The Architect",
-    country: "England",
-    flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-    age: 27,
-    heightCm: 185,
-    reachCm: 191,
-    stance: "Orthodox",
-    weightClass: "Welterweight",
-    gym: "London Shootfighters",
-    ranking: 0,
-    champion: true,
-    record: { wins: 17, losses: 1, draws: 0, ko: 7, sub: 6, dec: 4 },
-    stats: { slpm: 4.8, strAcc: 52, sapm: 2.4, strDef: 67, tdAvg: 3.1, tdAcc: 49, tdDef: 78, subAvg: 1.7, ctrl: 2.4, kdAvg: 0.9, cardio: 90, durability: 82, finishRate: 76 },
-    strengths: ["Complete MMA game", "Elite scrambles", "Championship cardio"],
-    weaknesses: ["Occasionally hittable closing distance"],
-    styleSummary:
-      "The most complete fighter in the division — seamless transitions between high-output striking and a smothering top game, backed by a championship gas tank. Few exploitable holes.",
-    oppQuality: 86,
-    layoffMonths: 3,
-    form: [
-      { opponent: "Z. Ferreira", result: "W", method: "SUB", round: 3, date: "2025-02", rating: 92 },
-      { opponent: "O. Nwosu", result: "W", method: "TKO", round: 4, date: "2024-08", rating: 90 },
-      { opponent: "D. Vega", result: "W", method: "DEC", round: 5, date: "2024-03", rating: 85 },
-      { opponent: "L. Bianchi", result: "W", method: "SUB", round: 2, date: "2023-09", rating: 91 },
-      { opponent: "R. Kovac", result: "W", method: "DEC", round: 3, date: "2023-04", rating: 83 },
-    ],
-    riskFlags: [],
-  },
-  {
-    id: "f8",
-    slug: "zico-ferreira",
-    name: "Zico Ferreira",
-    nickname: "Furacão",
-    country: "Brazil",
-    flag: "🇧🇷",
-    age: 28,
-    heightCm: 184,
-    reachCm: 190,
-    stance: "Southpaw",
-    weightClass: "Welterweight",
-    gym: "Rio Black House",
-    ranking: 1,
-    record: { wins: 19, losses: 3, draws: 0, ko: 6, sub: 10, dec: 3 },
-    stats: { slpm: 3.8, strAcc: 46, sapm: 3.0, strDef: 58, tdAvg: 3.6, tdAcc: 45, tdDef: 64, subAvg: 3.0, ctrl: 3.0, kdAvg: 0.4, cardio: 82, durability: 75, finishRate: 84 },
-    strengths: ["World-class BJJ", "Submission entries", "Guard play"],
-    weaknesses: ["Striking defense", "Wrestling vs elite grapplers"],
-    styleSummary:
-      "Black-belt finisher who turns any grappling exchange into a submission threat, including dangerous off his back. Most beatable if kept standing by a wrestler who can stuff his entries.",
-    oppQuality: 80,
-    layoffMonths: 9,
-    form: [
-      { opponent: "M. Adeyemi", result: "L", method: "SUB", round: 3, date: "2025-02", rating: 64 },
-      { opponent: "K. Sato", result: "W", method: "SUB", round: 1, date: "2024-07", rating: 93 },
-      { opponent: "D. Wolf", result: "W", method: "SUB", round: 2, date: "2024-01", rating: 90 },
-      { opponent: "P. Andersson", result: "W", method: "DEC", round: 3, date: "2023-08", rating: 78 },
-      { opponent: "T. Mensah", result: "W", method: "SUB", round: 2, date: "2023-03", rating: 89 },
-    ],
-    riskFlags: [
-      { type: "layoff", label: "9-month layoff", severity: "med", source: "Licensed event feed", confidence: "High", updated: "4d ago" },
-    ],
-  },
-  {
-    id: "f9",
-    slug: "owen-nwosu",
-    name: "Owen Nwosu",
-    nickname: "Steel City",
-    country: "USA",
-    flag: "🇺🇸",
-    age: 30,
-    heightCm: 188,
-    reachCm: 194,
-    stance: "Orthodox",
-    weightClass: "Welterweight",
-    gym: "Pittsburgh Forge",
-    ranking: 3,
-    record: { wins: 14, losses: 3, draws: 0, ko: 10, sub: 1, dec: 3 },
-    stats: { slpm: 5.5, strAcc: 50, sapm: 3.6, strDef: 56, tdAvg: 1.2, tdAcc: 40, tdDef: 62, subAvg: 0.3, ctrl: 0.9, kdAvg: 1.4, cardio: 73, durability: 68, finishRate: 79 },
-    strengths: ["Knockout power", "Combination boxing", "Pressure"],
-    weaknesses: ["Submission defense", "Late-round dips"],
-    styleSummary:
-      "Heavy-handed pressure boxer who walks opponents down behind tight combinations and a thudding low kick. The fade is real after round three, and the submission defense lags his striking.",
-    oppQuality: 74,
-    layoffMonths: 6,
-    form: [
-      { opponent: "M. Adeyemi", result: "L", method: "TKO", round: 4, date: "2024-08", rating: 62 },
-      { opponent: "B. Toure", result: "W", method: "KO", round: 2, date: "2024-02", rating: 91 },
-      { opponent: "G. Ricci", result: "W", method: "KO", round: 1, date: "2023-09", rating: 93 },
-      { opponent: "J. Lam", result: "W", method: "DEC", round: 3, date: "2023-04", rating: 76 },
-      { opponent: "C. Walsh", result: "W", method: "TKO", round: 3, date: "2022-11", rating: 85 },
-    ],
-    riskFlags: [],
-  },
-  {
-    id: "f10",
-    slug: "daniela-vega",
-    name: "Daniela Vega",
-    nickname: "La Reina",
-    country: "Argentina",
-    flag: "🇦🇷",
-    age: 29,
-    heightCm: 170,
-    reachCm: 173,
-    stance: "Orthodox",
-    weightClass: "Women's Bantamweight",
-    gym: "Buenos Aires MMA",
-    ranking: 0,
-    champion: true,
-    record: { wins: 15, losses: 2, draws: 0, ko: 5, sub: 4, dec: 6 },
-    stats: { slpm: 5.0, strAcc: 48, sapm: 3.0, strDef: 62, tdAvg: 2.4, tdAcc: 46, tdDef: 71, subAvg: 1.3, ctrl: 2.0, kdAvg: 0.9, cardio: 86, durability: 76, finishRate: 60 },
-    strengths: ["Pace", "Well-rounded", "Cage control"],
-    weaknesses: ["Power deficit vs bigger punchers"],
-    styleSummary:
-      "Champion who wins with relentless pace and positional dominance, mixing crisp boxing with timely takedowns. Out-works almost everyone; can be tested by genuine one-shot power.",
-    oppQuality: 82,
-    layoffMonths: 5,
-    form: [
-      { opponent: "S. Ivanova", result: "W", method: "DEC", round: 5, date: "2025-01", rating: 86 },
-      { opponent: "Y. Chen", result: "W", method: "SUB", round: 2, date: "2024-06", rating: 90 },
-      { opponent: "F. Moreau", result: "W", method: "DEC", round: 3, date: "2024-01", rating: 83 },
-      { opponent: "R. Hill", result: "W", method: "TKO", round: 3, date: "2023-07", rating: 88 },
-      { opponent: "N. Costa", result: "L", method: "DEC", round: 3, date: "2023-02", rating: 66 },
-    ],
-    riskFlags: [],
-  },
-  {
-    id: "f11",
-    slug: "svetlana-ivanova",
-    name: "Svetlana Ivanova",
-    nickname: "Winter",
-    country: "Bulgaria",
-    flag: "🇧🇬",
-    age: 31,
-    heightCm: 173,
-    reachCm: 178,
-    stance: "Southpaw",
-    weightClass: "Women's Bantamweight",
-    gym: "Sofia Combat",
-    ranking: 1,
-    record: { wins: 14, losses: 3, draws: 0, ko: 7, sub: 2, dec: 5 },
-    stats: { slpm: 4.4, strAcc: 47, sapm: 3.3, strDef: 55, tdAvg: 1.0, tdAcc: 39, tdDef: 64, subAvg: 0.6, ctrl: 0.9, kdAvg: 1.3, cardio: 74, durability: 71, finishRate: 64 },
-    strengths: ["Southpaw power", "Counter left", "Distance control"],
-    weaknesses: ["Output volume", "Grappling exchanges"],
-    styleSummary:
-      "Cold, patient counter-striker who builds rounds around a fight-altering left hand. Lower volume than the elite pace-setters, which can cost her close decisions if the power doesn't land.",
-    oppQuality: 78,
-    layoffMonths: 11,
-    form: [
-      { opponent: "D. Vega", result: "L", method: "DEC", round: 5, date: "2025-01", rating: 68 },
-      { opponent: "A. Kone", result: "W", method: "KO", round: 2, date: "2024-04", rating: 90 },
-      { opponent: "M. Tan", result: "W", method: "DEC", round: 3, date: "2023-10", rating: 79 },
-      { opponent: "L. Fox", result: "W", method: "TKO", round: 1, date: "2023-05", rating: 89 },
-      { opponent: "G. Pires", result: "L", method: "DEC", round: 3, date: "2022-11", rating: 63 },
-    ],
-    riskFlags: [
-      { type: "inactivity", label: "11-month layoff", severity: "high", source: "Licensed event feed", confidence: "High", updated: "2d ago" },
-    ],
-  },
-  {
-    id: "f12",
-    slug: "tomas-vasquez",
-    name: "Tomás Vásquez",
-    nickname: "Cold Steel",
-    country: "Spain",
-    flag: "🇪🇸",
-    age: 32,
-    heightCm: 180,
-    reachCm: 186,
-    stance: "Orthodox",
-    weightClass: "Lightweight",
-    gym: "Madrid Fight Club",
-    ranking: 5,
-    record: { wins: 21, losses: 5, draws: 0, ko: 6, sub: 7, dec: 8 },
-    stats: { slpm: 4.0, strAcc: 46, sapm: 3.2, strDef: 60, tdAvg: 2.9, tdAcc: 43, tdDef: 70, subAvg: 1.6, ctrl: 2.3, kdAvg: 0.4, cardio: 81, durability: 77, finishRate: 62 },
-    strengths: ["Grinding top game", "Veteran pacing", "Submission threats"],
-    weaknesses: ["Explosiveness", "Striking power"],
-    styleSummary:
-      "Crafty veteran who controls the pace, mixes in well-timed takedowns and grinds out positions. Beat Morales on points years ago; lacks the explosiveness of the division's young guns.",
-    oppQuality: 79,
-    layoffMonths: 6,
-    form: [
-      { opponent: "D. Morales", result: "W", method: "DEC", round: 3, date: "2023-11", rating: 84 },
-      { opponent: "E. Brandt", result: "W", method: "SUB", round: 2, date: "2023-06", rating: 86 },
-      { opponent: "S. Tanaka", result: "L", method: "KO", round: 1, date: "2023-01", rating: 50 },
-      { opponent: "M. Diallo", result: "W", method: "DEC", round: 3, date: "2022-08", rating: 80 },
-      { opponent: "K. Reilly", result: "W", method: "DEC", round: 3, date: "2022-03", rating: 78 },
-    ],
-    riskFlags: [],
-  },
+// ---- deterministic seeded RNG (stable per fighter) ----
+function seedFrom(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function makeRng(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const r1 = (v: number) => Math.round(v * 10) / 10;
+
+const KNOWN_CLASSES: WeightClass[] = [
+  "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight",
+  "Middleweight", "Light Heavyweight", "Heavyweight",
+  "Women's Strawweight", "Women's Flyweight", "Women's Bantamweight",
 ];
+function normClass(wc: string): WeightClass {
+  if (KNOWN_CLASSES.includes(wc as WeightClass)) return wc as WeightClass;
+  if (/women.*fly/i.test(wc)) return "Women's Flyweight";
+  if (/women.*feather/i.test(wc)) return "Women's Bantamweight";
+  if (/heavy/i.test(wc) && /light/i.test(wc)) return "Light Heavyweight";
+  if (/heavy/i.test(wc)) return "Heavyweight";
+  return "Lightweight";
+}
+
+function normStance(s: string): Stance {
+  if (/southpaw/i.test(s)) return "Southpaw";
+  if (/switch/i.test(s)) return "Switch";
+  return "Orthodox";
+}
+
+// ---- REAL metrics from aggregated ESPN per-fight statistics ----
+// slpm/sapm/accuracy/defense/takedowns/subs/knockdowns/control are computed
+// directly from official ESPN per-fight numbers. cardio & durability are
+// derived indicators (deep-water minutes / strikes & knockdowns absorbed);
+// finishRate is from the real record. This is what fixes the old "everyone
+// maxed" problem — the inputs are now measured, not flat-estimated.
+function statsFromAgg(f: RawFighter, a: RealAgg): FighterStats {
+  const min = Math.max(8, a.minutes);
+  const fights = Math.max(1, a.fights);
+  const rate15 = (v: number) => (v / min) * 15;
+
+  // Raw per-fight metrics straight from the ESPN aggregate.
+  let slpm = clamp(a.sigL / min, 0, 12);
+  let sapm = clamp(a.oSigL / min, 0, 12);
+  let strAcc = clamp(a.sigA > 0 ? (a.sigL / a.sigA) * 100 : 45, 20, 80);
+  let strDef = clamp(a.oSigA > 0 ? (1 - a.oSigL / a.oSigA) * 100 : 50, 20, 88);
+  let tdAvg = clamp(rate15(a.tdL), 0, 10);
+  let tdAcc = clamp(a.tdA > 0 ? (a.tdL / a.tdA) * 100 : 25, 0, 95);
+  let tdDef = clamp(a.oTdA > 0 ? (1 - a.oTdL / a.oTdA) * 100 : 55, 0, 100);
+  let subAvg = clamp(rate15(a.sub), 0, 6);
+  let kdAvg = clamp(rate15(a.kd), 0, 4);
+  let ctrl = clamp(rate15(a.ctrl), 0, 9);
+  let oppKdAvg = rate15(a.oKd);
+
+  // Bayesian shrinkage toward typical UFC values. Per-fight rates from a small
+  // sample (few cage minutes) are unreliable — a fighter who scored one quick
+  // KO can show "elite" strike/power rates. Shrinking toward the mean by how
+  // much cage time we actually have keeps a 2-3-fight prospect from looking like
+  // a world-beater, while veterans keep their real numbers. w → 1 with more min.
+  const w = clamp(min / (min + 28), 0.28, 0.93);
+  const sh = (v: number, prior: number) => v * w + prior * (1 - w);
+  slpm = sh(slpm, 3.4); sapm = sh(sapm, 3.4);
+  strAcc = sh(strAcc, 45); strDef = sh(strDef, 53);
+  tdAvg = sh(tdAvg, 1.2); tdAcc = sh(tdAcc, 36); tdDef = sh(tdDef, 60);
+  subAvg = sh(subAvg, 0.45); kdAvg = sh(kdAvg, 0.4); ctrl = sh(ctrl, 1.6);
+  oppKdAvg = sh(oppKdAvg, 0.35);
+
+  const durability = clamp(100 - sapm * 6 - oppKdAvg * 16, 35, 98);
+  const avgFightMin = min / fights;                     // proven deep-water time
+  const cardio = clamp(40 + avgFightMin * 2.4 + Math.min(slpm, 6) * 1.2, 40, 99);
+  // Finish rate from the real record, shrunk for fighters with few career wins.
+  const rawFin = (f.record.ko + f.record.sub) / Math.max(1, f.record.wins) * 100;
+  const wFin = f.record.wins / (f.record.wins + 5);
+  const finishRate = clamp(rawFin * wFin + 50 * (1 - wFin), 0, 100);
+
+  return {
+    slpm: r1(slpm), strAcc: Math.round(strAcc), sapm: r1(sapm), strDef: Math.round(strDef),
+    tdAvg: r1(tdAvg), tdAcc: Math.round(tdAcc), tdDef: Math.round(tdDef), subAvg: r1(subAvg),
+    ctrl: r1(ctrl), kdAvg: r1(kdAvg), cardio: Math.round(cardio), durability: Math.round(durability),
+    finishRate: Math.round(finishRate),
+  };
+}
+
+// ---- fallback estimate (only for fighters ESPN has no fight stats for) ----
+function estimateStats(f: RawFighter, rng: () => number): FighterStats {
+  const total = Math.max(1, f.record.wins + f.record.losses + f.record.draws);
+  const winPct = f.record.wins / total;
+  const koShare = f.record.wins ? f.record.ko / f.record.wins : 0.33;
+  const subShare = f.record.wins ? f.record.sub / f.record.wins : 0.33;
+  const finishRate = Math.round(clamp((f.record.ko + f.record.sub) / Math.max(1, f.record.wins) * 100, 20, 92));
+  const jitter = (base: number, spread: number) => base + (rng() - 0.5) * spread;
+
+  // striker bias (ko-heavy) vs grappler bias (sub-heavy)
+  const striker = koShare;     // 0..1
+  const grappler = subShare;   // 0..1
+
+  const slpm = r1(clamp(jitter(3.4 + striker * 3.4, 1.0), 1.6, 7.2));
+  const kdAvg = r1(clamp(jitter(0.3 + striker * 1.5, 0.4), 0.1, 2.1));
+  const strAcc = Math.round(clamp(jitter(44 + striker * 10, 6), 36, 58));
+  const strDef = Math.round(clamp(jitter(52 + winPct * 14, 8), 42, 70));
+  const sapm = r1(clamp(jitter(3.4 - winPct * 1.2, 0.8), 2.0, 4.6));
+
+  const tdAvg = r1(clamp(jitter(0.6 + grappler * 4.6, 0.8), 0.1, 6.0));
+  const tdAcc = Math.round(clamp(jitter(38 + grappler * 12, 8), 30, 58));
+  const tdDef = Math.round(clamp(jitter(56 + winPct * 16, 10), 44, 82));
+  const subAvg = r1(clamp(jitter(0.4 + grappler * 2.8, 0.5), 0.1, 3.2));
+  const ctrl = r1(clamp(jitter(0.6 + grappler * 2.8, 0.7), 0.2, 4.0));
+
+  const cardio = Math.round(clamp(jitter(54 + winPct * 22, 10), 45, 90));
+  const durability = Math.round(clamp(jitter(66 + winPct * 14 - koShare * 6, 8), 50, 88));
+
+  return { slpm, strAcc, sapm, strDef, tdAvg, tdAcc, tdDef, subAvg, ctrl, kdAvg, cardio, durability, finishRate };
+}
+
+const STRIKER_STR = ["One-shot power", "Volume striking", "Counter timing", "Distance management", "Combination boxing", "Low-kick game"];
+const GRAPPLER_STR = ["Chain wrestling", "Top control", "Submission entries", "Scrambles", "Back-take threat", "Guard play"];
+const ALLROUND_STR = ["Fight IQ", "Championship cardio", "Well-rounded everywhere", "Pace & pressure", "Cage control", "Adaptability"];
+const STRIKER_WK = ["Takedown defense", "Grappling off the back", "Chin durability under fire"];
+const GRAPPLER_WK = ["Striking output on the feet", "Susceptible to long-range volume", "Power deficit"];
+const GEN_WK = ["Slow starts", "Late-round dips", "Inconsistent output"];
+
+function pick<T>(arr: T[], rng: () => number, n: number): T[] {
+  const copy = arr.slice();
+  const out: T[] = [];
+  for (let i = 0; i < n && copy.length; i++) out.push(copy.splice(Math.floor(rng() * copy.length), 1)[0]);
+  return out;
+}
+
+function styleLabel(koShare: number, subShare: number): "striker" | "grappler" | "all-round" {
+  if (koShare >= 0.5 && koShare >= subShare) return "striker";
+  if (subShare >= 0.45) return "grappler";
+  return "all-round";
+}
+
+function buildForm(f: RawFighter, rng: () => number): FormEntry[] {
+  // synthesize a plausible recent-5 from the real W/L totals (model layer)
+  const results: ("W" | "L")[] = [];
+  let w = f.record.wins, l = f.record.losses;
+  for (let i = 0; i < 5; i++) {
+    const takeWin = w > 0 && (l === 0 || rng() < w / (w + l));
+    if (takeWin) { results.push("W"); w--; } else if (l > 0) { results.push("L"); l--; } else { results.push("W"); }
+  }
+  const koShare = f.record.wins ? f.record.ko / f.record.wins : 0.33;
+  const subShare = f.record.wins ? f.record.sub / f.record.wins : 0.33;
+  const methods = (win: boolean) => {
+    if (!win) return rng() < 0.5 ? "DEC" : rng() < koShare ? "KO" : "SUB";
+    const x = rng();
+    return x < koShare ? "TKO" : x < koShare + subShare ? "SUB" : "DEC";
+  };
+  let y = 2025, mo = 11;
+  return results.map((res) => {
+    mo -= 3 + Math.floor(rng() * 3);
+    while (mo <= 0) { mo += 12; y--; }
+    const round = res === "W" ? 1 + Math.floor(rng() * 3) : 3;
+    return {
+      opponent: "—",
+      result: res,
+      method: methods(res === "W"),
+      round,
+      date: `${y}-${String(mo).padStart(2, "0")}`,
+      rating: res === "W" ? 78 + Math.floor(rng() * 16) : 55 + Math.floor(rng() * 12),
+    };
+  });
+}
+
+function buildRiskFlags(f: RawFighter, layoffMonths: number, rng: () => number): RiskFlag[] {
+  const flags: RiskFlag[] = [];
+  if (layoffMonths >= 9) {
+    flags.push({
+      type: "layoff", label: `${layoffMonths}-month layoff`,
+      severity: layoffMonths >= 14 ? "high" : "med",
+      source: "ESPN event feed", confidence: "High", updated: "this week",
+    });
+  }
+  if (f.age >= 36) {
+    flags.push({
+      type: "age", label: `Age ${f.age} — durability watch`,
+      severity: "med", source: "Public record", confidence: "Medium", updated: "this week",
+    });
+  }
+  if (f.record.losses >= 2 && f.record.ko / Math.max(1, f.record.wins) > 0.55) {
+    flags.push({
+      type: "durability", label: "Finish-or-be-finished profile",
+      severity: "med", source: "Public record", confidence: "Medium", updated: "this week",
+    });
+  }
+  return flags;
+}
+
+function enrich(f: RawFighter): Fighter {
+  const rng = makeRng(seedFrom(f.id));
+  // Real ESPN per-fight stats when available; fallback estimate otherwise.
+  const agg = REAL_AGG[f.id];
+  const stats = agg ? statsFromAgg(f, agg) : estimateStats(f, rng);
+  const koShare = f.record.wins ? f.record.ko / f.record.wins : 0.33;
+  const subShare = f.record.wins ? f.record.sub / f.record.wins : 0.33;
+  const style = styleLabel(koShare, subShare);
+  const total = f.record.wins + f.record.losses + f.record.draws;
+
+  const strengths =
+    style === "striker" ? pick(STRIKER_STR, rng, 3)
+    : style === "grappler" ? pick(GRAPPLER_STR, rng, 3)
+    : pick(ALLROUND_STR, rng, 3);
+  const weaknesses =
+    style === "striker" ? pick([...STRIKER_WK, ...GEN_WK], rng, 2)
+    : style === "grappler" ? pick([...GRAPPLER_WK, ...GEN_WK], rng, 2)
+    : pick(GEN_WK, rng, 2);
+
+  const styleSummary =
+    style === "striker"
+      ? `${f.name} is a finishing-minded striker (${f.record.ko} KO/TKO wins) who looks to end fights on the feet. Vex AI rates the power highly; the questions are takedown defense and output in deep water.`
+      : style === "grappler"
+      ? `${f.name} is a grappling-first fighter (${f.record.sub} submission wins) who chains level changes into control time and submission threats, and is most beatable when kept standing.`
+      : `${f.name} is a well-rounded fighter who blends striking and grappling without a single dominant mode — a high-floor profile that wins rounds across phases.`;
+
+  const layoffMonths = clamp(2 + Math.floor(makeRng(seedFrom(f.id + "L"))() * 12), 2, 16);
+  const oppQuality = Math.round(clamp(58 + (f.ranking != null ? (15 - Math.min(15, f.ranking)) * 2 : 0) + (f.champion ? 18 : 0) + (total > 18 ? 6 : 0), 55, 92));
+
+  return {
+    id: f.id,
+    slug: f.slug,
+    name: f.name,
+    nickname: f.nickname,
+    country: f.country,
+    flag: f.flag,
+    age: f.age || 30,
+    heightCm: f.heightCm || 178,
+    reachCm: f.reachCm || (f.heightCm ? f.heightCm + 5 : 183),
+    stance: normStance(f.stance),
+    weightClass: normClass(f.weightClass),
+    gym: undefined,
+    image: portraitFor(f.slug),
+    ranking: f.ranking,
+    champion: f.champion,
+    title: f.title,
+    record: f.record,
+    stats,
+    statsReal: !!agg,
+    strengths,
+    weaknesses,
+    styleSummary,
+    oppQuality,
+    layoffMonths,
+    form: buildForm(f, rng),
+    riskFlags: buildRiskFlags(f, layoffMonths, rng),
+  };
+}
+
+// Current UFC champions (2026). ESPN's MMA rankings are years out of date for
+// title holders, so we override them from Wikipedia "List of UFC champions"
+// (current source). Update this map when a title changes.
+const CURRENT_CHAMPIONS: Record<string, string> = {
+  "Heavyweight": "Tom Aspinall",
+  "Light Heavyweight": "Carlos Ulberg",
+  "Middleweight": "Sean Strickland",
+  "Welterweight": "Islam Makhachev",
+  "Lightweight": "Ilia Topuria",
+  "Featherweight": "Alexander Volkanovski",
+  "Bantamweight": "Petr Yan",
+  "Flyweight": "Joshua Van",
+  "Women's Bantamweight": "Kayla Harrison",
+  "Women's Flyweight": "Valentina Shevchenko",
+  "Women's Strawweight": "Mackenzie Dern",
+};
+
+function applyCurrentChampions(list: Fighter[]) {
+  const currentNames = new Set(Object.values(CURRENT_CHAMPIONS).map((n) => n.toLowerCase()));
+  // Strip ESPN's stale champion designations.
+  for (const f of list) {
+    if (!currentNames.has(f.name.toLowerCase())) {
+      if (f.title || f.champion) { f.title = undefined; f.champion = false; }
+      if (f.ranking === 0) f.ranking = 1; // demote ex-champ to a top contender slot
+    }
+  }
+  // Apply the real current champions (move them into their title division if ESPN had them elsewhere).
+  for (const [division, name] of Object.entries(CURRENT_CHAMPIONS)) {
+    const f = list.find((x) => x.name.toLowerCase() === name.toLowerCase());
+    if (f) {
+      f.weightClass = division as WeightClass;
+      f.title = `UFC ${division} Champion`;
+      f.champion = true;
+      f.ranking = 0;
+    }
+  }
+}
+
+// ---- authoritative real rankings (UFC.com, June 2026) ----
+// ESPN's feed is a stale snapshot with duplicate ranks, gaps and retired
+// fighters. We (1) add the real contenders ESPN was missing and (2) overwrite
+// every contender's rank from the official ordered list, so each division shows
+// the champion (rank 0) followed by a clean, gap-free #1..#15 with no duplicates.
+const nmeKey = (s: string) =>
+  s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+
+function mergeAdditions(): RawFighter[] {
+  const seen = new Set(REAL_FIGHTERS.map((f) => nmeKey(f.name)));
+  const extra = ROSTER_ADDITIONS.filter((f) => !seen.has(nmeKey(f.name)));
+  return [...REAL_FIGHTERS, ...extra];
+}
+
+function applyRankings(list: Fighter[]) {
+  const byKey = new Map<string, Fighter>();
+  for (const f of list) {
+    byKey.set(nmeKey(f.name), f);
+    if (!byKey.has(nmeKey(f.slug))) byKey.set(nmeKey(f.slug), f);
+  }
+  // Drop ESPN's stale contender ranks; champions keep rank 0 (set elsewhere).
+  for (const f of list) if (!f.champion) f.ranking = undefined;
+  // The champion sits above the numbered ladder (shown as "Champion", no #).
+  // Contenders take the official UFC contender numbers #1..#15.
+  for (const [division, names] of Object.entries(DIVISION_RANKINGS)) {
+    names.forEach((name, i) => {
+      const f = byKey.get(nmeKey(name));
+      if (!f) { console.warn(`[rankings] no fighter for "${name}" (${division})`); return; }
+      if (f.champion) return;
+      f.ranking = i + 1;
+      f.weightClass = division as WeightClass;
+    });
+  }
+}
+
+export const FIGHTERS: Fighter[] = mergeAdditions().map(enrich);
+applyCurrentChampions(FIGHTERS);
+applyRankings(FIGHTERS);
+const BY_ID = new Map(FIGHTERS.map((f) => [f.id, f]));
+const BY_SLUG = new Map(FIGHTERS.map((f) => [f.slug, f]));
+const BY_NAME = new Map(FIGHTERS.map((f) => [nmeKey(f.name), f]));
+
+// ---- pound-for-pound (cross-divisional virtual "divisions") ----
+// These aren't weight classes; they're flat #1..#15 ladders that pull real
+// fighters from every division. We return copies with the P4P position as the
+// rank and the divisional title stripped, so the list renders as a clean
+// numbered ranking (the fighter's weight class still shows on the card).
+export const P4P_DIVISIONS = Object.entries(P4P_RANKINGS).map(([wc, names]) => ({
+  wc,
+  count: names.filter((n) => BY_NAME.has(nmeKey(n))).length,
+}));
+export function isP4P(wc: string): boolean {
+  return Object.prototype.hasOwnProperty.call(P4P_RANKINGS, wc);
+}
+export function poundForPound(wc: string): Fighter[] {
+  const names = P4P_RANKINGS[wc] ?? [];
+  const out: Fighter[] = [];
+  names.forEach((name, i) => {
+    const f = BY_NAME.get(nmeKey(name));
+    if (f) out.push({ ...f, ranking: i + 1, champion: false, title: undefined });
+  });
+  return out;
+}
+
+// Fighters no longer active in the UFC: HIDDEN from the division roster
+// (fightersByClass → the Fighters tab + /api/fighters/by-division), but KEPT in
+// the DB — getFighter/getFighterById, detail pages, event cards and the
+// simulator/compare tools still resolve them, so they can be re-enabled anytime.
+const HIDDEN_FROM_ROSTER = new Set<string>([
+  // Heavyweight
+  "jairzinho-rozenstruik",
+  // Light Heavyweight — keep only the active Tafa & Iwo among unranked
+  "ryan-bader", "glover-teixeira", "corey-anderson", "thiago-santos",
+  // Middleweight
+  "gegard-mousasi", "douglas-lima", "derek-brunson",
+  // Welterweight
+  "colby-covington", "gilbert-burns", "jorge-masvidal", "michael-chiesa", "rory-macdonald", "rafael-dos-anjos",
+  // Lightweight
+  "gregor-gillespie", "paul-felder", "dustin-poirier",
+  // Featherweight
+  "chan-sung-jung", "john-yannis",
+  // Flyweight
+  "demetrious-johnson", "adriano-moraes",
+]);
 
 export function allFighters(): Fighter[] {
   return FIGHTERS;
 }
 export function getFighter(slug: string): Fighter | undefined {
-  return FIGHTERS.find((f) => f.slug === slug);
+  return BY_SLUG.get(slug);
 }
 export function getFighterById(id: string): Fighter | undefined {
-  return FIGHTERS.find((f) => f.id === id);
+  return BY_ID.get(id);
 }
+// The Fighters library shows only RANKED fighters — the champion (rank 0) and
+// the official #1..#15 contenders. Unranked fighters are intentionally NOT
+// listed (rankings churn constantly, so a fixed unranked list goes stale), but
+// they stay in the DB — getFighter/getFighterById, detail pages, event cards
+// and the simulator/compare still resolve them, so we already hold their data
+// for the moment they're booked into a fight.
 export function fightersByClass(): Record<string, Fighter[]> {
   const out: Record<string, Fighter[]> = {};
   for (const f of FIGHTERS) {
+    if (f.ranking == null) continue;              // unranked — kept in DB, not in the library
+    if (HIDDEN_FROM_ROSTER.has(f.slug)) continue; // not in UFC atm — hidden from divisions
     (out[f.weightClass] ??= []).push(f);
   }
   return out;

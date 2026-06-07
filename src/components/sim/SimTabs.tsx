@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { UpcomingPicks } from "./UpcomingPicks";
 import { PastPicks } from "./PastPicks";
 import { AccuracyPanel } from "./AccuracyPanel";
+import { FeatureGate } from "@/components/billing/FeatureGate";
 
 // Tab switcher around the simulator. The simulator (server-rendered, reads URL
 // params) is passed as children and kept mounted (hidden, not unmounted) so its
@@ -30,7 +31,15 @@ export function SimTabs({ children }: { children: ReactNode }) {
         </button>
       </div>
       <div className={tab === "sim" ? "" : "hidden"}>{children}</div>
-      {tab === "upcoming" && <UpcomingPicks />}
+      {tab === "upcoming" && (
+        <FeatureGate
+          minPlan="pro"
+          title="Upcoming Picks"
+          description="Vex AI's locked-in, Bitcoin-timestamped picks for every upcoming card, in advance. A Pro tool."
+        >
+          <UpcomingPicks />
+        </FeatureGate>
+      )}
       {tab === "past" && <PastPicks />}
       {tab === "accuracy" && <AccuracyPanel />}
     </div>

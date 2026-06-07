@@ -35,6 +35,9 @@ yarn-error.log*
 # dev screenshots (audit.mjs / qa.mjs / a11y.mjs output)
 /shots/
 
+# private/internal docs — never commit or deploy
+MODEL_INTERNAL.md
+
 # env files (can opt-in for committing if needed)
 .env*
 # …but keep the placeholder template in the repo (no real secrets)

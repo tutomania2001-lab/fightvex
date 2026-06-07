@@ -7,6 +7,22 @@ export interface FxNews { date: string; tag: NewsTag; title: string; body: strin
 export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-07",
+    tag: "Feature",
+    title: "Accounts are live — watchlists, saved picks and billing",
+    body:
+      "You can now create a free FightVex account: save simulations to revisit, build a fighter watchlist, keep your own running prediction record, and manage your plan. Security is built in from the ground up — accounts run on a Postgres database with row-level security, so your data is isolated to you, and sign-in is handled by a managed auth provider (no home-rolled password storage). Free to join; Pro and Elite unlock the advanced tools.",
+    href: "/login",
+  },
+  {
+    date: "2026-06-07",
+    tag: "Transparency",
+    title: "Three real-data upgrades to the engine — honestly scoped",
+    body:
+      "We pushed three improvements into the prediction engine, all grounded in real fight data and scoped honestly. (1) Real layoff: the model now reads each fighter's actual time since their last bout — previously a placeholder — so ring-rust is applied to the genuinely inactive, not guessed, which also brings the live engine in line with our backtest. (2) Division-aware finishes: KO / submission / decision likelihoods now scale to each weight class's real historical base rates (heavyweights finish far more often by knockout than flyweights), making the method-of-victory read more realistic. (3) Strength of schedule: a fighter's “competition quality” now reflects the real win rates of their recent opponents instead of a ranking-based estimate. Straight talk on impact: these sharpen realism and fix a placeholder — we are NOT claiming they break the ~62% winner-accuracy ceiling we've been open about (competition quality, by design, can't be isolated in a leakage-free backtest). Real data, never fabricated, scoped for what it actually does.",
+    href: "/methodology",
+  },
+  {
+    date: "2026-06-07",
     tag: "Milestone",
     title: "First live event: Vex AI goes 10/12 and calls the main-event upset",
     body:

@@ -21,7 +21,10 @@ import { getCareerHistory, type CareerFight } from "./espn-live";
 import { lastName, recordString } from "./format";
 import { commitCard, canonicalCard, invalidateCommitment, type CommitPick } from "./commit";
 
-const MODEL_VERSION = "vex-v3.1-shortnotice";
+// v3.2 — real layoff (months since last bout), division-aware finish hazards,
+// and strength-of-schedule in the Competition signal. Bumping the version re-logs
+// every upcoming pick with the new engine (pre-fight, so still honest).
+const MODEL_VERSION = "vex-v3.2-layoff-division-sos";
 const INDEX_KEY = "pred:index";
 const recKey = (boutId: string) => `pred:${boutId}`;
 

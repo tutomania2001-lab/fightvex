@@ -14,7 +14,7 @@ export default function ResponsibleGamblingPage() {
       <Badge variant="amber">Responsible Gambling</Badge>
       <h1 className="mt-3 font-display text-4xl font-bold uppercase sm:text-5xl">Play it smart</h1>
       <p className="mt-3 text-muted">
-        FightVector is an analytics and research platform. We do not accept wagers. Our
+        FightVex is an analytics and research platform. We do not accept wagers. Our
         tools are designed to inform decisions, never to pressure you into them.
       </p>
 

@@ -7,7 +7,7 @@ import { CompareView } from "@/components/compare/CompareView";
 export const metadata: Metadata = {
   title: "Compare UFC Fighters Head-to-Head",
   description:
-    "Overlay any two UFC or MMA fighters across every tracked metric — striking, grappling, physicals and a skill radar — for a full head-to-head comparison.",
+    "Overlay any two UFC fighters across every tracked metric — striking, grappling, physicals and a skill radar — for a full head-to-head comparison.",
   alternates: { canonical: "/compare" },
 };
 

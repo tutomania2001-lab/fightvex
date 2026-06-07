@@ -20,7 +20,7 @@ export const revalidate = 1800;
 export const metadata: Metadata = {
   title: "UFC Betting Tools — Odds, Value Signals, EV & CLV Calculators",
   description:
-    "Free UFC & MMA betting tools: real market odds, no-vig implied probability, Vex AI value signals, a line-movement tracker, and expected-value (EV), closing-line-value (CLV) and Kelly bankroll calculators. Informational only — not betting advice. 21+.",
+    "Free UFC betting tools: real market odds, no-vig implied probability, Vex AI value signals, a line-movement tracker, and expected-value (EV), closing-line-value (CLV) and Kelly bankroll calculators. Informational only — not betting advice. 21+.",
   alternates: { canonical: "/betting" },
 };
 
@@ -122,7 +122,7 @@ export default async function BettingPage() {
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web",
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        description: "Free UFC & MMA betting tools: real odds, value signals, EV, CLV and Kelly bankroll calculators.",
+        description: "Free UFC betting tools: real odds, value signals, EV, CLV and Kelly bankroll calculators.",
       }} />
       <div className="reveal mb-2.5 shrink-0">
         <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">The Edge Desk</h1>

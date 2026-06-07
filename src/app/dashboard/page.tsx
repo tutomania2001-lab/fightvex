@@ -56,7 +56,7 @@ export default function DashboardPage() {
           <Panel className="reveal p-6">
             <h2 className="mb-2 font-display text-lg font-bold uppercase">Bankroll Tracking</h2>
             <p className="rounded-lg border border-line bg-panel-2/40 p-4 text-sm text-muted">
-              No tracked bets yet — unit, position and closing-line-value tracking activates once accounts launch. We never display fabricated figures. FightVector does not accept or place wagers. 21+.
+              No tracked bets yet — unit, position and closing-line-value tracking activates once accounts launch. We never display fabricated figures. FightVex does not accept or place wagers. 21+.
             </p>
           </Panel>
         </div>
@@ -72,7 +72,7 @@ export default function DashboardPage() {
           </Panel>
           <Panel className="reveal p-5">
             <h2 className="mb-2 font-display text-lg font-bold uppercase">Upgrade to Elite</h2>
-            <p className="text-sm text-muted">CLV tracker, market-overreaction detector, AI bet-slip review and bankroll suite.</p>
+            <p className="text-sm text-muted">Closing-line-value tool, bankroll calculator, and more Elite betting tools.</p>
             <Link href="/pricing" className="btn-flare mt-3 inline-block rounded-md px-4 py-2 text-xs font-bold uppercase">See Elite →</Link>
           </Panel>
         </aside>

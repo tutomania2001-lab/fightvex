@@ -7,7 +7,7 @@ import { pct } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "How Vex AI Works — MMA Fight Prediction Methodology",
-  description: "Exactly how Vex AI turns real fighter statistics into UFC/MMA win probabilities — inputs, category weights, Monte-Carlo simulation, calibration and how we prevent overconfidence.",
+  description: "Exactly how Vex AI turns real fighter statistics into UFC win probabilities — inputs, category weights, Monte-Carlo simulation, calibration and how we prevent overconfidence.",
   alternates: { canonical: "/methodology" },
 };
 
@@ -21,7 +21,7 @@ export default function MethodologyPage() {
       </p>
 
       <Section title="1. Inputs">
-        <p>Fighter identities, records, rankings, bios and event cards are <b>real data from trusted public sources</b>. From those we build each fighter&apos;s statistical profile: significant strikes landed/absorbed per minute, striking accuracy/defense, takedowns per 15 and accuracy/defense, submission attempts, control time and knockdowns, plus engineered indices for cardio, durability and finishing ability. Context inputs include reach, stance, age, layoff duration, recent form and opponent quality.</p>
+        <p>Fighter identities, records, rankings, bios and event cards are <b>real data from trusted public sources</b>. From those we build each fighter&apos;s statistical profile: significant strikes landed/absorbed per minute, striking accuracy/defense, takedowns per 15 and accuracy/defense, submission attempts, control time and knockdowns, plus engineered indices for cardio, durability and finishing ability. Context inputs include reach, stance, age, real layoff (months since the fighter&apos;s last bout) and recent form. Competition (opponent quality) is grounded in real strength-of-schedule — the average win rate of a fighter&apos;s recent opponents — not just a rank or a guess.</p>
         <p>Where a fighter has real aggregated per-fight statistics, we use them. Where those aren&apos;t available, the per-fight stats are <b>transparently estimated</b> from that fighter&apos;s real record and finish profile — deterministic and reproducible, never random — and flagged as estimates in the UI. We never present an estimate as if it were measured.</p>
       </Section>
 
@@ -62,7 +62,7 @@ P(A) = 1 / (1 + e^( -k × (R_A − R_B) ))`}</pre>
       </Section>
 
       <Section title="7. Calibration & accuracy (the honest part)">
-        <p>The simulation&apos;s finish hazards are <b>validated against real outcomes</b>: we checked the model&apos;s predicted finish rate against what actually happened across the historical bouts and corrected it until they matched (about half of fights reach a decision, the rest split between KO/TKO and submission). So the method-of-victory split is calibrated to reality, not invented.</p>
+        <p>The simulation&apos;s finish hazards are <b>validated against real outcomes</b>: we checked the model&apos;s predicted finish rate against what actually happened across the historical bouts and corrected it until they matched (about half of fights reach a decision, the rest split between KO/TKO and submission). Those finish rates are also <b>weight-class aware</b> — heavyweights finish far more often by knockout than flyweights — using each division&apos;s real historical KO/submission base rates. So the method-of-victory split is calibrated to reality, not invented.</p>
         <p>Two honest checks, never one invented number. <b>(1) Going forward:</b> every Vex AI pick is <b>logged before the fight</b> and graded against the <b>real result</b> afterward — never back-dated; the live number is earned only from graded predictions. Our <b>first live card is now graded</b> (and the model started strong), but a single card is a tiny sample — the live record stays deliberately humble and grows honestly, card after card. See the self-building record on the <Link href="/accuracy" className="text-blood hover:underline">Vex AI accuracy page</Link>. <b>(2) Looking back:</b> the engine is also validated on real history — see the leakage-free backtest in the next section.</p>
       </Section>
 

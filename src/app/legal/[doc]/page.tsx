@@ -6,14 +6,14 @@ import { Panel } from "@/components/ui/Panel";
 const DOCS: Record<string, { title: string; intro: string; sections: { h: string; p: string }[] }> = {
   terms: {
     title: "Terms of Service",
-    intro: "These plain-language terms summarize how FightVector may be used. This is demonstration copy, not legal advice; a production launch requires review by a qualified attorney.",
+    intro: "These plain-language terms summarize how FightVex may be used. This is demonstration copy, not legal advice; a production launch requires review by a qualified attorney.",
     sections: [
-      { h: "1. Informational use only", p: "FightVector provides analytics, statistics and probabilistic simulations for information and entertainment. Nothing on the platform is betting, investment or financial advice, and we do not accept or place wagers." },
+      { h: "1. Informational use only", p: "FightVex provides analytics, statistics and probabilistic simulations for information and entertainment. Nothing on the platform is betting, investment or financial advice, and we do not accept or place wagers." },
       { h: "2. No guarantee of outcomes", p: "All predictions are probabilistic. We make no representation that any prediction, value signal or simulation will be accurate or profitable. You are solely responsible for any decisions you make." },
       { h: "3. Eligibility & age", p: "You must be of legal age in your jurisdiction (21+ in many regions) and located where accessing this content is lawful. We may use geofencing and verification to enforce this." },
       { h: "4. Acceptable use", p: "You may not scrape, resell, or redistribute our data, attempt to reverse-engineer the models, or use the service to violate any law or third-party terms." },
       { h: "5. Data sources", p: "Data is obtained from licensed providers, official sources, public records and clearly attributed news. We are not affiliated with any MMA promotion or sportsbook." },
-      { h: "6. Limitation of liability", p: "The service is provided 'as is.' To the maximum extent permitted by law, FightVector is not liable for losses arising from use of the platform." },
+      { h: "6. Limitation of liability", p: "The service is provided 'as is.' To the maximum extent permitted by law, FightVex is not liable for losses arising from use of the platform." },
     ],
   },
   privacy: {

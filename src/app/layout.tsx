@@ -18,11 +18,11 @@ const brunson = localFont({ src: "./fonts/Brunson.ttf", variable: "--font-brunso
 export const metadata: Metadata = {
   metadataBase: new URL("https://fightvex.com"),
   title: {
-    default: "FightVex — AI UFC & MMA Betting Tools, Fight Simulator & Odds",
+    default: "FightVex — AI UFC Betting Tools, Fight Simulator & Odds",
     template: "%s · FightVex",
   },
   description:
-    "Free AI UFC & MMA betting tools: a backtested fight simulator (validated on 10,000+ real fights, with picks anchored in Bitcoin before each event), real odds with value signals, fighter stats and matchup analysis. 21+. Not betting advice.",
+    "Free AI UFC betting tools: a backtested fight simulator (validated on 10,000+ real fights, with picks anchored in Bitcoin before each event), real odds with value signals, fighter stats and matchup analysis. 21+. Not betting advice.",
   keywords: [
     "UFC betting tools", "MMA betting tools", "UFC fight simulator", "MMA fight simulator",
     "UFC fight predictor", "who will win UFC", "UFC odds", "MMA odds comparison",
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "FightVex",
     url: "https://fightvex.com",
-    title: "FightVex — AI UFC & MMA Betting Tools & Fight Simulator",
+    title: "FightVex — AI UFC Betting Tools & Fight Simulator",
     description:
       "Backtested AI fight simulations (validated on 10,000+ real fights, picks Bitcoin-timestamped before each event), real odds with value signals, and deep fighter analytics. 21+.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FightVex — AI UFC & MMA betting intelligence" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FightVex — AI UFC betting intelligence" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FightVex — AI UFC & MMA Betting Tools",
+    title: "FightVex — AI UFC Betting Tools",
     description: "Backtested AI fight simulator, real odds + value signals, deep fighter analytics. Picks Bitcoin-verified pre-fight. 21+.",
     images: ["/og.png"],
   },
@@ -87,14 +87,14 @@ const SITE_LD = {
       url: "https://fightvex.com",
       logo: "https://fightvex.com/og.png",
       description:
-        "AI UFC & MMA betting intelligence — a transparent fight simulator, real odds with value signals, and deep fighter analytics.",
+        "AI UFC betting intelligence — a transparent fight simulator, real odds with value signals, and deep fighter analytics.",
     },
     {
       "@type": "WebSite",
       "@id": "https://fightvex.com/#website",
       url: "https://fightvex.com",
       name: "FightVex",
-      description: "AI UFC & MMA betting tools, fight simulator and odds analysis.",
+      description: "AI UFC betting tools, fight simulator and odds analysis.",
       publisher: { "@id": "https://fightvex.com/#organization" },
       inLanguage: "en",
     },

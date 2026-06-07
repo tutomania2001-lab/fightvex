@@ -19,7 +19,7 @@ const SIM_LD = {
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   description:
-    "Free AI UFC & MMA fight simulator — Monte-Carlo win probability, method of victory and round-by-round breakdown for any matchup.",
+    "Free AI UFC fight simulator — Monte-Carlo win probability, method of victory and round-by-round breakdown for any matchup.",
 };
 
 // Truthful FAQ — also emitted as FAQPage structured data (rich-result eligible).
@@ -53,9 +53,9 @@ const FAQ_LD = {
 };
 
 export const metadata: Metadata = {
-  title: "Free AI UFC Fight Simulator — Predict Any MMA Matchup",
+  title: "Free AI UFC Fight Simulator — Predict Any UFC Matchup",
   description:
-    "Simulate any UFC or MMA matchup free. Vex AI runs thousands of Monte-Carlo fights for win probability, method of victory, round-by-round breakdown and skill profiles — transparent and explainable. 21+.",
+    "Simulate any UFC matchup free. Vex AI runs thousands of Monte-Carlo fights for win probability, method of victory, round-by-round breakdown and skill profiles — transparent and explainable. 21+.",
   alternates: { canonical: "/simulator" },
 };
 

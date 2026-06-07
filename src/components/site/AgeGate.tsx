@@ -26,7 +26,7 @@ export function AgeGate() {
         </div>
         <h2 className="font-display text-2xl font-bold uppercase tracking-wide">Age Verification</h2>
         <p className="mt-3 text-sm text-muted">
-          FightVector contains betting-related analytics intended for adults of legal age (21+ in many regions). By entering, you confirm you are of legal age in your jurisdiction and accept our{" "}
+          FightVex contains betting-related analytics intended for adults of legal age (21+ in many regions). By entering, you confirm you are of legal age in your jurisdiction and accept our{" "}
           <a href="/legal/terms" className="text-blood underline">Terms</a> and{" "}
           <a href="/responsible-gambling" className="text-blood underline">Responsible Gambling</a> policy.
         </p>

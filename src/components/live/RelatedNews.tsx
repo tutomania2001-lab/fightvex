@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { SortToggle } from "./SortToggle";
 
-// Real UFC/MMA news. General feed (no athleteId) is aggregated from many trusted
+// Real UFC news. General feed (no athleteId) is aggregated from many trusted
 // outlets via /api/news/ufc (Google News, MMA Fighting, Sherdog, MMA Mania, ESPN);
 // a fighter feed (athleteId) uses ESPN. Every item links to its real publisher;
 // nothing is fabricated. Auto-refreshes so the feed stays current.

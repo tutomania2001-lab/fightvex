@@ -331,7 +331,7 @@ function ToolsSection({ plan }: { plan: Plan }) {
 const TIERS: { plan: Plan; price: string; cadence: string; blurb: string }[] = [
   { plan: "free", price: "£0", cadence: "forever", blurb: "Core profiles, fight cards and limited simulations." },
   { plan: "pro", price: "£20", cadence: "/mo", blurb: "Unlimited sims, full metrics, line movement and EV tools." },
-  { plan: "elite", price: "£40", cadence: "/mo", blurb: "CLV tracker, overreaction detector, bet-slip review and bankroll suite." },
+  { plan: "elite", price: "£40", cadence: "/mo", blurb: "Closing-line-value tool, bankroll calculator and Elite betting tools." },
 ];
 
 function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded: boolean }) {

@@ -583,7 +583,7 @@ export function HeroFightAnimation({ sections = [], match2Info, match2 }: { sect
             <motion.p className="mt-4 max-w-[380px] text-sm leading-relaxed text-muted sm:text-base"
               initial={{ opacity: 0, y: 40 }} animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.26, duration: 0.85, ease: [0.16, 1, 0.3, 1] }}>
-              AI-powered UFC and MMA analytics, matchup insights, and betting intelligence for sharper picks.
+              AI-powered UFC analytics, matchup insights, and betting intelligence for sharper picks.
             </motion.p>
             <motion.div className="mt-7 flex flex-wrap items-center gap-3"
               initial={{ opacity: 0, y: 34 }} animate={inView ? { opacity: 1, y: 0 } : {}}

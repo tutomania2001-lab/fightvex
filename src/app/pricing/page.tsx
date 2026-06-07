@@ -24,7 +24,7 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
       { label: "Upcoming fight cards", desc: "Full UFC cards with dates, weight classes and the Vex AI pick." },
       { label: "Real odds", desc: "Live moneyline for every bout on the card." },
       { label: "Simulator preview", desc: "Watch one sample matchup simulate — the controls are locked." },
-      { label: "Research feed", desc: "Aggregated UFC news, on a short delay." },
+      { label: "Research feed", desc: "Live UFC news aggregated from trusted outlets." },
     ],
   },
   {
@@ -37,12 +37,11 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     tagline: "Run the model yourself and find value in the odds.",
     features: [
       { label: "Everything in Free" },
-      { label: "Full fighter profiles", desc: "All 40+ metrics per fighter, not just the core stats." },
+      { label: "Full fighter profiles", desc: "Every tracked metric per fighter, not just the core stats." },
       { label: "Unlimited 50,000-run simulations", desc: "Run any matchup at full depth — change rounds or short-notice and re-run freely." },
       { label: "Line-movement tracker", desc: "See how each fight's odds shifted from open to now." },
       { label: "EV & no-vig calculators", desc: "Turn any odds into a true win % and expected value." },
       { label: "Watchlist + email alerts", desc: "Follow fighters and get emailed when they're booked on a card." },
-      { label: "Real-time research feed", desc: "The full news feed, no delay." },
     ],
   },
   {
@@ -55,11 +54,11 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     tagline: "Deeper sims and tools to track and size your bets.",
     features: [
       { label: "Everything in Pro" },
-      { label: "Closing-line-value tracker", desc: "Log your bets and measure each against the closing line." },
-      { label: "Market-overreaction flags", desc: "Bouts where the line moved more than the matchup warrants." },
-      { label: "AI bet-slip review", desc: "The model's read on each leg of a slip and its combined edge." },
-      { label: "Bankroll tools", desc: "Kelly unit-sizing, staking plans and profit/loss tracking." },
-      { label: "Priority + API access", desc: "Earliest research and a lightweight data API." },
+      { label: "Closing-line-value tool", desc: "Compare each bout's opening line to the latest market line." },
+      { label: "Bankroll calculator", desc: "Fractional-Kelly unit sizing with a sensible stake cap." },
+      { label: "Market-overreaction flags", desc: "Bouts where the line moved more than the matchup warrants. (Coming soon)" },
+      { label: "AI bet-slip review", desc: "The model's read on each leg of a slip and its combined edge. (Coming soon)" },
+      { label: "Priority access", desc: "Earliest access to new tools and research." },
     ],
   },
 ];
@@ -118,13 +117,13 @@ export default function PricingPage() {
       <div className="reveal panel mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl p-7 sm:flex-row">
         <div>
           <h3 className="font-display text-xl font-bold uppercase">Analyst & B2B</h3>
-          <p className="mt-1 text-sm text-muted">Data licensing, embeddable widgets, and an analyst/admin dashboard for media and sportsbook partners.</p>
+          <p className="mt-1 text-sm text-muted">Interested in data access, embeds or an analyst dashboard for media or sportsbook partners? Tell us what you need.</p>
         </div>
         <Link href="/login" className="rounded-md border border-line px-6 py-3 text-sm font-bold uppercase tracking-wide hover:border-steel">Contact sales</Link>
       </div>
 
       <p className="mx-auto mt-8 max-w-2xl text-center text-[11px] leading-relaxed text-muted">
-        21+. FightVector provides informational analytics and does not accept wagers or
+        21+. FightVex provides informational analytics and does not accept wagers or
         guarantee outcomes. Affiliate sportsbook links, where shown, are clearly
         disclosed and region-aware. Please gamble responsibly.
       </p>

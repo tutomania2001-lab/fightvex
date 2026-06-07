@@ -13,7 +13,7 @@ import { pct, lastName, recordString, cmToFtIn, cmToIn } from "@/lib/format";
 import { styleMatchup } from "@/lib/style";
 import { SaveInsightButton } from "./SaveInsightButton";
 
-const ENGINE_VERSION = "VEX AI v2.1";
+const ENGINE_VERSION = "VEX AI v3.2";
 
 // ----------------------------------------------------------------------------
 // Shared building blocks

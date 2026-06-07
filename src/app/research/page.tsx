@@ -17,7 +17,7 @@ const ufcFeed = (
       MMA Mania, Bloody Elbow, BJPenn, LowKick, The Mac Life and ESPN, newest first. Every item is
       attributed to its source and links back to the original publisher — nothing generated or editorialized.
     </p>
-    <RelatedNews limit={24} />
+    <RelatedNews limit={24} feed />
     <p className="reveal mt-8 rounded-lg border border-line bg-panel/60 p-4 text-[11px] leading-relaxed text-muted">
       Headlines are pulled live from public news feeds (Google News and the outlets&apos; own RSS) and open
       on the publisher&apos;s site. FightVex does not generate, rewrite or editorialize news content; the feed

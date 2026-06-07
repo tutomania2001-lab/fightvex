@@ -72,7 +72,7 @@ export default function DashboardPage() {
           </Panel>
           <Panel className="reveal p-5">
             <h2 className="mb-2 font-display text-lg font-bold uppercase">Upgrade to Elite</h2>
-            <p className="text-sm text-muted">5,000-run Monte Carlo, CLV tracker, market-overreaction detector and bet-slip review.</p>
+            <p className="text-sm text-muted">CLV tracker, market-overreaction detector, AI bet-slip review and bankroll suite.</p>
             <Link href="/pricing" className="btn-flare mt-3 inline-block rounded-md px-4 py-2 text-xs font-bold uppercase">See Elite →</Link>
           </Panel>
         </aside>

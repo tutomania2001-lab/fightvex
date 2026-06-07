@@ -38,7 +38,7 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     features: [
       { label: "Everything in Free" },
       { label: "Full fighter profiles", desc: "All 40+ metrics per fighter, not just the core stats." },
-      { label: "Unlimited simulations", desc: "Run any matchup, change rounds or short-notice, and re-run freely." },
+      { label: "Unlimited 50,000-run simulations", desc: "Run any matchup at full depth — change rounds or short-notice and re-run freely." },
       { label: "Line-movement tracker", desc: "See how each fight's odds shifted from open to now." },
       { label: "EV & no-vig calculators", desc: "Turn any odds into a true win % and expected value." },
       { label: "Watchlist + email alerts", desc: "Follow fighters and get emailed when they're booked on a card." },
@@ -55,7 +55,6 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     tagline: "Deeper sims and tools to track and size your bets.",
     features: [
       { label: "Everything in Pro" },
-      { label: "5,000-run simulations", desc: "Deeper Monte-Carlo for tighter, steadier probabilities." },
       { label: "Closing-line-value tracker", desc: "Log your bets and measure each against the closing line." },
       { label: "Market-overreaction flags", desc: "Bouts where the line moved more than the matchup warrants." },
       { label: "AI bet-slip review", desc: "The model's read on each leg of a slip and its combined edge." },

@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
-import { updateUser, validateName, toPublicUser } from "@/lib/auth";
+import { validateName } from "@/lib/auth";
+import { updateProfileName } from "@/lib/supabase/profile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Update editable profile fields (currently: name). Email is immutable here
-// because it's the account key / future Stripe customer email.
+// because it's the account key / Stripe customer email.
 export async function PATCH(req: Request) {
   const me = await currentUser();
   if (!me) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
@@ -21,7 +22,7 @@ export async function PATCH(req: Request) {
   const invalid = validateName(name);
   if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
 
-  const updated = await updateUser(me.id, { name: name.trim() });
-  if (!updated) return NextResponse.json({ error: "Account not found." }, { status: 404 });
-  return NextResponse.json({ user: toPublicUser(updated) });
+  await updateProfileName(me.id, name.trim());
+  const user = await currentUser();
+  return NextResponse.json({ user });
 }

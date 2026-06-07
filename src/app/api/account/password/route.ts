@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
-import {
-  getUserById, verifyPassword, hashPassword, updateUser, validatePassword,
-  revokeUserSessions, createSession, rateLimited, SESSION_COOKIE, SESSION_TTL_SECONDS,
-} from "@/lib/auth";
+import { validatePassword, rateLimited } from "@/lib/auth";
 import { badOrigin } from "@/lib/origin";
 import { clientIp } from "@/lib/ip";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Change password: requires the current password (re-auth), then rehashes.
+// Change password: re-auth with the current password, then update via Supabase.
 export async function POST(req: Request) {
   const csrf = badOrigin(req);
   if (csrf) return csrf;
@@ -31,24 +29,16 @@ export async function POST(req: Request) {
   const invalid = validatePassword(newPassword);
   if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
 
-  const user = await getUserById(me.id);
-  if (!user) return NextResponse.json({ error: "Account not found." }, { status: 404 });
-  if (!(await verifyPassword(currentPassword, user.passwordHash)))
-    return NextResponse.json({ error: "Current password is incorrect." }, { status: 403 });
-
-  await updateUser(me.id, { passwordHash: await hashPassword(newPassword) });
-
-  // Kill every existing session (any stolen/old session is now dead), then
-  // re-issue one for THIS device so the user stays logged in where they are.
-  await revokeUserSessions(me.id);
-  const token = await createSession(me.id);
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_TTL_SECONDS,
+  const supabase = await createSupabaseServerClient();
+  // Re-authenticate to prove the current password before allowing the change.
+  const { error: reauth } = await supabase.auth.signInWithPassword({
+    email: me.email,
+    password: currentPassword,
   });
-  return res;
+  if (reauth) return NextResponse.json({ error: "Current password is incorrect." }, { status: 403 });
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  return NextResponse.json({ ok: true });
 }

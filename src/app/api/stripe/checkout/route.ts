@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
-import { getUserById, updateUser } from "@/lib/auth";
+import { getProfileBilling, updateProfileBilling } from "@/lib/supabase/profile";
 import { createCheckoutSession, stripeEnabled } from "@/lib/stripe";
 import { badOrigin } from "@/lib/origin";
 
@@ -30,19 +30,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unknown plan." }, { status: 400 });
 
   // Reuse the Stripe customer if this account already has one.
-  const full = await getUserById(me.id);
+  const { stripeCustomerId } = await getProfileBilling(me.id);
   const origin = new URL(req.url).origin;
 
   const args = { plan: plan as "pro" | "elite", userId: me.id, email: me.email, origin };
   try {
-    const { url } = await createCheckoutSession({ ...args, customerId: full?.stripeCustomerId });
+    const { url } = await createCheckoutSession({ ...args, customerId: stripeCustomerId });
     return NextResponse.json({ url });
   } catch (e) {
     // Self-heal a stale customer id (e.g. a test-mode customer after switching to
     // live keys): drop the dead id and retry letting Stripe make a fresh customer.
-    if (full?.stripeCustomerId && /No such customer/i.test(String(e))) {
+    if (stripeCustomerId && /No such customer/i.test(String(e))) {
       try {
-        await updateUser(me.id, { stripeCustomerId: undefined });
+        await updateProfileBilling(me.id, { stripeCustomerId: null });
         const { url } = await createCheckoutSession(args); // no customerId → new live customer
         return NextResponse.json({ url });
       } catch { /* fall through to generic error */ }

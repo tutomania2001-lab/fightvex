@@ -1,16 +1,9 @@
 import { NextResponse } from "next/server";
-import {
-  authEnabled,
-  createSession,
-  createUser,
-  rateLimited,
-  toPublicUser,
-  validateSignup,
-  SESSION_COOKIE,
-  SESSION_TTL_SECONDS,
-} from "@/lib/auth";
+import { rateLimited, validateSignup, normalizeEmail } from "@/lib/auth";
 import { clientIp } from "@/lib/ip";
 import { badOrigin } from "@/lib/origin";
+import { createSupabaseServerClient, supabaseEnabled } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,11 +11,10 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const csrf = badOrigin(req);
   if (csrf) return csrf;
-  if (!authEnabled)
+  if (!supabaseEnabled)
     return NextResponse.json({ error: "Accounts are not configured yet." }, { status: 503 });
 
-  // Self-serve registration is open: users create their own account (free plan
-  // by default) and later upgrade by purchasing a plan. Rate-limited per IP.
+  // Self-serve registration (free plan by default; upgrade via Stripe later).
   let body: { email?: string; password?: string; name?: string };
   try {
     body = await req.json();
@@ -40,17 +32,22 @@ export async function POST(req: Request) {
   const invalid = validateSignup(email, password, name);
   if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
 
-  const result = await createUser(email, password, name);
-  if ("error" in result) return NextResponse.json({ error: result.error }, { status: 409 });
-
-  const token = await createSession(result.user.id);
-  const res = NextResponse.json({ user: toPublicUser(result.user) });
-  res.cookies.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_TTL_SECONDS,
+  // Supabase Auth creates the user; the DB trigger provisions profile + stats.
+  // The @supabase/ssr server client writes the session cookies on the response.
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signUp({
+    email: normalizeEmail(email),
+    password,
+    options: { data: { name: name.trim() } },
   });
-  return res;
+  if (error) {
+    const taken = /already|registered|exists/i.test(error.message);
+    return NextResponse.json(
+      { error: taken ? "An account with this email already exists." : error.message },
+      { status: taken ? 409 : 400 }
+    );
+  }
+
+  const user = await getCurrentUser();
+  return NextResponse.json({ user });
 }

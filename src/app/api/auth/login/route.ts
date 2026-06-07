@@ -1,31 +1,26 @@
 import { NextResponse } from "next/server";
 import {
-  authEnabled,
-  createSession,
-  getUserByEmail,
   rateLimited,
   failCount,
   recordFailure,
   clearFailures,
   normalizeEmail,
-  toPublicUser,
-  verifyPassword,
-  SESSION_COOKIE,
-  SESSION_TTL_SECONDS,
 } from "@/lib/auth";
 import { clientIp } from "@/lib/ip";
 import { badOrigin } from "@/lib/origin";
+import { createSupabaseServerClient, supabaseEnabled } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const ACCT_MAX_FAILS = 8;          // lock an account after N recent failures…
-const ACCT_WINDOW = 60 * 15;       // …within 15 minutes
+const ACCT_MAX_FAILS = 8; // lock an account after N recent failures…
+const ACCT_WINDOW = 60 * 15; // …within 15 minutes
 
 export async function POST(req: Request) {
   const csrf = badOrigin(req);
   if (csrf) return csrf;
-  if (!authEnabled)
+  if (!supabaseEnabled)
     return NextResponse.json({ error: "Accounts are not configured yet." }, { status: 503 });
 
   let body: { email?: string; password?: string };
@@ -46,21 +41,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
 
   // Generic error on both branches — never reveal whether the email exists.
-  const user = await getUserByEmail(email);
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email: acct,
+    password,
+  });
+  if (error) {
     if (acct) await recordFailure("login_acct", acct, ACCT_WINDOW);
     return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
   }
   if (acct) await clearFailures("login_acct", acct); // reset on success
 
-  const token = await createSession(user.id);
-  const res = NextResponse.json({ user: toPublicUser(user) });
-  res.cookies.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_TTL_SECONDS,
-  });
-  return res;
+  const user = await getCurrentUser();
+  return NextResponse.json({ user });
 }

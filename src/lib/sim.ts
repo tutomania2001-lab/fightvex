@@ -108,6 +108,31 @@ export const WEIGHTS: Record<string, number> = {
 const BASE_KO = 3.8;
 const BASE_SUB = 17.2;
 
+// Per-division finish-rate priors. KO rate varies hugely by weight (Heavyweight
+// ~48% of fights → Women's Strawweight ~14%) while submission rate is relatively
+// flat across divisions — so the global BASE_KO/BASE_SUB get a per-division
+// multiplier. Multipliers are anchored to the overall UFC split (~31% KO,
+// ~19% sub) so the heavily-populated mid divisions sit near 1.0 and the global
+// finish rate the sim is tuned to is preserved. Source: Fight Matrix "UFC fight
+// outcomes by weight class" (real historical base rates). Women's Featherweight
+// folds into Women's Bantamweight (normClass maps it there).
+const FINISH_MULT: Record<string, { ko: number; sub: number }> = {
+  "Heavyweight":          { ko: 1.55, sub: 1.12 },
+  "Light Heavyweight":    { ko: 1.41, sub: 1.00 },
+  "Middleweight":         { ko: 1.19, sub: 1.14 },
+  "Welterweight":         { ko: 1.05, sub: 1.01 },
+  "Lightweight":          { ko: 0.95, sub: 1.15 },
+  "Featherweight":        { ko: 0.93, sub: 0.91 },
+  "Bantamweight":         { ko: 0.82, sub: 1.02 },
+  "Flyweight":            { ko: 0.80, sub: 1.12 },
+  "Women's Bantamweight": { ko: 0.71, sub: 0.87 },
+  "Women's Flyweight":    { ko: 0.55, sub: 1.01 },
+  "Women's Strawweight":  { ko: 0.45, sub: 1.03 },
+};
+function finishMult(wc: string): { ko: number; sub: number } {
+  return FINISH_MULT[wc] ?? { ko: 1, sub: 1 };
+}
+
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const norm = (v: number, lo: number, hi: number) => clamp((v - lo) / (hi - lo), 0, 1) * 100;
 const sig = (x: number) => 1 / (1 + Math.exp(-x));
@@ -208,7 +233,7 @@ interface FightOutcome { winner: "A" | "B"; method: "ko" | "sub" | "dec"; round:
 
 // One simulated fight. Carries fatigue + damage across rounds so the fight has
 // a shape (e.g. a low-cardio fighter fades; a hurt fighter gets finished later).
-function simFight(ca: Caps, cb: Caps, rounds: number, rng: () => number, debA: number, debB: number): FightOutcome {
+function simFight(ca: Caps, cb: Caps, rounds: number, rng: () => number, debA: number, debB: number, koMult = 1, subMult = 1): FightOutcome {
   let fatA = 0, fatB = 0, dmgA = 0, dmgB = 0, scoreA = 0, scoreB = 0;
   const roundWinsA: boolean[] = [];
   for (let r = 0; r < rounds; r++) {
@@ -251,10 +276,10 @@ function simFight(ca: Caps, cb: Caps, rounds: number, rng: () => number, debA: n
     // dominant standing round + power against a hurt/weak chin; a submission needs
     // control + submission skill beating the opponent's defence. The (0.2 + dmg…)
     // term keeps round-1 finishes rare unless the power/edge is huge.
-    const koHazA = clamp(BASE_KO * (0.4 + domA) * standing * (ca.power / 100) * (0.25 + dmgB * 1.5) * vulnB, 0, 0.5);
-    const koHazB = clamp(BASE_KO * (0.4 + domB) * standing * (cb.power / 100) * (0.25 + dmgA * 1.5) * vulnA, 0, 0.5);
-    const subHazA = clamp(BASE_SUB * ctrlA * (ca.subO / 100) * (0.35 + dmgB * 0.85) * clamp(1.1 - cb.subD / 100, 0.25, 1), 0, 0.4);
-    const subHazB = clamp(BASE_SUB * ctrlB * (cb.subO / 100) * (0.35 + dmgA * 0.85) * clamp(1.1 - ca.subD / 100, 0.25, 1), 0, 0.4);
+    const koHazA = clamp(BASE_KO * koMult * (0.4 + domA) * standing * (ca.power / 100) * (0.25 + dmgB * 1.5) * vulnB, 0, 0.5);
+    const koHazB = clamp(BASE_KO * koMult * (0.4 + domB) * standing * (cb.power / 100) * (0.25 + dmgA * 1.5) * vulnA, 0, 0.5);
+    const subHazA = clamp(BASE_SUB * subMult * ctrlA * (ca.subO / 100) * (0.35 + dmgB * 0.85) * clamp(1.1 - cb.subD / 100, 0.25, 1), 0, 0.4);
+    const subHazB = clamp(BASE_SUB * subMult * ctrlB * (cb.subO / 100) * (0.35 + dmgA * 0.85) * clamp(1.1 - ca.subD / 100, 0.25, 1), 0, 0.4);
     const finA = koHazA + subHazA, finB = koHazB + subHazB;
 
     const tsec = 15 + Math.floor(rng() * 280);
@@ -292,6 +317,8 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   const subB = subscores(b);
   const ca = caps(a);
   const cb = caps(b);
+  // Per-division finish-rate prior (both fighters share the bout's weight class).
+  const fm = finishMult(a.weightClass);
 
   // ---- Transparent PRIOR from the composite rating gap (a stabiliser only) ----
   let rA = composite(subA);
@@ -330,7 +357,7 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   const finTimes: Record<string, number[]> = {};
 
   for (let i = 0; i < runs; i++) {
-    const o = simFight(ca, cb, params.rounds, rng, debA, debB);
+    const o = simFight(ca, cb, params.rounds, rng, debA, debB, fm.ko, fm.sub);
     for (let r = 0; r < o.roundWinsA.length; r++) {
       momentum[r] += o.roundWinsA[r] ? 1 : -1;
       if (o.roundWinsA[r]) roundWonA[r]++;

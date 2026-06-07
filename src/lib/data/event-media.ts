@@ -14,6 +14,7 @@ import type { FightEvent } from "../types";
 export const EVENT_HERO: Record<string, string> = {
   "ufc-fight-night-muhammad-vs-bonfim": "/events/ufc-fight-night-muhammad-vs-bonfim.jpg",
   "ufc-fight-night-kape-vs-horiguchi": "/events/ufc-fight-night-kape-vs-horiguchi.jpg",
+  "ufc-329-mcgregor-vs-holloway-2": "/events/ufc-329-mcgregor-vs-holloway-2.jpg",
 };
 
 // Keyword rules on the slug (survive fighter/slug changes). The White House card

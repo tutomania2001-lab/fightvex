@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { logUpcoming, gradeDue, trackingEnabled } from "@/lib/predictions";
 import { upgradeCommitments } from "@/lib/commit";
 import { cronAuth } from "@/lib/cron-auth";
+import { sendWatchlistAlerts } from "@/lib/alerts";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -23,5 +24,6 @@ export async function GET(req: Request) {
   const logged = await logUpcoming(now);
   const graded = await gradeDue(now);
   const commitments = await upgradeCommitments(); // confirm pending Bitcoin anchors
-  return NextResponse.json({ ok: true, at: new Date(now).toISOString(), logged, graded, commitments });
+  const alerts = await sendWatchlistAlerts(now); // Pro+ "your fighter is on this card" emails
+  return NextResponse.json({ ok: true, at: new Date(now).toISOString(), logged, graded, commitments, alerts });
 }

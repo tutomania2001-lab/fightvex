@@ -61,7 +61,33 @@ export function AccuracyPanel() {
 
   return (
     <div className="reveal space-y-8">
-      {/* Historical backtest — always available (static, real). */}
+      {/* 1) LIVE RECORD — real pre-registered picks, graded. Shown first. */}
+      {state === "loading" && <div className="h-28 animate-pulse rounded-xl bg-panel-2/40" />}
+      {state === "ready" && rec?.enabled && rec.graded > 0 && (
+        <section>
+          <h3 className="mb-1 font-display text-lg font-bold uppercase">Live record · {rec.graded} graded</h3>
+          <p className="mb-4 max-w-2xl text-sm text-muted">
+            Aggregate of real picks logged <b>before</b> each fight (the per-fight breakdown is under <b>Past Picks</b>).
+          </p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Metric label="Winner picks" value={rec.winAccuracy != null ? pct1(rec.winAccuracy) : "—"} sub={`${rec.graded} graded`} tone="fg" />
+            <Metric label="Method picks" value={rec.methodAccuracy != null ? pct1(rec.methodAccuracy) : "—"} sub={`${rec.methodGraded} verifiable`} tone="fg" />
+            <Metric label="Brier" value={rec.brier != null ? rec.brier.toFixed(3) : "—"} sub="0.25 = coin flip" tone="edge" />
+            <Metric label="Log loss" value={rec.logLoss != null ? rec.logLoss.toFixed(3) : "—"} sub="0.69 = coin flip" tone="edge" />
+          </div>
+          {rec.calibration.length > 0 && (
+            <div className="mt-4"><Calibration rows={rec.calibration} /></div>
+          )}
+        </section>
+      )}
+      {state === "ready" && (!rec?.enabled || rec.graded === 0) && (
+        <section className="rounded-xl border border-line/60 bg-panel/40 p-4">
+          <h3 className="font-display text-lg font-bold uppercase">Live record · building</h3>
+          <p className="mt-1 max-w-2xl text-sm text-muted">No fights graded yet — every pick is logged before its card and graded after, so the live numbers fill in as cards settle. The validated backtest below is the baseline.</p>
+        </section>
+      )}
+
+      {/* 2) HISTORICAL BACKTEST — always available (static, real). */}
       <section>
         <h3 className="mb-1 font-display text-lg font-bold uppercase">Historical backtest · {BACKTEST.backtested.toLocaleString()} real bouts</h3>
         <p className="mb-4 max-w-2xl text-sm text-muted">
@@ -79,7 +105,7 @@ export function AccuracyPanel() {
         <Calibration rows={BACKTEST.calibration} />
       </section>
 
-      {/* Bitcoin-anchored proof that the picks were locked BEFORE the fights. */}
+      {/* 3) LOCKED FIGHTS — Bitcoin-anchored proof, last. */}
       {state === "ready" && rec?.commitments && rec.commitments.length > 0 && (
         <section>
           <h3 className="mb-1 font-display text-lg font-bold uppercase">₿ Locked before the fights — verify it yourself</h3>
@@ -90,27 +116,6 @@ export function AccuracyPanel() {
           <div className="space-y-4">
             {rec.commitments.map((c) => <CommitVerify key={c.eventSlug} c={c} />)}
           </div>
-        </section>
-      )}
-
-      {/* Live aggregate — only once real picks are graded (otherwise the Past
-          Picks tab already covers the "nothing settled yet" state). This adds
-          what Past Picks doesn't: aggregate metrics + a live calibration curve. */}
-      {state === "ready" && rec?.enabled && rec.graded > 0 && (
-        <section>
-          <h3 className="mb-1 font-display text-lg font-bold uppercase">Live record · {rec.graded} graded</h3>
-          <p className="mb-4 max-w-2xl text-sm text-muted">
-            Aggregate of real picks logged <b>before</b> each fight (the per-fight breakdown is under <b>Past Picks</b>).
-          </p>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Metric label="Winner picks" value={rec.winAccuracy != null ? pct1(rec.winAccuracy) : "—"} sub={`${rec.graded} graded`} tone="fg" />
-            <Metric label="Method picks" value={rec.methodAccuracy != null ? pct1(rec.methodAccuracy) : "—"} sub={`${rec.methodGraded} verifiable`} tone="fg" />
-            <Metric label="Brier" value={rec.brier != null ? rec.brier.toFixed(3) : "—"} sub="0.25 = coin flip" tone="edge" />
-            <Metric label="Log loss" value={rec.logLoss != null ? rec.logLoss.toFixed(3) : "—"} sub="0.69 = coin flip" tone="edge" />
-          </div>
-          {rec.calibration.length > 0 && (
-            <div className="mt-4"><Calibration rows={rec.calibration} /></div>
-          )}
         </section>
       )}
     </div>

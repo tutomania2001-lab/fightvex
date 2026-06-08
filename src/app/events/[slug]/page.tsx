@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Matchup } from "@/lib/types";
 import { allEvents, getEvent } from "@/lib/data/events";
 import { getFighterById } from "@/lib/data/fighters";
@@ -21,7 +22,14 @@ function Bout({ m }: { m: Matchup }) {
   const sim = simulate(a, b, { rounds: m.rounds, runs: 400, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB });
   const side: "a" | "b" = sim.probA >= sim.probB ? "a" : "b";
   const pick = { side, lastName: lastName(side === "a" ? a.name : b.name), prob: Math.max(sim.probA, sim.probB) };
-  return <FightCard a={a} b={b} matchup={m} pick={pick} bodyA={torsoFor(a.slug)} bodyB={torsoFor(b.slug)} />;
+  return (
+    <div>
+      <FightCard a={a} b={b} matchup={m} pick={pick} bodyA={torsoFor(a.slug)} bodyB={torsoFor(b.slug)} />
+      <div className="mt-1.5 text-right">
+        <Link href={`/predict/${a.slug}-vs-${b.slug}`} className="text-xs font-semibold uppercase tracking-wide text-muted hover:text-blood">Full prediction →</Link>
+      </div>
+    </div>
+  );
 }
 
 export function generateStaticParams() {

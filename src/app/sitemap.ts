@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { allFighters } from "@/lib/data/fighters";
+import { allFighters, getFighterById } from "@/lib/data/fighters";
 import { allEvents } from "@/lib/data/events";
 
 const BASE = "https://fightvex.com";
@@ -41,5 +41,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...events, ...fighters];
+  // Programmatic matchup-prediction pages (one per real bout, deduped by slug).
+  const seenPredict = new Set<string>();
+  const predicts: MetadataRoute.Sitemap = [];
+  for (const e of allEvents()) {
+    for (const m of e.matchups) {
+      const a = getFighterById(m.fighterA);
+      const b = getFighterById(m.fighterB);
+      if (!a || !b) continue;
+      const slug = `${a.slug}-vs-${b.slug}`;
+      if (seenPredict.has(slug)) continue;
+      seenPredict.add(slug);
+      predicts.push({ url: `${BASE}/predict/${slug}`, lastModified: now, changeFrequency: "daily", priority: 0.7 });
+    }
+  }
+
+  return [...staticRoutes, ...events, ...fighters, ...predicts];
 }

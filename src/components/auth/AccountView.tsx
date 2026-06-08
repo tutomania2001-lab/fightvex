@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -106,6 +106,22 @@ export function AccountView() {
     run();
     return () => { cancelled = true; };
   }, [params, refresh]);
+
+  // Self-heal: if a signed-in user still shows "free", silently reconcile against
+  // Stripe once on load. Catches anyone whose webhook was missed — no button, no
+  // action needed; they just open their account and it upgrades if they've paid.
+  const reconciledRef = useRef(false);
+  useEffect(() => {
+    if (!user || user.plan !== "free" || reconciledRef.current) return;
+    reconciledRef.current = true;
+    (async () => {
+      try {
+        const r = await fetch("/api/stripe/sync", { method: "POST" });
+        const j = (await r.json().catch(() => ({}))) as { synced?: boolean };
+        if (j?.synced) await refresh();
+      } catch { /* ignore */ }
+    })();
+  }, [user, refresh]);
 
   const go = useCallback((id: SectionId) => {
     setSection(id);
@@ -350,26 +366,8 @@ const TIERS: { plan: Plan; price: string; cadence: string; blurb: string }[] = [
 ];
 
 function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded: boolean }) {
-  const { refresh } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [syncMsg, setSyncMsg] = useState<string | null>(null);
-
-  // Webhook-independent reconcile: confirm the subscription directly with Stripe.
-  async function sync() {
-    setBusy(true); setError(null); setSyncMsg(null);
-    try {
-      const r = await fetch("/api/stripe/sync", { method: "POST" });
-      const j = (await r.json()) as { plan?: string; synced?: boolean; error?: string };
-      if (r.ok && j.synced) { await refresh(); setSyncMsg("Subscription found — your plan is now active."); }
-      else if (r.ok) setSyncMsg("No active subscription found on this account yet. If you just paid, give it a moment and try again.");
-      else setError(j.error || "Couldn't sync.");
-    } catch {
-      setError("Network error. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
 
   async function openPortal() {
     setBusy(true);
@@ -426,14 +424,6 @@ function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded:
             ? "You're on the free plan. Upgrade to unlock Pro tools."
             : `Thanks for subscribing to ${PLAN_LABEL[plan]}.`}
         </p>
-        {plan === "free" && (
-          <div className="mt-3">
-            <button onClick={sync} disabled={busy} className={`${ghostBtn} disabled:opacity-60`}>
-              {busy ? "Checking…" : "Already subscribed? Sync now"}
-            </button>
-            {syncMsg && <p className="mt-2 text-sm text-edge">{syncMsg}</p>}
-          </div>
-        )}
         {plan !== "free" && (
           <button onClick={openPortal} disabled={busy} className={`mt-4 ${ghostBtn} disabled:opacity-60`}>
             {busy ? "Opening…" : "Manage billing"}

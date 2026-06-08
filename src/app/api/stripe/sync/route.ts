@@ -34,9 +34,8 @@ export async function POST(req: Request) {
       stripeCustomerId: found.customerId,
       stripeSubscriptionId: found.subscriptionId,
     });
-  } catch (e) {
-    // Surface the real DB error so we can diagnose (owner-facing).
-    return NextResponse.json({ error: `Update failed: ${String((e as Error)?.message || e)}`, plan: found.plan }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Couldn't update the account. Please try again." }, { status: 500 });
   }
   return NextResponse.json({ plan: found.plan, synced: true });
 }

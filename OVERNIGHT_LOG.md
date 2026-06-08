@@ -42,3 +42,5 @@ _(none yet — will fill in as I hit anything requiring keys, money, a new tool,
 - Real bet-logging ledger (DB + product calls) — see NEXT_SESSION_PLAN roadmap.
 - 7-day free Pro trial (billing change — needs your OK).
 - Model: fight-week signals (missed weight), model-vs-closing-line tracking.
+
+- tick 2026-06-08 01:52 UTC: all green (7 routes 200, /api/health ok, no warnings, no high-value safe work pending — no change forced)

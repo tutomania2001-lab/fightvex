@@ -4,6 +4,7 @@ import type { Plan } from "@/lib/entitlements";
 import { verifyWebhook, planForId } from "@/lib/stripe";
 import { reportError } from "@/lib/observability";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { setProfilePlan } from "@/lib/supabase/profile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -74,8 +75,11 @@ export async function POST(req: Request) {
       const plan = meta.plan as Plan | undefined;
       const customer = str(obj.customer);
       const subscription = str(obj.subscription);
+      const email = str((obj.customer_details as { email?: string } | undefined)?.email) || str(obj.customer_email);
       if (userId && (plan === "pro" || plan === "elite")) {
-        await setPlan(userId, plan, { stripeCustomerId: customer, stripeSubscriptionId: subscription });
+        // Upsert with the email so a missing profile row is created, not no-op'd.
+        if (email) await setProfilePlan(userId, email, { plan, stripeCustomerId: customer, stripeSubscriptionId: subscription });
+        else await setPlan(userId, plan, { stripeCustomerId: customer, stripeSubscriptionId: subscription });
       }
     } else if (event.type === "customer.subscription.updated") {
       const meta = (obj.metadata as Record<string, string>) || {};

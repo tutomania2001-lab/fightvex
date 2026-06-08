@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
-import { getProfileBilling, updateProfileBilling } from "@/lib/supabase/profile";
+import { getProfileBilling, setProfilePlan } from "@/lib/supabase/profile";
 import { syncPlanFromStripe, stripeEnabled } from "@/lib/stripe";
 import { badOrigin } from "@/lib/origin";
 
@@ -28,10 +28,14 @@ export async function POST(req: Request) {
 
   if (!found) return NextResponse.json({ plan: "free", synced: false });
 
-  await updateProfileBilling(me.id, {
-    plan: found.plan,
-    stripeCustomerId: found.customerId,
-    stripeSubscriptionId: found.subscriptionId,
-  });
+  try {
+    await setProfilePlan(me.id, me.email, {
+      plan: found.plan,
+      stripeCustomerId: found.customerId,
+      stripeSubscriptionId: found.subscriptionId,
+    });
+  } catch {
+    return NextResponse.json({ error: "Found your subscription but couldn't update the account. Please try again." }, { status: 500 });
+  }
   return NextResponse.json({ plan: found.plan, synced: true });
 }

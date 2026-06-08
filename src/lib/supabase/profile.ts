@@ -29,3 +29,19 @@ export async function updateProfileBilling(
 export async function updateProfileName(userId: string, name: string): Promise<void> {
   await createSupabaseAdmin().from("profiles").update({ name }).eq("id", userId);
 }
+
+// Set a user's plan reliably: UPSERT (not update) so a missing profile row — e.g.
+// an account created before the signup trigger — is created instead of the write
+// silently hitting 0 rows. `email` is required because profiles.email is NOT NULL.
+// Surfaces DB errors so callers can react instead of falsely reporting success.
+export async function setProfilePlan(
+  userId: string,
+  email: string,
+  patch: { plan: Plan; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null }
+): Promise<void> {
+  const row: Record<string, unknown> = { id: userId, email, plan: patch.plan };
+  if ("stripeCustomerId" in patch) row.stripe_customer_id = patch.stripeCustomerId ?? null;
+  if ("stripeSubscriptionId" in patch) row.stripe_subscription_id = patch.stripeSubscriptionId ?? null;
+  const { error } = await createSupabaseAdmin().from("profiles").upsert(row, { onConflict: "id" });
+  if (error) throw new Error(`profiles upsert: ${error.message}`);
+}

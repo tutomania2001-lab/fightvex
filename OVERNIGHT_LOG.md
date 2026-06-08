@@ -80,3 +80,12 @@ Baseline (current v3.2 engine): **64.5%** full / **63.4%** held-out (post-cal), 
 
 ### Data note
 - 12 roster fighters (incl. Gable Steveson, Farman Hasanov) have ESPN eventlogs but NO per-fight stat breakdown — genuinely unavailable, so they keep the labeled estimate fallback (not a fetch bug). Health check now treats this as a soft note, not a failure.
+
+---
+
+## Approved batch — ALL SHIPPED (2026-06-08)
+1. ✅ Public accuracy bumped to real backtested numbers (64.6% full / 63.5% recent).
+2. ✅ Model-vs-closing-line (CLV) tracking — captures pick-time + closing no-vig per pick; /accuracy shows beat-the-close %, edge-vs-close, CLV+ win rate (populates as picks grade).
+3. ✅ Trial-ending reminder email — daily cron (14:00 UTC), Stripe trialing query, Resend, deduped.
+4. ⏳ Annual Pro plan — backend + UI toggle shipped (same plan, £96/yr −20%), GATED on STRIPE_PRICE_PRO_ANNUAL. **Needs: owner creates the £96/yr price on the Pro product in Stripe → give price id → set env → annual goes live.**
+5. ✅ Free pick of the week (/free-pick, never the headliner) + 1 free simulation per account (KV-tracked).

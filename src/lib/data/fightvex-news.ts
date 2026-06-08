@@ -8,6 +8,14 @@ export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-08",
     tag: "Feature",
+    title: "Pro is now free for 7 days",
+    body:
+      "New members get a 7-day free trial of Pro — full simulator, every fighter metric, the line-movement tracker, EV/CLV tools, the bankroll calculator and watchlist alerts, all unlocked from day one. You're only charged £10/mo if you stay past the trial, and you can cancel anytime in your account. One trial per member.",
+    href: "/pricing",
+  },
+  {
+    date: "2026-06-08",
+    tag: "Feature",
     title: "AI prediction pages for every bout",
     body:
       "Every upcoming UFC bout now has its own prediction page: the Vex AI pick and win %, the method-of-victory split, the likely round, real market odds with a value lean, a full tale-of-the-tape and the key factors — all in one place. Browse them on the new Predictions tab, or jump straight in from any fight card or fighter page. Transparent and backtested; informational only, not betting advice.",

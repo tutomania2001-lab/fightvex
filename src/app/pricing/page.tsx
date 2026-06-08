@@ -5,7 +5,7 @@ import type { Plan } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
   title: "Pricing — Free & Pro",
-  description: "FightVex Pro: one plan unlocks everything — unlimited AI fight simulations, betting tools and watchlist alerts. Free tier to browse. Cancel anytime. 21+.",
+  description: "FightVex Pro: start a 7-day free trial, then £10/mo — one plan unlocks everything: unlimited AI fight simulations, betting tools and watchlist alerts. Free tier to browse. Cancel anytime. 21+.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -33,8 +33,8 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
     price: "£10",
     cadence: "/month",
     highlight: true,
-    cta: "Get Pro",
-    tagline: "One plan. Everything unlocked. Cancel anytime.",
+    cta: "Start 7-day free trial",
+    tagline: "7-day free trial, then £10/mo. Everything unlocked. Cancel anytime.",
     features: [
       { label: "Everything in Free" },
       { label: "Unlimited 50,000-run simulations", desc: "Run any matchup at full depth — change rounds or short-notice and re-run freely." },

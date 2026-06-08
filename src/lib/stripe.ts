@@ -116,6 +116,12 @@ export async function createCheckoutSession(opts: {
   if (opts.customerId) params.customer = opts.customerId;
   else params.customer_email = opts.email;
 
+  // 7-day free trial for FIRST-TIME subscribers only (no existing Stripe
+  // customer = never subscribed before), so it can't be farmed by re-signups.
+  // The webhook already treats `trialing` as active, so they get Pro access
+  // immediately and are billed only if they don't cancel within 7 days.
+  if (!opts.customerId) params["subscription_data[trial_period_days]"] = "7";
+
   const session = await stripePost<{ url: string }>("checkout/sessions", params);
   return { url: session.url };
 }

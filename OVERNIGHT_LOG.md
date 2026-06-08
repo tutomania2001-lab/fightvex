@@ -5,12 +5,13 @@ Rules: ship only additive/reversible work (typecheck + build + smoke before depl
 queue anything needing keys/money/new tools/product decisions for approval below.
 
 ## ✅ Shipped (live on fightvex.com)
-- **Programmatic matchup-prediction pages** — `/predict/<a>-vs-<b>` for every real bout on every card. Each page: Vex AI win %, method-of-victory split, likely round, real odds + value lean, key factors, "Open in Simulator" deep-link, FAQ, and SportsEvent + FAQPage + Breadcrumb JSON-LD. Added to sitemap; linked from each bout on the event pages ("Full prediction →"). _(This is the top organic-growth lever — long-tail "who wins X vs Y" search.)_ — pending deploy verify.
+- **Programmatic matchup-prediction pages** — `/predict/<a>-vs-<b>` for every real bout on every card. Each page: Vex AI win %, method-of-victory split, likely round, real odds + value lean, key factors, "Open in Simulator" deep-link, FAQ, and SportsEvent + FAQPage + Breadcrumb JSON-LD. Added to sitemap; linked from each bout on the event pages ("Full prediction →"). **Verified live** (e.g. /predict/ilia-topuria-vs-justin-gaethje → 200). _(Top organic-growth lever — long-tail "who wins X vs Y" search; +~80 indexable pages.)_
+- **PostHog funnel events** — `checkout_started` (PlanButton), `signup`/`login` + identify (AuthForm), `simulation_run` (Simulator). Dormant unless the PostHog key is set. _(Deploying.)_
 
 ## 🔧 In progress / queued (safe, no approval needed)
-- PostHog funnel events (signup → pricing → checkout-start → sim-run).
-- `/api/health` (data-freshness + last-cron timestamps) for silent-breakage visibility.
+- `/api/health` — data-freshness probe (events/fighters counts, next event, odds capture age, backtest summary, warnings[]). _(Building.)_
 - Dynamic OG share images for fighter + matchup pages.
+- Internal-link & discoverability polish.
 
 ## ⚠ NEEDS YOUR APPROVAL (not done — explained for you)
 _(none yet — will fill in as I hit anything requiring keys, money, a new tool, or a product/billing/model decision)_

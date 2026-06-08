@@ -44,3 +44,4 @@ _(none yet — will fill in as I hit anything requiring keys, money, a new tool,
 - Model: fight-week signals (missed weight), model-vs-closing-line tracking.
 
 - tick 2026-06-08 01:52 UTC: all green (7 routes 200, /api/health ok, no warnings, no high-value safe work pending — no change forced)
+- tick 2026-06-08 02:56 UTC: all green; shipped predict-page interlink ("More predictions from this card") for SEO/discovery

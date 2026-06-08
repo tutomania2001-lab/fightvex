@@ -43,6 +43,7 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
       { label: "EV & no-vig calculators", desc: "Turn any odds into a true win % and expected value." },
       { label: "Closing-line-value tool", desc: "Compare each bout's opening line to the latest market line." },
       { label: "Bankroll calculator", desc: "Fractional-Kelly unit sizing with a sensible stake cap." },
+      { label: "Bet log + CLV tracking", desc: "Log your bets and track closing-line value, record and P&L over time." },
       { label: "Watchlist + email alerts", desc: "Follow fighters and get emailed when they're booked on a card." },
       { label: "Priority access", desc: "Earliest access to new tools and research." },
     ],

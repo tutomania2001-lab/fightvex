@@ -273,3 +273,85 @@ export async function removeWatch(userId: string, fighterId: string): Promise<Wa
   await sb.from("watchlist").delete().eq("user_id", userId).eq("fighter_id", fighterId);
   return listWatch(userId);
 }
+
+// ---- bet log / bankroll ledger (Pro) — own rows only (RLS) ----
+export type Bet = {
+  id: string;
+  boutId: string | null;
+  selection: string; // fighter / market label
+  stake: number; // units
+  oddsTaken: number; // American odds when placed
+  closingOdds: number | null; // American odds at close (for CLV)
+  result: "win" | "loss" | "push" | null; // null = open
+  placedAt: string;
+  settledAt: string | null;
+};
+
+type BetRow = {
+  id: string;
+  bout_id: string | null;
+  selection: string;
+  stake: number;
+  odds_taken: number;
+  closing_odds: number | null;
+  result: Bet["result"];
+  placed_at: string;
+  settled_at: string | null;
+};
+
+const toBet = (r: BetRow): Bet => ({
+  id: r.id,
+  boutId: r.bout_id,
+  selection: r.selection,
+  stake: r.stake,
+  oddsTaken: r.odds_taken,
+  closingOdds: r.closing_odds,
+  result: r.result,
+  placedAt: r.placed_at,
+  settledAt: r.settled_at,
+});
+
+const BET_COLS = "id, bout_id, selection, stake, odds_taken, closing_odds, result, placed_at, settled_at";
+
+export async function listBets(userId: string): Promise<Bet[]> {
+  const sb = await createSupabaseServerClient();
+  const { data } = await sb.from("bets").select(BET_COLS).eq("user_id", userId).order("placed_at", { ascending: false });
+  return ((data ?? []) as BetRow[]).map(toBet);
+}
+
+export async function addBet(
+  userId: string,
+  input: { selection: string; stake: number; oddsTaken: number; boutId?: string | null }
+): Promise<Bet[]> {
+  const sb = await createSupabaseServerClient();
+  await sb.from("bets").insert({
+    user_id: userId,
+    selection: input.selection,
+    stake: input.stake,
+    odds_taken: Math.round(input.oddsTaken),
+    bout_id: input.boutId ?? null,
+  });
+  return listBets(userId);
+}
+
+export async function updateBet(
+  userId: string,
+  id: string,
+  patch: { result?: Bet["result"]; closingOdds?: number | null }
+): Promise<Bet[]> {
+  const sb = await createSupabaseServerClient();
+  const upd: Record<string, unknown> = {};
+  if (patch.result !== undefined) {
+    upd.result = patch.result;
+    upd.settled_at = patch.result ? new Date().toISOString() : null;
+  }
+  if (patch.closingOdds !== undefined) upd.closing_odds = patch.closingOdds === null ? null : Math.round(patch.closingOdds);
+  if (Object.keys(upd).length) await sb.from("bets").update(upd).eq("user_id", userId).eq("id", id);
+  return listBets(userId);
+}
+
+export async function deleteBet(userId: string, id: string): Promise<Bet[]> {
+  const sb = await createSupabaseServerClient();
+  await sb.from("bets").delete().eq("user_id", userId).eq("id", id);
+  return listBets(userId);
+}

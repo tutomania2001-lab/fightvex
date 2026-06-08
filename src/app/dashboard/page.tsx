@@ -56,7 +56,7 @@ export default function DashboardPage() {
           <Panel className="reveal p-6">
             <h2 className="mb-2 font-display text-lg font-bold uppercase">Bankroll Tracking</h2>
             <p className="rounded-lg border border-line bg-panel-2/40 p-4 text-sm text-muted">
-              No tracked bets yet — unit, position and closing-line-value tracking activates once accounts launch. We never display fabricated figures. FightVex does not accept or place wagers. 21+.
+              Log your bets in the <Link href="/account?section=bets" className="text-blood hover:underline">Bet Log</Link> to track closing-line value, record and P&amp;L over time (Pro). Units only — we never display fabricated figures, and FightVex does not accept or place wagers. 21+.
             </p>
           </Panel>
         </div>

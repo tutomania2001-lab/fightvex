@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PLAN_LABEL, PLAN_RANK, toolsForPlan, type Plan } from "@/lib/entitlements";
 import { AccountHome, type HomePayload, type TrackRecord, type ChecklistItem, type Stats } from "@/components/auth/AccountHome";
+import { BetsSection } from "@/components/auth/BetsSection";
 
 // Local mirrors of the server shapes (avoid importing the server-only store).
 type SavedInsight = {
@@ -21,12 +22,13 @@ type SavedInsight = {
 };
 type WatchItem = { fighterId: string; name: string; addedAt: string };
 
-type SectionId = "home" | "insights" | "watchlist" | "tools" | "subscription" | "profile";
+type SectionId = "home" | "insights" | "watchlist" | "bets" | "tools" | "subscription" | "profile";
 
 const SECTIONS: { id: SectionId; label: string }[] = [
   { id: "home", label: "Home" },
   { id: "insights", label: "Saved Insights" },
   { id: "watchlist", label: "Watchlist" },
+  { id: "bets", label: "Bet Log" },
   { id: "tools", label: "Tools & Access" },
   { id: "subscription", label: "Subscription" },
   { id: "profile", label: "Profile" },
@@ -192,6 +194,7 @@ export function AccountView() {
           )}
           {section === "insights" && <InsightsSection insights={insights} onRemove={removeInsight} />}
           {section === "watchlist" && <WatchlistSection watchlist={watchlist} onRemove={removeWatch} />}
+          {section === "bets" && <BetsSection />}
           {section === "tools" && <ToolsSection plan={user.plan} />}
           {section === "subscription" && <SubscriptionSection plan={user.plan} justUpgraded={params.get("checkout") === "success"} />}
           {section === "profile" && <ProfileSection name={user.name} email={user.email} onSaved={refresh} />}

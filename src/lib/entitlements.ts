@@ -38,6 +38,7 @@ export const TOOLS: Tool[] = [
   { id: "clv-tool", name: "Closing-Line-Value Tool", description: "Compare each bout's opening line to the latest market line.", href: "/betting", minPlan: "pro", category: "Betting" },
   { id: "bankroll", name: "Bankroll Calculator", description: "Fractional-Kelly unit sizing with a sensible stake cap.", href: "/betting", minPlan: "pro", category: "Betting" },
   { id: "watchlist-alerts", name: "Watchlist Alerts", description: "Get emailed when a watched fighter is booked on a card.", href: "/account?section=watchlist", minPlan: "pro", category: "Research" },
+  { id: "bet-log", name: "Bet Log & CLV", description: "Log your bets and track closing-line value, record and P&L over time.", href: "/account?section=bets", minPlan: "pro", category: "Betting" },
 ];
 
 export function hasAccess(plan: Plan, minPlan: Plan): boolean {

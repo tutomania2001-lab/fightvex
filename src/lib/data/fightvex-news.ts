@@ -8,6 +8,14 @@ export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-08",
     tag: "Feature",
+    title: "Bet Log: track your CLV and P&L (Pro)",
+    body:
+      "Pro members can now log every bet in their account — stake, odds taken and the closing line — and FightVex tracks your closing-line value, win/loss record and running P&L in units. Beating the close is the metric that actually predicts long-term edge, so now you can measure yours, honestly. It's your private ledger: units only, no fabricated figures, and we never hold or place wagers. 21+.",
+    href: "/account?section=bets",
+  },
+  {
+    date: "2026-06-08",
+    tag: "Feature",
     title: "Pro is now free for 7 days",
     body:
       "New members get a 7-day free trial of Pro — full simulator, every fighter metric, the line-movement tracker, EV/CLV tools, the bankroll calculator and watchlist alerts, all unlocked from day one. You're only charged £10/mo if you stay past the trial, and you can cancel anytime in your account. One trial per member.",

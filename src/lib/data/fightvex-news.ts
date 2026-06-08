@@ -7,6 +7,14 @@ export interface FxNews { date: string; tag: NewsTag; title: string; body: strin
 export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-08",
+    tag: "Transparency",
+    title: "The model now accounts for missed weight",
+    body:
+      "Vex AI already handicaps short-notice fighters; it now also models missed weight. When a fighter misses at the official weigh-in — drained from a hard cut — the simulation applies a per-round and rating debuff and flags it as a fight-week factor. Like short-notice, it's curated from the real weigh-in result (never guessed) and only applied to that fighter's current bout, then cleared after the card. Honest fight-week context, where it genuinely swings a fight.",
+    href: "/methodology",
+  },
+  {
+    date: "2026-06-08",
     tag: "Feature",
     title: "Bet Log: track your CLV and P&L (Pro)",
     body:

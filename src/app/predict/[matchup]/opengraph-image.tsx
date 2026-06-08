@@ -11,13 +11,14 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "FightVex matchup prediction";
 
-function resolve(slug: string): { a: Fighter; b: Fighter; rounds: number; snA: boolean; snB: boolean } | null {
+function resolve(slug: string): { a: Fighter; b: Fighter; rounds: number; snA: boolean; snB: boolean; mwA: boolean; mwB: boolean } | null {
   for (const e of allEvents()) {
     for (const m of e.matchups) {
       const a = getFighterById(m.fighterA);
       const b = getFighterById(m.fighterB);
       if (!a || !b) continue;
-      if (`${a.slug}-vs-${b.slug}` === slug) return { a, b, rounds: m.rounds, snA: !!m.shortNoticeA, snB: !!m.shortNoticeB };
+      if (`${a.slug}-vs-${b.slug}` === slug)
+        return { a, b, rounds: m.rounds, snA: !!m.shortNoticeA, snB: !!m.shortNoticeB, mwA: !!m.missedWeightA, mwB: !!m.missedWeightB };
     }
   }
   return null;
@@ -30,7 +31,7 @@ export default async function Image({ params }: { params: Promise<{ matchup: str
   const title = r ? `${r.a.name}  vs  ${r.b.name}` : "FightVex Prediction";
   let verdict = "AI fight prediction";
   if (r) {
-    const sim = simulate(r.a, r.b, { rounds: r.rounds === 5 ? 5 : 3, runs: 800, shortNoticeA: r.snA, shortNoticeB: r.snB });
+    const sim = simulate(r.a, r.b, { rounds: r.rounds === 5 ? 5 : 3, runs: 800, shortNoticeA: r.snA, shortNoticeB: r.snB, missedWeightA: r.mwA, missedWeightB: r.mwB });
     const favA = sim.probA >= 0.5;
     const fav = favA ? r.a : r.b;
     const prob = Math.round(Math.max(sim.probA, sim.probB) * 100);

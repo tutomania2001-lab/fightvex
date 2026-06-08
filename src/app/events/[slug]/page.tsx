@@ -19,7 +19,7 @@ function Bout({ m }: { m: Matchup }) {
   const a = getFighterById(m.fighterA);
   const b = getFighterById(m.fighterB);
   if (!a || !b) return null;
-  const sim = simulate(a, b, { rounds: m.rounds, runs: 400, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB });
+  const sim = simulate(a, b, { rounds: m.rounds, runs: 400, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB });
   const side: "a" | "b" = sim.probA >= sim.probB ? "a" : "b";
   const pick = { side, lastName: lastName(side === "a" ? a.name : b.name), prob: Math.max(sim.probA, sim.probB) };
   return (

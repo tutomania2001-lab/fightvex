@@ -12,7 +12,7 @@ import { recordString, impliedProb, noVigProbA, bestPrice, fmtOdds, pct, lastNam
 export function MatchupRow({ matchup }: { matchup: Matchup }) {
   const a = getFighterById(matchup.fighterA)!;
   const b = getFighterById(matchup.fighterB)!;
-  const sim = simulate(a, b, { rounds: matchup.rounds, runs: 600, shortNoticeA: matchup.shortNoticeA, shortNoticeB: matchup.shortNoticeB });
+  const sim = simulate(a, b, { rounds: matchup.rounds, runs: 600, shortNoticeA: matchup.shortNoticeA, shortNoticeB: matchup.shortNoticeB, missedWeightA: matchup.missedWeightA, missedWeightB: matchup.missedWeightB });
 
   const bestA = bestPrice(matchup.odds.map((o) => o.priceA));
   const bestB = bestPrice(matchup.odds.map((o) => o.priceB));

@@ -119,6 +119,9 @@ export interface Matchup {
   /** Fighter took the bout on short notice (fed from fight-week news, not the data feed) → prep debuff in the sim. */
   shortNoticeA?: boolean;
   shortNoticeB?: boolean;
+  /** Fighter missed weight at the weigh-in (fed from fight-week news) → drained debuff in the sim. */
+  missedWeightA?: boolean;
+  missedWeightB?: boolean;
   odds: OddsLine[];
   /** Set when `odds` are REAL web-sourced market lines (e.g. "Market consensus · Jun 2026"). Undefined => model-implied. */
   oddsSource?: string;

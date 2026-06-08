@@ -19,7 +19,7 @@ export default function Home() {
   const featured = event.matchups[0];
   const fa = getFighterById(featured.fighterA)!;
   const fb = getFighterById(featured.fighterB)!;
-  const featSim = simulate(fa, fb, { rounds: featured.rounds, runs: 800, shortNoticeA: featured.shortNoticeA, shortNoticeB: featured.shortNoticeB });
+  const featSim = simulate(fa, fb, { rounds: featured.rounds, runs: 800, shortNoticeA: featured.shortNoticeA, shortNoticeB: featured.shortNoticeB, missedWeightA: featured.missedWeightA, missedWeightB: featured.missedWeightB });
 
   // Real info for the MATCH 2 hero tab — the featured event matchup.
   const featBestA = bestPrice(featured.odds.map((o) => o.priceA));

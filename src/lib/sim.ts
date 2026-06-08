@@ -24,6 +24,9 @@ export interface SimParams {
   rounds: 3 | 5;
   shortNoticeA?: boolean;
   shortNoticeB?: boolean;
+  /** Fighter missed weight at the official weigh-in (drained / weakened). */
+  missedWeightA?: boolean;
+  missedWeightB?: boolean;
   runs?: number;
 }
 export interface FactorContribution {
@@ -327,10 +330,14 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   const layoffPen = (m: number) => -Math.max(0, m - 9) * 0.35;
   rA += layoffPen(a.layoffMonths);
   rB += layoffPen(b.layoffMonths);
-  const debA = params.shortNoticeA ? 0.93 : 1;
-  const debB = params.shortNoticeB ? 0.93 : 1;
+  // Fight-week handicaps stack: short-notice (less prep) and missed weight
+  // (drained from a bad cut) each cut per-round output and the rating prior.
+  const debA = (params.shortNoticeA ? 0.93 : 1) * (params.missedWeightA ? 0.93 : 1);
+  const debB = (params.shortNoticeB ? 0.93 : 1) * (params.missedWeightB ? 0.93 : 1);
   if (params.shortNoticeA) rA -= 4;
   if (params.shortNoticeB) rB -= 4;
+  if (params.missedWeightA) rA -= 3;
+  if (params.missedWeightB) rB -= 3;
 
   const completeness = Math.min(dataCompleteness(a), dataCompleteness(b));
   // Prior slope, tuned by WALK-FORWARD validation on 3,289 leakage-free bouts
@@ -428,6 +435,10 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   if (params.shortNoticeA || params.shortNoticeB) {
     const d = ((params.shortNoticeA ? -4 : 0) - (params.shortNoticeB ? -4 : 0)) * slope * 100;
     effEdges.push({ label: "Short-notice", delta: d, dimension: "Preparation" });
+  }
+  if (params.missedWeightA || params.missedWeightB) {
+    const d = ((params.missedWeightA ? -3 : 0) - (params.missedWeightB ? -3 : 0)) * slope * 100;
+    effEdges.push({ label: "Missed weight", delta: d, dimension: "Preparation" });
   }
 
   // ---- Headline (most-likely winner, method, round, time) ----

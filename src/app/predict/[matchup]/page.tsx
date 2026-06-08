@@ -59,6 +59,8 @@ function read(r: Resolved) {
     runs: 2000,
     shortNoticeA: r.m.shortNoticeA,
     shortNoticeB: r.m.shortNoticeB,
+    missedWeightA: r.m.missedWeightA,
+    missedWeightB: r.m.missedWeightB,
   });
   const favA = sim.probA >= 0.5;
   const fav = favA ? r.a : r.b;

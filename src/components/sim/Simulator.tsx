@@ -9,7 +9,7 @@ import { SimResultView } from "./SimResultView";
 import { FighterPicker } from "./FighterPicker";
 import { UpgradeGate } from "./UpgradeGate";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { isShortNotice } from "@/lib/data/context.override";
+import { isShortNotice, missedWeight } from "@/lib/data/context.override";
 
 // Placeholder "Select Fighter" — renders the body silhouette + zeroed stats so
 // the simulator shows its UI shell (titles, empty graphs at 0) before a real
@@ -131,7 +131,7 @@ export function Simulator({
 
   const result = useMemo(() => {
     if (!realA || !realB) return blankResult(rounds); // empty zeroed preview
-    const params: SimParams = { rounds, shortNoticeA: snA, shortNoticeB: snB, runs: runs + nonce * 7 };
+    const params: SimParams = { rounds, shortNoticeA: snA, shortNoticeB: snB, missedWeightA: missedWeight(aId ?? undefined), missedWeightB: missedWeight(bId ?? undefined), runs: runs + nonce * 7 };
     return simulate(realA, realB, params);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aId, bId, rounds, snA, snB, runs, nonce, canSimulate]);

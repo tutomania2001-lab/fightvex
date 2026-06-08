@@ -13,7 +13,7 @@ import type { FightEvent, Matchup, OddsLine, WeightClass } from "../types";
 import { REAL_EVENTS, type RawBout } from "./espn.generated";
 import { realOddsFor, ODDS_SOURCE, ODDS_CAPTURED } from "./odds.generated";
 import { getFighterById } from "./fighters";
-import { isShortNotice } from "./context.override";
+import { isShortNotice, missedWeight } from "./context.override";
 import { impliedProb } from "../format";
 import { simulate } from "../sim";
 
@@ -56,7 +56,9 @@ function buildMatchup(bout: RawBout): Matchup | null {
   // is simulated, so every surface reflects the same prep handicap.
   const shortNoticeA = isShortNotice(bout.fighterA);
   const shortNoticeB = isShortNotice(bout.fighterB);
-  const sim = simulate(a, b, { rounds: bout.rounds, runs: 600, shortNoticeA, shortNoticeB });
+  const missedWeightA = missedWeight(bout.fighterA);
+  const missedWeightB = missedWeight(bout.fighterB);
+  const sim = simulate(a, b, { rounds: bout.rounds, runs: 600, shortNoticeA, shortNoticeB, missedWeightA, missedWeightB });
   const pA = sim.probA;
 
   // REAL web-sourced market odds when available (odds.generated.ts);
@@ -123,6 +125,8 @@ function buildMatchup(bout: RawBout): Matchup | null {
     boutOrder: bout.boutOrder,
     shortNoticeA,
     shortNoticeB,
+    missedWeightA,
+    missedWeightB,
     odds,
     oddsSource,
     lineHistory: lineHistory(lineEndA),

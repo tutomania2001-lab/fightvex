@@ -16,3 +16,14 @@ export const SHORT_NOTICE = new Set<string>([
 ]);
 
 export const isShortNotice = (id: string | undefined): boolean => !!id && SHORT_NOTICE.has(id);
+
+// Fighters who MISSED WEIGHT at the official weigh-in for their current bout —
+// drained from a hard/failed cut, which the sim applies as a per-round + rating
+// debuff (sim.ts `missedWeightA/B`). Same maintenance rule as SHORT_NOTICE: add
+// only after the real weigh-in confirms a miss, remove after the card so it
+// never debuffs the fighter's next, on-weight fight. Keyed by ESPN athlete id.
+export const MISSED_WEIGHT = new Set<string>([
+  // e.g. "1234567", // Fighter Name — missed weight by X lb (Event, date)
+]);
+
+export const missedWeight = (id: string | undefined): boolean => !!id && MISSED_WEIGHT.has(id);

@@ -24,7 +24,7 @@ export default function PredictHub() {
         const a = getFighterById(m.fighterA);
         const b = getFighterById(m.fighterB);
         if (!a || !b) return null;
-        const sim = simulate(a, b, { rounds: m.rounds, runs: 400, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB });
+        const sim = simulate(a, b, { rounds: m.rounds, runs: 400, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB });
         const favA = sim.probA >= 0.5;
         const fav = favA ? a : b;
         const prob = Math.round(Math.max(sim.probA, sim.probB) * 100);

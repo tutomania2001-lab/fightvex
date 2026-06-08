@@ -37,6 +37,7 @@ const LINKS = [
   { href: "/events", label: "Events" },
   { href: "/predict", label: "Predictions" },
   { href: "/free-pick", label: "Free Pick" },
+  { href: "/play", label: "Play" },
   { href: "/fighters", label: "Fighters" },
   { href: "/simulator", label: "Simulator" },
   { href: "/betting", label: "Bet" },

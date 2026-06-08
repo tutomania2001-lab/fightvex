@@ -11,6 +11,7 @@ const COLS = [
       { href: "/predict", label: "Predictions" },
       { href: "/free-pick", label: "Free Pick of the Week" },
       { href: "/upsets", label: "Upset Radar" },
+      { href: "/play", label: "Pick'em vs AI" },
       { href: "/simulator", label: "AI Simulator" },
       { href: "/betting", label: "Betting Intelligence" },
       { href: "/events", label: "Events" },

@@ -15,7 +15,7 @@ export type PublicUser = {
 type AuthState = {
   user: PublicUser | null;
   loading: boolean;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<PublicUser | null>;
   logout: () => Promise<void>;
 };
 
@@ -36,8 +36,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    setUser(await fetchMe());
+    const u = await fetchMe();
+    setUser(u);
     setLoading(false);
+    return u;
   }, []);
 
   const logout = useCallback(async () => {

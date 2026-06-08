@@ -87,11 +87,22 @@ export function AccountView() {
   }, [user]);
 
   // Returning from Stripe checkout: the webhook upgrades the plan a beat later,
-  // so re-pull the session shortly after landing so the new plan shows.
+  // so POLL the session (every 1.5s, up to ~30s) until the plan flips off "free"
+  // — the UI updates within ~1.5s of the webhook landing instead of needing a
+  // manual reload.
   useEffect(() => {
     if (params.get("checkout") !== "success") return;
-    const t = setTimeout(() => refresh(), 2500);
-    return () => clearTimeout(t);
+    let cancelled = false;
+    let tries = 0;
+    const poll = async () => {
+      if (cancelled) return;
+      const u = await refresh();
+      tries += 1;
+      if ((u && u.plan !== "free") || tries >= 20) return; // upgraded, or give up after ~30s
+      setTimeout(poll, 1500);
+    };
+    poll();
+    return () => { cancelled = true; };
   }, [params, refresh]);
 
   const go = useCallback((id: SectionId) => {
@@ -197,7 +208,7 @@ export function AccountView() {
           {section === "bets" && <BetsSection />}
           {section === "tools" && <ToolsSection plan={user.plan} />}
           {section === "subscription" && <SubscriptionSection plan={user.plan} justUpgraded={params.get("checkout") === "success"} />}
-          {section === "profile" && <ProfileSection name={user.name} email={user.email} onSaved={refresh} />}
+          {section === "profile" && <ProfileSection name={user.name} email={user.email} onSaved={() => refresh().then(() => {})} />}
           </div>
         </div>
       </div>

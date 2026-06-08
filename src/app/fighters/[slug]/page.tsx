@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { allFighters, getFighter } from "@/lib/data/fighters";
+import { allFighters, getFighter, getFighterById } from "@/lib/data/fighters";
+import { upcomingEvents } from "@/lib/data/events";
 import { FighterAvatar } from "@/components/fighter/FighterAvatar";
 import { Flag } from "@/components/ui/Flag";
 import { Badge } from "@/components/ui/Badge";
@@ -51,6 +52,21 @@ export default async function FighterProfile({ params }: { params: Promise<{ slu
   const f = getFighter(slug);
   if (!f) notFound();
   const striking = strikingFor(f.name); // descriptive UFCStats striking-tendency insight (not a prediction input)
+
+  // If this fighter is booked on an upcoming card, surface a link to the bout's
+  // prediction page (cross-links the prediction graph; helps users + SEO).
+  const upcomingBout = (() => {
+    for (const e of upcomingEvents()) {
+      for (const m of e.matchups) {
+        if (m.fighterA !== f.id && m.fighterB !== f.id) continue;
+        const a = getFighterById(m.fighterA);
+        const b = getFighterById(m.fighterB);
+        if (!a || !b) continue;
+        return { event: e, opp: m.fighterA === f.id ? b : a, slug: `${a.slug}-vs-${b.slug}` };
+      }
+    }
+    return null;
+  })();
 
   const ld = {
     "@context": "https://schema.org",
@@ -120,6 +136,19 @@ export default async function FighterProfile({ params }: { params: Promise<{ slu
           ))}
         </div>
       </div>
+
+      {upcomingBout && (
+        <Link
+          href={`/predict/${upcomingBout.slug}`}
+          className="reveal mt-4 flex items-center justify-between gap-3 rounded-xl border border-blood/40 bg-blood/10 px-5 py-3 transition-colors hover:border-blood"
+        >
+          <span className="text-sm">
+            <b className="uppercase tracking-wide">Next fight:</b> vs {upcomingBout.opp.name} ·{" "}
+            {new Date(upcomingBout.event.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · {upcomingBout.event.name}
+          </span>
+          <span className="shrink-0 text-sm font-bold uppercase text-blood">Prediction →</span>
+        </Link>
+      )}
 
       {/* CAREER HISTORY — REAL ESPN fight history (loading / data / empty state) */}
       <Panel className="reveal mt-6 p-6">

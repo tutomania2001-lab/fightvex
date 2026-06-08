@@ -10,13 +10,16 @@ queue anything needing keys/money/new tools/product decisions for approval below
 - **`/api/health`** — freshness probe: events/fighters counts, next event, odds capture age, backtest, `warnings[]`. ✔ returns `{ok:true, warnings:[]}`.
 - **OG share cards (matchups)** — branded "A vs B · Vex AI favors X · N%" PNG per `/predict` page. ✔ 200 image/png (66KB).
 
-## 🔧 In progress (safe, no approval)
-- **`/predict` hub** — all upcoming AI predictions in one scannable list, CollectionPage/ItemList schema, linked from /events, in sitemap. _(Deploying.)_
-- **Fighter OG share cards** — per-fighter share PNG (name, record, weight class, rank). _(Building.)_
+- **`/predict` hub** — all upcoming AI predictions in one scannable list, CollectionPage/ItemList schema, linked from /events, in sitemap. ✔ 200.
+- **"Predictions" top-nav link** — site-wide discoverability of the hub. ✔ live.
+- **Fighter → prediction cross-link** — each fighter page booked on an upcoming card shows a "Next fight: vs X · Prediction →" banner to that bout's /predict page. _(Deploying.)_
+
+## ⚠ Known issue (reverted, needs proper debug — NOT broken on the live site)
+- **Fighter OG share cards** — the per-fighter `opengraph-image` 500'd at runtime on Vercel (the matchup OG works fine). Root cause not obvious from the generic error (the failing fighter had no title/nickname, so it's a common-path failure — likely a font/runtime issue in the image route, needs `vercel logs` or a local `next start` repro). **Reverted** so fighter pages fall back to the working site-wide og.png — no live breakage. Revisit with logs.
 
 ## Next up (safe)
-- "Predictions" in the top nav for discoverability.
-- Re-verify all pages + final smoke test; update this log into a morning summary.
+- Final full smoke test of all routes incl. new ones.
+- Consider: footer "Predictions" link; home "this week's predictions" strip (home hero is complex — lower priority).
 
 ## ⚠ NEEDS YOUR APPROVAL (not done — explained for you)
 _(none yet — will fill in as I hit anything requiring keys, money, a new tool, or a product/billing/model decision)_

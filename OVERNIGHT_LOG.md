@@ -9,9 +9,14 @@ Shipped + verified live tonight, all safe/additive: **(1)** programmatic matchup
 pages `/predict/<a>-vs-<b>` (+~80 indexable SEO pages, full schema, OG share cards),
 **(2)** a `/predict` hub + "Predictions" nav link, **(3)** PostHog conversion funnel events,
 **(4)** `/api/health` freshness probe, **(5)** fighter→prediction cross-links.
-Also added **fighter OG share cards** (initially 500'd, root-caused & fixed — see below).
-**Nothing needed your approval** — approval queue is empty.
-Still open for you: bigger items (bet-logging ledger, free trial, model work) in the backlog.
+**(6)** a full tale-of-the-tape on every predict page, plus **fighter OG share cards**
+(initially 500'd, root-caused & fixed — see below). Posted a **FightVex News** entry
+announcing the prediction pages. **Nothing needed your approval** — approval queue is empty.
+
+**Status:** the safe, no-approval backlog is now cleared. Everything builds, deploys and
+smoke-tests green. The remaining big wins (bet-logging ledger, 7-day free trial, model
+fight-week signals) need your call and are in the backlog below. From here I'm keeping the
+site monitored and only doing further safe polish.
 
 ## ✅ Shipped & verified live (fightvex.com)
 - **Programmatic matchup-prediction pages** — `/predict/<a>-vs-<b>` for every bout: Vex AI win %, method split, likely round, real odds + value lean, key factors, "Open in Simulator", FAQ + SportsEvent/FAQPage/Breadcrumb JSON-LD. In sitemap; linked "Full prediction →" from each bout on event pages. ✔ 200 (e.g. /predict/ilia-topuria-vs-justin-gaethje). _(+~80 indexable long-tail pages.)_

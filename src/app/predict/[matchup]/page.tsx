@@ -314,6 +314,31 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
         </div>
       </div>
 
+      {/* Interlink: other bouts on the same card (SEO + discovery) */}
+      {event.matchups.some((mm) => mm.id !== m.id) && (
+        <div className="reveal mt-8">
+          <h2 className="mb-3 font-display text-lg font-bold uppercase">More predictions from {event.name}</h2>
+          <div className="flex flex-wrap gap-2">
+            {event.matchups
+              .filter((mm) => mm.id !== m.id)
+              .map((mm) => {
+                const a2 = getFighterById(mm.fighterA);
+                const b2 = getFighterById(mm.fighterB);
+                if (!a2 || !b2) return null;
+                return (
+                  <Link
+                    key={mm.id}
+                    href={`/predict/${a2.slug}-vs-${b2.slug}`}
+                    className="rounded-md border border-line/60 bg-bg/60 px-3 py-1.5 text-xs font-semibold transition-colors hover:border-steel"
+                  >
+                    {last(a2.name)} vs {last(b2.name)}
+                  </Link>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
       <p className="mt-8 text-center text-[11px] leading-relaxed text-muted">
         21+. Predictions are probabilistic estimates from a transparent simulation, not guarantees or betting advice. Please gamble responsibly.
       </p>

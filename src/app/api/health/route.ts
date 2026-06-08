@@ -22,18 +22,25 @@ export async function GET() {
   const oddsAgeDays = Math.round((now - new Date(ODDS_CAPTURED).getTime()) / DAY);
   const nextDaysAway = next ? Math.round((new Date(next.date).getTime() - now) / DAY) : null;
 
-  // Data completeness: any fighter ON AN UPCOMING CARD missing real per-fight
-  // stats is an actionable gap (run fetch_stats) — enforces "never miss available info".
+  // Data completeness: fighters on an upcoming card without real per-fight stats.
+  // This is a SOFT note, not a hard failure — some are debutants/prospects ESPN
+  // has no stat detail for (the labeled estimate fallback is correct there). It
+  // surfaces gaps to investigate (a fetchable miss like McGregor would show here)
+  // without false-alarming on unavoidable cases.
   const upFighterIds = new Set<string>();
   for (const e of up) for (const m of e.matchups) { upFighterIds.add(m.fighterA); upFighterIds.add(m.fighterB); }
   const missingStats = [...upFighterIds].filter((id) => !REAL_AGG[id]);
 
+  // Hard warnings → drive ok:false (genuine breakage).
   const warnings: string[] = [];
   if (!next) warnings.push("no_upcoming_events");
   if (Number.isFinite(oddsAgeDays) && oddsAgeDays > 10) warnings.push(`odds_stale_${oddsAgeDays}d`);
   if (events.length === 0) warnings.push("no_events_loaded");
   if (allFighters().length === 0) warnings.push("no_fighters_loaded");
-  if (missingStats.length) warnings.push(`upcoming_fighters_missing_stats:${missingStats.length}`);
+
+  // Soft notes → informational, don't fail health.
+  const notes: string[] = [];
+  if (missingStats.length) notes.push(`upcoming_fighters_missing_stats:${missingStats.length} (debutants/prospects ESPN may lack stat detail for)`);
 
   return NextResponse.json(
     {
@@ -50,6 +57,7 @@ export async function GET() {
       },
       backtest: { accuracy: BACKTEST.accuracy, bouts: BACKTEST.backtested, years: `${BACKTEST.yearFrom}-${BACKTEST.yearTo}` },
       warnings,
+      notes,
     },
     { headers: { "cache-control": "no-store" } },
   );

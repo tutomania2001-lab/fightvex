@@ -70,3 +70,13 @@ Baseline (current v3.2 engine): **64.5%** full / **63.4%** held-out (post-cal), 
 
 ### ⚠ Note for you
 - Deployed backtest shows the model now actually scores ~64.5% (the public /accuracy still shows the older 61.9% — stale, conservative). I can regenerate the public number with a full canonical run if you want it updated.
+
+### ⚠ NEEDS YOUR APPROVAL (queued — not done autonomously)
+- **Bump public accuracy to the real number.** Backtest now validates ~64.5% full / ~63.4% held-out, but /accuracy still shows the stale 61.9%. It's REAL + higher (good news) — I left it for your OK since it's the headline credibility stat. Say the word and I'll regenerate + commit.
+- **Model-vs-closing-line (CLV) tracking** — prove the model beats the closing line (the metric that sells betting value). Bigger build; want it?
+- **Trial-ending reminder email** (Resend) — reduces surprise charges, lifts trial→paid. Outward-facing (sends real emails) so I won't enable sends without your OK.
+- **Annual plan** (e.g. £100/yr) — billing/pricing decision.
+- **Public "free pick of the week"** — one ungated prediction as a hook (since predictions are now Pro). Product decision: which pick goes public.
+
+### Data note
+- 12 roster fighters (incl. Gable Steveson, Farman Hasanov) have ESPN eventlogs but NO per-fight stat breakdown — genuinely unavailable, so they keep the labeled estimate fallback (not a fetch bug). Health check now treats this as a soft note, not a failure.

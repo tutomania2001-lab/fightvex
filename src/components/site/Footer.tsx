@@ -8,12 +8,15 @@ const COLS = [
   {
     title: "Product",
     links: [
-      { href: "/events", label: "Events" },
-      { href: "/fighters", label: "Fighters" },
+      { href: "/predict", label: "Predictions" },
+      { href: "/free-pick", label: "Free Pick of the Week" },
+      { href: "/upsets", label: "Upset Radar" },
       { href: "/simulator", label: "AI Simulator" },
       { href: "/betting", label: "Betting Intelligence" },
-      { href: "/research", label: "News" },
+      { href: "/events", label: "Events" },
+      { href: "/fighters", label: "Fighters" },
       { href: "/compare", label: "Compare Fighters" },
+      { href: "/research", label: "News" },
     ],
   },
   {
@@ -24,6 +27,7 @@ const COLS = [
       { href: "/dashboard", label: "Dashboard" },
       { href: "/methodology", label: "Methodology" },
       { href: "/accuracy", label: "Accuracy Record" },
+      { href: "/faq", label: "FAQ" },
     ],
   },
   {

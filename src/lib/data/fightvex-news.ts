@@ -7,6 +7,14 @@ export interface FxNews { date: string; tag: NewsTag; title: string; body: strin
 export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-08",
+    tag: "Feature",
+    title: "Predictions get their own home",
+    body:
+      "Everything Vex AI predicts now lives in one place — the Predictions tab: the pick for every upcoming bout, the locked-in Upcoming Picks (committed before each card), the graded Past Picks and the full Accuracy record. The Simulator is now just the simulator — build any matchup yourself. Predictions are a Pro feature; the Past Picks and Accuracy record stay open to everyone, so anyone can check our real track record.",
+    href: "/predict",
+  },
+  {
+    date: "2026-06-08",
     tag: "Transparency",
     title: "The model now accounts for missed weight",
     body:

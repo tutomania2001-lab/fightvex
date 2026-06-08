@@ -5,7 +5,6 @@ import { WEIGHTS } from "@/lib/sim";
 import { BACKTEST } from "@/lib/data/backtest.generated";
 import { Simulator } from "@/components/sim/Simulator";
 import { SimulatorLoader } from "@/components/sim/SimulatorLoader";
-import { SimTabs } from "@/components/sim/SimTabs";
 import { FaqAccordion } from "@/components/sim/FaqAccordion";
 import { WeightsInfo } from "@/components/sim/WeightsInfo";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -77,11 +76,9 @@ export default function SimulatorPage() {
         <WeightsInfo weights={Object.entries(WEIGHTS).sort((a, b) => b[1] - a[1])} />
       </div>
 
-      <SimTabs>
-        <Suspense fallback={<Simulator fighters={fighters} />}>
-          <SimulatorLoader fighters={fighters} />
-        </Suspense>
-      </SimTabs>
+      <Suspense fallback={<Simulator fighters={fighters} />}>
+        <SimulatorLoader fighters={fighters} />
+      </Suspense>
 
       <JsonLd data={FAQ_LD} />
       <section className="reveal mx-auto mt-14 max-w-3xl">

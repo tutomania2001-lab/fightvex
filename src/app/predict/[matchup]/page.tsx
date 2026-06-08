@@ -12,6 +12,7 @@ import { Panel } from "@/components/ui/Panel";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { recordString, fmtOdds, noVigProbA, pct, cmToFtIn, cmToIn, confidenceLabel } from "@/lib/format";
 import { ProPrediction } from "@/components/predict/ProPrediction";
+import { FeatureGate } from "@/components/billing/FeatureGate";
 
 // Programmatic "X vs Y prediction" pages — one per real bout on every card.
 // High-intent organic landing pages: the Vex AI read (win %, method, round),
@@ -181,11 +182,12 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
           {a.name} <span className="text-blood">vs</span> {b.name}: Prediction &amp; Pick
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
-          {isPast ? "Pre-fight " : ""}Vex AI&apos;s read for this bout — the favoured fighter, real market odds, the tale-of-the-tape and key factors. The exact win %, method-of-victory split and market value lean are in the full read (Pro). Transparent simulation over real data; informational only, not betting advice.
+          {isPast ? "Pre-fight " : ""}Vex AI&apos;s full read for this bout — the pick, win probability, method-of-victory, value lean and tale-of-the-tape. A Pro feature; start a 7-day free trial to unlock. Informational only, not betting advice.
         </p>
       </div>
 
-      {/* Verdict — public hook (favoured side + qualitative confidence, no exact %) */}
+      <FeatureGate minPlan="pro" title="Full prediction — Pro" description="Vex AI's pick, win probability, method-of-victory, likely round, the market value lean and the tale-of-the-tape for this bout. Start a 7-day free trial to unlock.">
+      {/* Verdict — favoured side + qualitative confidence */}
       <Panel className="reveal bg-cage-fine relative mt-6 overflow-hidden p-6 sm:p-8">
         <div className="spotlight absolute inset-0 opacity-50" />
         <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
@@ -308,6 +310,7 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
           </div>
         </div>
       )}
+      </FeatureGate>
 
       <p className="mt-8 text-center text-[11px] leading-relaxed text-muted">
         21+. Predictions are probabilistic estimates from a transparent simulation, not guarantees or betting advice. Please gamble responsibly.

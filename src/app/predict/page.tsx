@@ -7,6 +7,7 @@ import { Panel } from "@/components/ui/Panel";
 import { Badge } from "@/components/ui/Badge";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { lastName, confidenceLabel } from "@/lib/format";
+import { PredictTabs } from "@/components/predict/PredictTabs";
 
 export const metadata: Metadata = {
   title: "UFC Fight Predictions — Vex AI Picks for Every Bout",
@@ -53,13 +54,15 @@ export default function PredictHub() {
       <div className="reveal">
         <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">UFC Fight Predictions</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Vex AI&apos;s read on every upcoming bout — the favored fighter and win probability, from a transparent,
-          backtested simulation over real data. Open any matchup for the full method-of-victory split, odds and key
-          factors. Informational only, not betting advice. 21+.
+          Vex AI&apos;s pick for every upcoming bout, the locked-in picks, and the graded track record — all in one
+          place. Predictions are a Pro feature; the Past Picks and Accuracy record are open to everyone. Informational
+          only, not betting advice. 21+.
         </p>
       </div>
 
-      <div className="mt-8 space-y-8">
+      <div className="mt-8">
+        <PredictTabs>
+          <div className="space-y-8">
         {sections.map(({ e, rows }) => (
           <section key={e.slug} className="reveal">
             <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
@@ -89,6 +92,8 @@ export default function PredictHub() {
             </div>
           </section>
         ))}
+          </div>
+        </PredictTabs>
       </div>
     </div>
   );

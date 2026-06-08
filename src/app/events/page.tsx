@@ -80,6 +80,9 @@ export default function EventsPage() {
           live feed, with Vex AI win projections, value signals and tale of the tape
           breakdowns. More event types coming soon.
         </p>
+        <Link href="/predict" className="mt-3 inline-block text-sm font-semibold uppercase tracking-wide text-blood hover:underline">
+          See all AI fight predictions →
+        </Link>
       </div>
 
       {/* ── This week's card (or the next one) — headlined with a live countdown ── */}

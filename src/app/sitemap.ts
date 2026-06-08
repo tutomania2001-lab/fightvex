@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE}/simulator`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE}/events`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE}/predict`, changeFrequency: "daily", priority: 0.85 },
     { url: `${BASE}/betting`, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE}/fighters`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE}/research`, changeFrequency: "daily", priority: 0.7 },

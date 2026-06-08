@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { recordString, fmtOdds, noVigProbA, pct, cmToFtIn, cmToIn, confidenceLabel } from "@/lib/format";
 import { ProPrediction } from "@/components/predict/ProPrediction";
 import { FeatureGate } from "@/components/billing/FeatureGate";
+import { ShareButton } from "@/components/ui/ShareButton";
 
 // Programmatic "X vs Y prediction" pages — one per real bout on every card.
 // High-intent organic landing pages: the Vex AI read (win %, method, round),
@@ -186,6 +187,9 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
         <p className="mt-2 max-w-2xl text-muted">
           {isPast ? "Pre-fight " : ""}Vex AI&apos;s full read for this bout — the pick, win probability, method-of-victory, value lean and tale-of-the-tape. A Pro feature; start a 7-day free trial to unlock. Informational only, not betting advice.
         </p>
+        <div className="mt-4">
+          <ShareButton text={`${a.name} vs ${b.name} — Vex AI prediction on FightVex.`} label="Share this prediction" />
+        </div>
       </div>
 
       <FeatureGate minPlan="pro" title="Full prediction — Pro" description="Vex AI's pick, win probability, method-of-victory, likely round, the market value lean and the tale-of-the-tape for this bout. Start a 7-day free trial to unlock.">

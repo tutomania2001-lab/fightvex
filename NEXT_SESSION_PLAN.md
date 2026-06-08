@@ -166,3 +166,35 @@ Adopting a managed-SaaS stack. Key rulings:
 - **Cut:** Pinecone, Azure.
 
 Each service is gated on the owner creating the account + providing keys (env vars in Vercel; secrets in GitHub for CI).
+
+---
+
+## Improvement roadmap (logged 2026-06-08)
+
+Status: stack complete (Supabase/Stripe/PostHog/Sentry/Resend live), single **Pro £10/mo** plan, model **v3.2**, SEO submitted to GSC (daily index-watch routine running). Ideas below, by leverage.
+
+### Grow (acquisition)
+- **Programmatic matchup pages** — indexable `X vs Y prediction` pages per upcoming bout (Vex AI read + method split + odds + FAQ/SportsEvent schema), linked + in sitemap. The long-tail organic engine. [biggest growth ROI]
+- **Shareable OG cards** — dynamic per-fighter/matchup share images ("Vex AI: Topuria 64% · KO").
+
+### Convert (free → Pro)
+- **7-day free Pro trial** via Stripe `trial_period_days` (better than the scrapped discount; needs owner OK — billing change).
+- **PostHog funnel** — instrument signup → pricing → checkout → sim-run events; find/fix the real drop-off.
+
+### Deepen Pro (justify £10)
+- **Real bet-logging ledger** — log a bet → track CLV vs the actual close → P&L over time (Postgres `bets` table already exists). The honest version of the advertised CLV/bankroll; biggest retention lever.
+- **Line-move alerts** — extend the watchlist email pipeline to "your fighter's line moved X%."
+
+### Sharpen the model (honestly)
+- **Model-vs-closing-line tracking** — log Vex AI edge vs the close each card (the metric bettors care about; also feeds A4 calibration).
+- **Fight-week signals** — missed weight at weigh-ins / injuries (short-notice already live).
+- **A4 calibration** activates ~150 graded picks (mechanism already shipped, no-op until then).
+
+### Operate
+- `/api/health` (data-freshness + last-cron timestamps) + cron-failure alerting via Sentry/webhook.
+- Model unit tests (statsFromAgg, simulate determinism, calibration math) — no test runner configured yet.
+- Wire `fetch-history` cache to commit back (or accept periodic re-fetch) so layoff/SOS baseline doesn't drift.
+
+### Owner-only follow-ups still open
+- Stripe: confirm Pro product default price = £10 (done?), archive unused Elite product.
+- GSC: daily index-watch routine `trig_0146fKvoC8HrWBgPaSDL6uaz` pings when indexed.

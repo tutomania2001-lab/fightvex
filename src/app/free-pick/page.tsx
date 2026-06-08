@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PickRationale } from "@/components/predict/PickRationale";
+import { ShareButton } from "@/components/ui/ShareButton";
 import { recordString, fmtOdds, noVigProbA, pct, lastName } from "@/lib/format";
 import type { Fighter } from "@/lib/types";
 
@@ -121,6 +122,10 @@ export default function FreePickPage() {
 
       {/* Plain-English rationale, generated from the model's own factor edges */}
       <PickRationale sim={sim} a={a} b={b} className="reveal mt-6" />
+
+      <div className="reveal mt-5 flex justify-center">
+        <ShareButton text={`Vex AI's free UFC pick: ${fav.name} ${Math.max(aWin, bWin)}% over ${dog.name}.`} label="Share this pick" />
+      </div>
 
       {/* Method + odds/value */}
       <div className="reveal mt-6 grid gap-6 sm:grid-cols-2">

@@ -27,3 +27,14 @@ export const MISSED_WEIGHT = new Set<string>([
 ]);
 
 export const missedWeight = (id: string | undefined): boolean => !!id && MISSED_WEIGHT.has(id);
+
+// Fighters carrying a real, reported fight-week setback — injury, illness or a
+// badly compromised camp/cut — that the market is often slow to price. Curated
+// from fight-week news (same maintenance rule: add when confirmed, remove after
+// the card). Applied as a modest "compromised" debuff (sim.ts `injuredA/B`),
+// lighter than missed-weight since severity varies. Keyed by ESPN athlete id.
+export const INJURED = new Set<string>([
+  // e.g. "1234567", // Fighter Name — entered with a reported rib injury (Event, date)
+]);
+
+export const injured = (id: string | undefined): boolean => !!id && INJURED.has(id);

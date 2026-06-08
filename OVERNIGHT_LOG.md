@@ -52,3 +52,21 @@ _(none yet — will fill in as I hit anything requiring keys, money, a new tool,
 - tick 2026-06-08 08:01 UTC: all green — no change forced
 - tick 2026-06-08 09:02 UTC: all green — no change forced
 - tick 2026-06-08 10:03 UTC: all green; Google index still pending (~10h post-submit, normal)
+
+---
+
+## Session 2 — autonomous (2026-06-08, daytime cont.)
+Rules unchanged: ship safe/additive (typecheck+build+smoke first); queue anything needing keys/decisions; stop only on "im back".
+
+### Shipped & verified
+- **Fixed missing fighter stats** (McGregor, Holloway + 45 others): targeted ESPN merge filled REAL_AGG 241→288. Their pages now show real metrics.
+- **Pipeline hardening**: `fetch_stats.py` now MERGES (never drops a fighter on an ESPN hiccup; auto-covers new fighters) — makes the CI's existing step non-destructive. `/api/health` now flags upcoming-card fighters missing stats (`upcomingFightersMissingStats`).
+- **Model — fight-week injury/illness signal (#3)**: curated `INJURED` set + modest debuff (rating −2, per-round ×0.96) + "Injury / illness" swing factor, threaded through every sim call site (incl. committed picks). Dormant until curated, so live predictions unchanged.
+
+### Model experiments — backtest-validated, HONEST results
+Baseline (current v3.2 engine): **64.5%** full / **63.4%** held-out (post-cal), log-loss 0.625.
+- **#1 Opponent-adjusted (SOS-weighted) stats — REJECTED.** Tested all-stats (ADJ 0.3/0.5/0.8) and offense-only (0.2/0.4); every variant was neutral-to-worse (held-out 63.4%→62.3%), log-loss worsened. The prior already captures opponent quality; SOS-scaling adds noise. Not shipped (reverted experiment).
+- **#2 Striking-profile features — can't validate → kept INSIGHT-ONLY.** history.json has no strike-location (head/body/leg) data, so the features can't be reconstructed point-in-time → can't be backtested leakage-free. Shipping them as predictors would be unvalidated/leaky. Left as UI insight (honest).
+
+### ⚠ Note for you
+- Deployed backtest shows the model now actually scores ~64.5% (the public /accuracy still shows the older 61.9% — stale, conservative). I can regenerate the public number with a full canonical run if you want it updated.

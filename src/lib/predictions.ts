@@ -139,7 +139,7 @@ export async function logUpcoming(nowMs: number): Promise<{ logged: number; alre
       }
       // 50,000 runs — matches the on-site Simulator so the logged pick and a
       // user's own simulation converge to the same result (no contradictions).
-      const sim = simulate(a, b, { rounds: m.rounds, runs: 50000, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB });
+      const sim = simulate(a, b, { rounds: m.rounds, runs: 50000, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB, injuredA: m.injuredA, injuredB: m.injuredB });
       const side: "A" | "B" = sim.probA >= sim.probB ? "A" : "B";
       const pred: Prediction = {
         boutId: m.id, eventSlug: e.slug, eventName: e.name, date: e.date,

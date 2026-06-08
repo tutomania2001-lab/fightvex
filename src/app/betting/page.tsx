@@ -45,7 +45,7 @@ export default async function BettingPage() {
       // 1000 runs to match the Simulator page exactly, so a fight's Vex AI %
       // is identical wherever it appears (server-rendered + ISR-cached, so the
       // extra runs cost nothing per request).
-      const sim = simulate(a, b, { rounds: m.rounds, runs: 1000, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB });
+      const sim = simulate(a, b, { rounds: m.rounds, runs: 1000, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB, injuredA: m.injuredA, injuredB: m.injuredB });
       const series = seriesMap[m.id];
       const latest = series && series.length ? series[series.length - 1] : null;
       const bestA = latest ? latest.a : bestPrice(m.odds.map((o) => o.priceA));

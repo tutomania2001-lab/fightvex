@@ -122,6 +122,9 @@ export interface Matchup {
   /** Fighter missed weight at the weigh-in (fed from fight-week news) → drained debuff in the sim. */
   missedWeightA?: boolean;
   missedWeightB?: boolean;
+  /** Fighter entered with a reported injury/illness (fight-week news) → modest debuff in the sim. */
+  injuredA?: boolean;
+  injuredB?: boolean;
   odds: OddsLine[];
   /** Set when `odds` are REAL web-sourced market lines (e.g. "Market consensus · Jun 2026"). Undefined => model-implied. */
   oddsSource?: string;

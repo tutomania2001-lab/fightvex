@@ -94,14 +94,16 @@ export function AccountView() {
     if (params.get("checkout") !== "success") return;
     let cancelled = false;
     let tries = 0;
-    const poll = async () => {
+    const run = async () => {
       if (cancelled) return;
+      // Reconcile straight from Stripe (doesn't wait on the webhook), then re-pull.
+      try { await fetch("/api/stripe/sync", { method: "POST" }); } catch { /* ignore */ }
       const u = await refresh();
       tries += 1;
-      if ((u && u.plan !== "free") || tries >= 20) return; // upgraded, or give up after ~30s
-      setTimeout(poll, 1500);
+      if ((u && u.plan !== "free") || tries >= 8) return; // upgraded, or give up after ~16s
+      setTimeout(run, 2000);
     };
-    poll();
+    run();
     return () => { cancelled = true; };
   }, [params, refresh]);
 
@@ -348,8 +350,26 @@ const TIERS: { plan: Plan; price: string; cadence: string; blurb: string }[] = [
 ];
 
 function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded: boolean }) {
+  const { refresh } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncMsg, setSyncMsg] = useState<string | null>(null);
+
+  // Webhook-independent reconcile: confirm the subscription directly with Stripe.
+  async function sync() {
+    setBusy(true); setError(null); setSyncMsg(null);
+    try {
+      const r = await fetch("/api/stripe/sync", { method: "POST" });
+      const j = (await r.json()) as { plan?: string; synced?: boolean; error?: string };
+      if (r.ok && j.synced) { await refresh(); setSyncMsg("Subscription found — your plan is now active."); }
+      else if (r.ok) setSyncMsg("No active subscription found on this account yet. If you just paid, give it a moment and try again.");
+      else setError(j.error || "Couldn't sync.");
+    } catch {
+      setError("Network error. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function openPortal() {
     setBusy(true);
@@ -406,6 +426,14 @@ function SubscriptionSection({ plan, justUpgraded }: { plan: Plan; justUpgraded:
             ? "You're on the free plan. Upgrade to unlock Pro tools."
             : `Thanks for subscribing to ${PLAN_LABEL[plan]}.`}
         </p>
+        {plan === "free" && (
+          <div className="mt-3">
+            <button onClick={sync} disabled={busy} className={`${ghostBtn} disabled:opacity-60`}>
+              {busy ? "Checking…" : "Already subscribed? Sync now"}
+            </button>
+            {syncMsg && <p className="mt-2 text-sm text-edge">{syncMsg}</p>}
+          </div>
+        )}
         {plan !== "free" && (
           <button onClick={openPortal} disabled={busy} className={`mt-4 ${ghostBtn} disabled:opacity-60`}>
             {busy ? "Opening…" : "Manage billing"}

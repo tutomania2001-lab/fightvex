@@ -135,6 +135,39 @@ export async function createPortalSession(customerId: string, origin: string): P
   return { url: session.url };
 }
 
+// ---- webhook-independent reconcile ----
+// Find the account's REAL active/trialing subscription in Stripe and map it to a
+// plan, so we can upgrade even if a webhook was missed/delayed. Looks up by the
+// stored customer id first, then falls back to finding the customer by email.
+type SubMatch = { plan: Plan; customerId: string; subscriptionId: string };
+
+async function activeSubFor(customerId: string): Promise<SubMatch | null> {
+  const subs = await stripeGet<{
+    data?: { id: string; status: string; items?: { data?: { price?: { id?: string; product?: string } }[] } }[];
+  }>(`subscriptions?customer=${encodeURIComponent(customerId)}&status=all&limit=10`);
+  for (const s of subs.data || []) {
+    if (s.status !== "active" && s.status !== "trialing") continue;
+    const price = s.items?.data?.[0]?.price;
+    const plan = planForId(price?.id) || planForId(typeof price?.product === "string" ? price.product : undefined);
+    if (plan) return { plan, customerId, subscriptionId: s.id };
+  }
+  return null;
+}
+
+export async function syncPlanFromStripe(opts: { email: string; customerId?: string | null }): Promise<SubMatch | null> {
+  if (!SECRET_KEY) return null;
+  if (opts.customerId) {
+    const found = await activeSubFor(opts.customerId);
+    if (found) return found;
+  }
+  const custs = await stripeGet<{ data?: { id: string }[] }>(`customers?email=${encodeURIComponent(opts.email)}&limit=10`);
+  for (const c of custs.data || []) {
+    const found = await activeSubFor(c.id);
+    if (found) return found;
+  }
+  return null;
+}
+
 // ---- webhook signature verification (Stripe scheme) ----
 // header: `t=<ts>,v1=<sig>[,v1=<sig>...]`; signature = HMAC-SHA256 of
 // `${t}.${rawBody}` with the webhook secret. Verifies + checks freshness.

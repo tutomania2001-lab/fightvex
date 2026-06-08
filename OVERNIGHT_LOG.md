@@ -89,3 +89,4 @@ Baseline (current v3.2 engine): **64.5%** full / **63.4%** held-out (post-cal), 
 3. ✅ Trial-ending reminder email — daily cron (14:00 UTC), Stripe trialing query, Resend, deduped.
 4. ⏳ Annual Pro plan — backend + UI toggle shipped (same plan, £96/yr −20%), GATED on STRIPE_PRICE_PRO_ANNUAL. **Needs: owner creates the £96/yr price on the Pro product in Stripe → give price id → set env → annual goes live.**
 5. ✅ Free pick of the week (/free-pick, never the headliner) + 1 free simulation per account (KV-tracked).
+- tick (stray, post-return): all green — 11 routes 200, health ok, acc 0.646 live, 2 debutant stat-notes (unfetchable). Loop not rescheduled (Bernardo back).

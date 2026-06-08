@@ -14,10 +14,12 @@ export function PlanButton({
   plan,
   label,
   highlight,
+  interval,
 }: {
   plan: Plan;
   label: string;
   highlight?: boolean;
+  interval?: "month" | "year";
 }) {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -53,12 +55,12 @@ export function PlanButton({
     }
     setBusy(true);
     setError(null);
-    posthog.capture("checkout_started", { plan });
+    posthog.capture("checkout_started", { plan, interval: interval ?? "month" });
     try {
       const r = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, interval: interval ?? "month" }),
       });
       const j = (await r.json()) as { url?: string; error?: string };
       if (j.url) {

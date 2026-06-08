@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PlanButton } from "@/components/billing/PlanButton";
+import { ProBilling } from "@/components/billing/ProBilling";
+import { annualEnabled } from "@/lib/stripe";
 import type { Plan } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
@@ -23,7 +25,7 @@ const TIERS: { name: string; plan: Plan; price: string; cadence: string; highlig
       { label: "Fighter profiles", desc: "Core stats, record and ranking for every fighter." },
       { label: "Upcoming fight cards", desc: "Full UFC cards with dates, weight classes and the Vex AI pick." },
       { label: "Real odds", desc: "Live moneyline for every bout on the card." },
-      { label: "Simulator preview", desc: "Watch one sample matchup simulate — the controls are locked." },
+      { label: "1 free simulation", desc: "Run one real matchup yourself — then unlimited with Pro." },
       { label: "Research feed", desc: "Live UFC news aggregated from trusted outlets." },
     ],
   },
@@ -76,14 +78,20 @@ export default function PricingPage() {
               <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white`}>Most popular</span>
             )}
             <h2 className={`font-display text-2xl font-bold uppercase ${accent.title}`}>{t.name}</h2>
-            <div className="mt-3 flex items-baseline gap-1">
-              <span className="font-display text-5xl font-bold text-fg">{t.price}</span>
-              <span className="text-sm text-muted">{t.cadence}</span>
-            </div>
-            <p className="mt-3 min-h-[2.5rem] text-sm text-muted">{t.tagline}</p>
-            <div className="mt-5">
-              <PlanButton plan={t.plan} label={t.cta} highlight={t.highlight} />
-            </div>
+            {t.plan === "pro" && annualEnabled ? (
+              <ProBilling label={t.cta} highlight={t.highlight} tagline={t.tagline} />
+            ) : (
+              <>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="font-display text-5xl font-bold text-fg">{t.price}</span>
+                  <span className="text-sm text-muted">{t.cadence}</span>
+                </div>
+                <p className="mt-3 min-h-[2.5rem] text-sm text-muted">{t.tagline}</p>
+                <div className="mt-5">
+                  <PlanButton plan={t.plan} label={t.cta} highlight={t.highlight} />
+                </div>
+              </>
+            )}
             <ul className="mt-6 space-y-3">
               {t.features.map((f) => (
                 <li key={f.label} className="flex items-start gap-2 text-sm leading-snug">

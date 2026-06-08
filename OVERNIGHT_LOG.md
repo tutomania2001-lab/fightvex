@@ -90,3 +90,11 @@ Baseline (current v3.2 engine): **64.5%** full / **63.4%** held-out (post-cal), 
 4. ✅ Annual Pro plan — LIVE. STRIPE_PRICE_PRO_ANNUAL=prod_UfTFTVGmCxxbSW set; monthly/annual toggle (£96/yr −20%) shipped. (Owner: confirm a test checkout shows £96/yr.)
 5. ✅ Free pick of the week (/free-pick, never the headliner) + 1 free simulation per account (KV-tracked).
 - tick (stray, post-return): all green — 11 routes 200, health ok, acc 0.646 live, 2 debutant stat-notes (unfetchable). Loop not rescheduled (Bernardo back).
+
+---
+## Session 3 — autonomous (2026-06-08, "do it all")
+Shipping safe/additive only; deploys now gated on build EXIT CODE (a grep-gated deploy let a broken OG slip through Vercel once — fixed).
+- ✅ Shareable cards: ShareButton (web-share+copy), branded free-pick OG card (exact %), upgraded prediction OG card to brand identity, share button on free-pick.
+- ✅ Upset Radar (/upsets): public page of bouts where Vex AI backs the betting underdog; sitemap + footer.
+- ✅ FAQ (/faq) with FAQPage schema; footer now links Predictions/Free Pick/Upset Radar/FAQ (internal-linking for indexing).
+- (next) Glossary, Pick'em vs AI, more SEO/discovery.

@@ -28,6 +28,7 @@ const COLS = [
       { href: "/methodology", label: "Methodology" },
       { href: "/accuracy", label: "Accuracy Record" },
       { href: "/faq", label: "FAQ" },
+      { href: "/glossary", label: "Glossary" },
     ],
   },
   {

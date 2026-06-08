@@ -36,7 +36,11 @@ export const metadata: Metadata = {
 
 export default function FreePickPage() {
   const event = nextEvent();
-  const m = event.matchups[0]; // headliner / featured bout
+  // The free pick is NEVER the headliner (that stays Pro). Use the best
+  // non-main bout — the first below the top line with both fighters scorable.
+  const m =
+    event.matchups.find((mm, i) => i > 0 && getFighterById(mm.fighterA) && getFighterById(mm.fighterB)) ??
+    event.matchups[0];
   const a = getFighterById(m.fighterA)!;
   const b = getFighterById(m.fighterB)!;
   const sim = simulate(a, b, { rounds: m.rounds, runs: 2000, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB, injuredA: m.injuredA, injuredB: m.injuredB });

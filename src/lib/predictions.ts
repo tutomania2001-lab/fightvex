@@ -14,11 +14,12 @@
 //                            outcome fields are appended only at grading)
 // ============================================================
 import { redis, authEnabled } from "./auth";
-import { allEvents } from "./data/events";
+import { allEvents, getMatchup } from "./data/events";
 import { getFighterById } from "./data/fighters";
 import { simulate } from "./sim";
 import { getCareerHistory, type CareerFight } from "./espn-live";
-import { lastName, recordString } from "./format";
+import { lastName, recordString, noVigProbA, bestPrice } from "./format";
+import { getSeriesMap } from "./odds-live";
 import { commitCard, canonicalCard, invalidateCommitment, type CommitPick } from "./commit";
 
 // v3.2 — real layoff (months since last bout), division-aware finish hazards,
@@ -33,6 +34,15 @@ const recKey = (id: string) => `pred:${id}`;
 const predId = (eventSlug: string, boutId: string) => `${eventSlug}::${boutId}`;
 
 export const trackingEnabled = authEnabled;
+
+// No-vig P(A) from a set of book lines (best price each side). Null if no line.
+function noVigFromOdds(odds?: { priceA: number; priceB: number }[]): number | null {
+  if (!odds || !odds.length) return null;
+  const a = bestPrice(odds.map((o) => o.priceA));
+  const b = bestPrice(odds.map((o) => o.priceB));
+  if (!a || !b) return null;
+  return noVigProbA(a, b);
+}
 
 async function loadAll(): Promise<Prediction[]> {
   if (!authEnabled) return [];
@@ -58,6 +68,7 @@ export interface Prediction {
   predMethod: MethodLabel;
   modelVersion: string;
   loggedAt: string; // when we logged it — MUST be before `date` to count
+  pickNoVigA?: number; // market no-vig P(A) at log time (for CLV)
   // ---- appended at grading time ----
   graded?: boolean;
   gradedAt?: string;
@@ -65,6 +76,7 @@ export interface Prediction {
   actualMethod?: ActualMethod | null;
   correctWinner?: boolean;
   correctMethod?: boolean | null; // null = couldn't verify (e.g. generic finish)
+  closeNoVigA?: number; // market no-vig P(A) at/near fight time (closing line, for CLV)
 }
 
 function modalMethod(m: { ko: number; sub: number; dec: number }): MethodLabel {
@@ -149,6 +161,7 @@ export async function logUpcoming(nowMs: number): Promise<{ logged: number; alre
         predMethod: modalMethod(side === "A" ? sim.methodA : sim.methodB),
         modelVersion: MODEL_VERSION,
         loggedAt: new Date(nowMs).toISOString(),
+        pickNoVigA: noVigFromOdds(m.odds) ?? undefined, // market line at pick time (CLV)
       };
       await redis(["SET", recKey(predId(e.slug, m.id)), JSON.stringify(pred)]); // overwrite to current model
       await redis(["SADD", INDEX_KEY, predId(e.slug, m.id)]); logged++;
@@ -198,7 +211,15 @@ export async function gradeDue(nowMs: number): Promise<{ graded: number; pending
     if (actualMethod === "Decision") correctMethod = p.predMethod === "Decision";
     else if (actualMethod === "KO/TKO" || actualMethod === "Submission") correctMethod = p.predMethod === actualMethod;
     else if (actualMethod === "Finish") correctMethod = p.predMethod === "Decision" ? false : null; // we know it wasn't a decision; can't verify which finish
-    const next: Prediction = { ...p, graded: true, gradedAt: new Date(nowMs).toISOString(), actualWinnerSide, actualMethod, correctWinner, correctMethod };
+    // Closing line for CLV: latest live odds snapshot if we have one, else the
+    // static captured line. Best-effort — CLV just skips picks with no line.
+    let closeNoVigA: number | undefined;
+    try {
+      const series = (await getSeriesMap([p.boutId]))[p.boutId];
+      if (series && series.length) closeNoVigA = noVigProbA(series[series.length - 1].a, series[series.length - 1].b);
+      else closeNoVigA = noVigFromOdds(getMatchup(p.boutId)?.matchup.odds) ?? undefined;
+    } catch { /* odds optional */ }
+    const next: Prediction = { ...p, graded: true, gradedAt: new Date(nowMs).toISOString(), actualWinnerSide, actualMethod, correctWinner, correctMethod, closeNoVigA };
     await redis(["SET", recKey(id), JSON.stringify(next)]);
     graded++;
   }
@@ -222,6 +243,8 @@ export interface AccuracyRecord {
     actualWinnerName: string; actualMethod: ActualMethod | null;
     correctWinner: boolean; correctMethod: boolean | null;
   }[];
+  // Model vs the closing line (CLV): does the model find value the market later confirms?
+  clv: { n: number; beatCloseRate: number; avgEdgeVsClose: number; winRateBeatClose: number | null } | null;
   modelVersion: string;
 }
 
@@ -230,7 +253,7 @@ export async function getRecord(): Promise<AccuracyRecord> {
   const empty: AccuracyRecord = {
     enabled: authEnabled, loggedTotal: 0, pending: 0, graded: 0,
     winAccuracy: null, methodAccuracy: null, methodGraded: 0, brier: null, logLoss: null,
-    calibration: [], recent: [], modelVersion: MODEL_VERSION,
+    calibration: [], recent: [], clv: null, modelVersion: MODEL_VERSION,
   };
   if (!authEnabled) return empty;
   let ids: string[] = [];
@@ -287,10 +310,33 @@ export async function getRecord(): Promise<AccuracyRecord> {
       correctMethod: p.correctMethod ?? null,
     }));
 
+  // Closing-line value: among graded picks for which we captured both the
+  // pick-time and closing market line, how often did the line move TOWARD our
+  // pick (positive CLV), what's the model's average edge vs the close, and do
+  // the positive-CLV picks actually win? Populates as new picks are graded.
+  const clvSet = valid.filter((p) => p.pickNoVigA != null && p.closeNoVigA != null);
+  let clv: AccuracyRecord["clv"] = null;
+  if (clvSet.length) {
+    let beat = 0, edgeSum = 0, beatWins = 0;
+    for (const p of clvSet) {
+      const model = p.predWinnerSide === "A" ? p.predProbA : 1 - p.predProbA;
+      const pickT = p.predWinnerSide === "A" ? p.pickNoVigA! : 1 - p.pickNoVigA!;
+      const close = p.predWinnerSide === "A" ? p.closeNoVigA! : 1 - p.closeNoVigA!;
+      if (close > pickT) { beat++; if (p.correctWinner) beatWins++; }
+      edgeSum += model - close;
+    }
+    clv = {
+      n: clvSet.length,
+      beatCloseRate: beat / clvSet.length,
+      avgEdgeVsClose: edgeSum / clvSet.length,
+      winRateBeatClose: beat ? beatWins / beat : null,
+    };
+  }
+
   return {
     enabled: true, loggedTotal: all.length, pending, graded: n,
     winAccuracy, methodAccuracy, methodGraded: methodSet.length,
-    brier: brierSum / n, logLoss: llSum / n, calibration, recent, modelVersion: MODEL_VERSION,
+    brier: brierSum / n, logLoss: llSum / n, calibration, recent, clv, modelVersion: MODEL_VERSION,
   };
 }
 

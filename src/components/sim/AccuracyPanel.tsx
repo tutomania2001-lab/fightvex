@@ -14,6 +14,7 @@ type Record = {
   enabled: boolean; graded: number; pending: number;
   winAccuracy: number | null; methodAccuracy: number | null; methodGraded: number;
   brier: number | null; logLoss: number | null; calibration: Cal[];
+  clv?: { n: number; beatCloseRate: number; avgEdgeVsClose: number; winRateBeatClose: number | null } | null;
   commitments?: Commitment[];
 };
 
@@ -84,6 +85,21 @@ export function AccuracyPanel() {
         <section className="rounded-xl border border-line/60 bg-panel/40 p-4">
           <h3 className="font-display text-lg font-bold uppercase">Live record · building</h3>
           <p className="mt-1 max-w-2xl text-sm text-muted">No fights graded yet — every pick is logged before its card and graded after, so the live numbers fill in as cards settle. The validated backtest below is the baseline.</p>
+        </section>
+      )}
+
+      {/* 1b) MODEL vs CLOSING LINE (CLV) — does the model find value the market later confirms? */}
+      {state === "ready" && rec?.clv && rec.clv.n >= 5 && (
+        <section>
+          <h3 className="mb-1 font-display text-lg font-bold uppercase">Model vs closing line · {rec.clv.n} graded</h3>
+          <p className="mb-4 max-w-2xl text-sm text-muted">
+            Closing-line value (CLV) — how the model&apos;s pick compares to where the market closed. Consistently beating the close is the sharpest evidence of real edge.
+          </p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <Metric label="Beat the close" value={pct1(rec.clv.beatCloseRate)} sub="line moved toward our pick" tone="fg" />
+            <Metric label="Edge vs close" value={`${rec.clv.avgEdgeVsClose >= 0 ? "+" : ""}${(rec.clv.avgEdgeVsClose * 100).toFixed(1)}%`} sub="model − closing prob" tone="edge" />
+            <Metric label="Win rate (CLV+)" value={rec.clv.winRateBeatClose != null ? pct1(rec.clv.winRateBeatClose) : "—"} sub="picks the line confirmed" tone="fg" />
+          </div>
         </section>
       )}
 

@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { PickResultHero } from "./PickResultHero";
 import { PickCardMenu } from "./PickCardMenu";
 import { PickVerify } from "./PickVerify";
-import { usePicks, fmtPicksDate, pctRound, tabReveal, stagger, staggerItem } from "./usePicks";
+import { usePicks, fmtPicksDate, pctRound } from "./usePicks";
 
 // SETTLED picks only — logged before the fight, graded against the real result.
-// Pick a past card from the menu to open it. Locked-in picks live in Upcoming.
+// Clean, scannable rows (matchup + who we backed + Won/Lost), matching the
+// Predictions list. Locked-in picks live in the Upcoming tab.
 export function PastPicks() {
   const { state, data } = usePicks();
   const [sel, setSel] = useState(0);
@@ -17,7 +16,7 @@ export function PastPicks() {
   if (state === "loading") {
     return (
       <div className="space-y-3">
-        {Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-64 animate-pulse rounded-2xl bg-panel-2/40" />)}
+        {Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-40 animate-pulse rounded-2xl bg-panel-2/40" />)}
       </div>
     );
   }
@@ -46,7 +45,7 @@ export function PastPicks() {
   const acc = c.total ? c.correct / c.total : 0;
 
   return (
-    <motion.div className="space-y-4" variants={tabReveal} initial="hidden" animate="show">
+    <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">
           <b className="text-fg">{correct}/{total}</b> winner picks correct across {data.cards.length} settled card{data.cards.length === 1 ? "" : "s"}
@@ -68,18 +67,26 @@ export function PastPicks() {
           </span>
         </div>
         <PickVerify commit={data.commitments?.find((x) => x.eventSlug === c.eventSlug)} />
-        <motion.div key={c.eventSlug} className="space-y-5 p-4 sm:p-5" variants={stagger} initial="hidden" animate="show">
+        <div className="space-y-2 p-4 sm:p-5">
           {c.picks.map((p) => (
-            <motion.div key={p.boutId} variants={staggerItem}>
-              <PickResultHero
-                a={p.a} b={p.b} probA={p.probA} confidence={p.confidence}
-                winnerName={p.pickName} method={p.predMethod}
-                status={{ kind: "graded", correct: p.correctWinner, actualName: p.actualWinnerName, actualMethod: p.actualMethod }}
-              />
-            </motion.div>
+            <div
+              key={p.boutId}
+              className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border px-4 py-3 ${p.correctWinner ? "border-edge/40 bg-edge/5" : "border-blood/40 bg-blood/5"}`}
+            >
+              <span className="min-w-0 font-display text-sm font-bold uppercase">{p.a.name} <span className="text-muted">vs</span> {p.b.name}</span>
+              <span className="flex shrink-0 items-center gap-2 text-sm">
+                <span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted">Backed </span>
+                  <span className="font-bold text-fg">{p.pickName}</span>
+                </span>
+                <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${p.correctWinner ? "bg-edge text-black" : "bg-blood text-white"}`}>
+                  {p.correctWinner ? "Won" : "Lost"}
+                </span>
+              </span>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

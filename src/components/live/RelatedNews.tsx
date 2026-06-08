@@ -121,7 +121,7 @@ export function RelatedNews({ athleteId, limit = 6, feed = false }: { athleteId?
               <div className="rounded-lg border border-line/60 bg-bg/60 px-4 py-3 transition-colors hover:border-steel">
                 <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider">
                   <span className="font-semibold text-blood">{n.source || "ESPN"}</span>
-                  {n.published && <span className="text-muted">· {fmtWhen(n.published)}</span>}
+                  {n.published && <span suppressHydrationWarning className="text-muted">· {fmtWhen(n.published)}</span>}
                 </div>
                 <h3 className="mt-0.5 font-display text-sm font-bold leading-snug text-fg">{n.headline}</h3>
               </div>
@@ -154,7 +154,7 @@ export function RelatedNews({ athleteId, limit = 6, feed = false }: { athleteId?
           <div className="rounded-xl border border-line/60 bg-bg/60 p-4 transition-colors hover:border-steel">
             <div className="mb-1 flex items-center justify-between gap-2">
               <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-blood">{n.source || "ESPN"}</span>
-              {n.published && <span className="shrink-0 text-[10px] text-muted">{fmtWhen(n.published)}</span>}
+              {n.published && <span suppressHydrationWarning className="shrink-0 text-[10px] text-muted">{fmtWhen(n.published)}</span>}
             </div>
             <h3 className="font-display text-sm font-bold leading-snug text-fg">{n.headline}</h3>
             {n.description && <p className="mt-1 line-clamp-2 text-xs text-muted">{n.description}</p>}

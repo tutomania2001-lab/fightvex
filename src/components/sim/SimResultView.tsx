@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import type { Fighter } from "@/lib/types";
@@ -543,7 +543,10 @@ function HistoryColumn({ f, tone }: { f: Fighter; tone: "blood" | "blue" }) {
 export function SimResultView({ a, b, result, onPick, runKey }: { a: Fighter; b: Fighter; result: SimResult; onPick: (side: "A" | "B") => void; runKey: string }) {
   const winner = result.headline.winnerSide === "A" ? a : b;
   const rounds = result.roundDist.aFinish.length;
-  const dateLabel = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  // Client-only (avoids an SSR/client date hydration mismatch — server "today"
+  // can differ from the visitor's).
+  const [dateLabel, setDateLabel] = useState("");
+  useEffect(() => { setDateLabel(new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })); }, []);
 
   const share = async () => {
     const text = `${a.name} vs ${b.name} — Vex AI predicts ${winner.name} by ${result.headline.method} (${pct(result.headline.confidence)})`;

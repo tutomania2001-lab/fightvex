@@ -166,7 +166,7 @@ export function AccountHome({
             <Link href={`/events/${home.event.slug}`} className="group inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-fg">Full card <span className="transition-transform group-hover:translate-x-0.5">→</span></Link>
           </div>
           <p className="mt-2 font-display text-2xl font-bold uppercase">{home.event.name}</p>
-          <p className="text-sm text-muted">{eventTiming(home.event.date)} · {home.event.city}, {home.event.country}</p>
+          <p className="text-sm text-muted"><span suppressHydrationWarning>{eventTiming(home.event.date)}</span> · {home.event.city}, {home.event.country}</p>
 
           {home.watchedOnCard.length > 0 ? (
             <div className="mt-4 space-y-2">

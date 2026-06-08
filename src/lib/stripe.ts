@@ -86,14 +86,24 @@ async function resolvePriceId(configured: string): Promise<string> {
 }
 
 // Create a subscription Checkout Session for `plan`, tied to `userId`.
+// Annual Pro price (same plan, yearly billing). Set when the owner creates the
+// yearly price in Stripe; until then, annual is unavailable and checkout is monthly.
+const PRO_ANNUAL_ID = process.env.STRIPE_PRICE_PRO_ANNUAL;
+export const annualEnabled = !!PRO_ANNUAL_ID;
+
 export async function createCheckoutSession(opts: {
   plan: Exclude<Plan, "free">;
   userId: string;
   email: string;
   customerId?: string;
   origin: string;
+  interval?: "month" | "year";
 }): Promise<{ url: string }> {
-  const configured = configuredIdForPlan(opts.plan);
+  // Same Pro plan, yearly billing → the annual price; everything else monthly.
+  const configured =
+    opts.plan === "pro" && opts.interval === "year" && PRO_ANNUAL_ID
+      ? PRO_ANNUAL_ID
+      : configuredIdForPlan(opts.plan);
   if (!configured) throw new Error(`No Stripe price configured for ${opts.plan}`);
   const price = await resolvePriceId(configured);
 
@@ -166,6 +176,28 @@ export async function syncPlanFromStripe(opts: { email: string; customerId?: str
     if (found) return found;
   }
   return null;
+}
+
+// ---- trial-ending reminders ----
+// Trialing subscriptions whose trial ends within `withinHours`, with the
+// customer email (expanded). Used by the daily trial-reminder cron.
+export async function trialsEndingSoon(
+  withinHours = 48,
+): Promise<{ subscriptionId: string; email: string | null; trialEnd: number }[]> {
+  if (!SECRET_KEY) return [];
+  const now = Math.floor(Date.now() / 1000);
+  const until = now + withinHours * 3600;
+  const r = await stripeGet<{ data?: { id: string; trial_end?: number; customer?: { email?: string } | string }[] }>(
+    `subscriptions?status=trialing&limit=100&expand[]=data.customer`,
+  );
+  const out: { subscriptionId: string; email: string | null; trialEnd: number }[] = [];
+  for (const s of r.data || []) {
+    const te = s.trial_end;
+    if (typeof te !== "number" || te < now || te > until) continue;
+    const email = typeof s.customer === "object" ? s.customer.email ?? null : null;
+    out.push({ subscriptionId: s.id, email, trialEnd: te });
+  }
+  return out;
 }
 
 // ---- webhook signature verification (Stripe scheme) ----

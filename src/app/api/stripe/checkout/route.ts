@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (!me)
     return NextResponse.json({ error: "Please log in to upgrade.", needAuth: true }, { status: 401 });
 
-  let body: { plan?: string };
+  let body: { plan?: string; interval?: string };
   try {
     body = await req.json();
   } catch {
@@ -28,12 +28,13 @@ export async function POST(req: Request) {
   const plan = body.plan;
   if (plan !== "pro" && plan !== "elite")
     return NextResponse.json({ error: "Unknown plan." }, { status: 400 });
+  const interval: "month" | "year" = body.interval === "year" ? "year" : "month";
 
   // Reuse the Stripe customer if this account already has one.
   const { stripeCustomerId } = await getProfileBilling(me.id);
   const origin = new URL(req.url).origin;
 
-  const args = { plan: plan as "pro" | "elite", userId: me.id, email: me.email, origin };
+  const args = { plan: plan as "pro" | "elite", userId: me.id, email: me.email, origin, interval };
   try {
     const { url } = await createCheckoutSession({ ...args, customerId: stripeCustomerId });
     return NextResponse.json({ url });

@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/odds", "schedule": "0 12 * * *" },
-    { "path": "/api/cron/predictions", "schedule": "0 13 * * *" }
+    { "path": "/api/cron/predictions", "schedule": "0 13 * * *" },
+    { "path": "/api/cron/trial-reminders", "schedule": "0 14 * * *" }
   ]
 }

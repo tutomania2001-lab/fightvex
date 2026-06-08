@@ -75,7 +75,7 @@ export default function PricingPage() {
           return (
           <div key={t.name} className={`reveal panel relative rounded-2xl p-7 ${accent.ring}`}>
             {t.highlight && (
-              <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white`}>Most popular</span>
+              <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white`}>Join Now</span>
             )}
             <h2 className={`font-display text-2xl font-bold uppercase ${accent.title}`}>{t.name}</h2>
             {t.plan === "pro" && annualEnabled ? (

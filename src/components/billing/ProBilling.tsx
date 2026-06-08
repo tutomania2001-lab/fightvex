@@ -14,17 +14,17 @@ export function ProBilling({ label, highlight, tagline }: { label: string; highl
   return (
     <>
       <div className="mt-3 flex items-baseline gap-1">
-        <span className="font-display text-5xl font-bold text-fg">{annual ? "£96" : "£10"}</span>
+        <span className="font-display text-5xl font-bold text-fg">{annual ? "£60" : "£10"}</span>
         <span className="text-sm text-muted">{annual ? "/year" : "/month"}</span>
       </div>
       <div className="mt-3 inline-flex rounded-md border border-line p-0.5 text-[11px]">
         <button onClick={() => setInterval("month")} className={`${seg} ${!annual ? "bg-fg text-bg" : "text-muted hover:text-fg"}`}>Monthly</button>
         <button onClick={() => setInterval("year")} className={`${seg} ${annual ? "bg-fg text-bg" : "text-muted hover:text-fg"}`}>
-          Annual <span className={annual ? "text-bg" : "text-edge"}>−20%</span>
+          Annual <span className={annual ? "text-bg" : "text-edge"}>−40%</span>
         </button>
       </div>
       <p className="mt-3 min-h-[2.5rem] text-sm text-muted">
-        {annual ? "7-day free trial, then £96/yr — save 20% vs monthly. Everything unlocked. Cancel anytime." : tagline}
+        {annual ? "7-day free trial, then £60/yr — save 40% vs monthly. Everything unlocked. Cancel anytime." : tagline}
       </p>
       <div className="mt-5">
         <PlanButton plan="pro" label={label} highlight={highlight} interval={interval} />

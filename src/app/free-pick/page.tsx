@@ -8,6 +8,7 @@ import { Flag } from "@/components/ui/Flag";
 import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { PickRationale } from "@/components/predict/PickRationale";
 import { recordString, fmtOdds, noVigProbA, pct, lastName } from "@/lib/format";
 import type { Fighter } from "@/lib/types";
 
@@ -117,6 +118,9 @@ export default function FreePickPage() {
           <p className="mt-1 text-xs text-muted">Confidence: {sim.variance === "LOW" ? "high" : sim.variance === "HIGH" ? "low (volatile)" : "medium"}</p>
         </div>
       </Panel>
+
+      {/* Plain-English rationale, generated from the model's own factor edges */}
+      <PickRationale sim={sim} a={a} b={b} className="reveal mt-6" />
 
       {/* Method + odds/value */}
       <div className="reveal mt-6 grid gap-6 sm:grid-cols-2">

@@ -12,6 +12,7 @@ import { torsoFor } from "@/lib/data/bodies.generated";
 import { pct, lastName, recordString, cmToFtIn, cmToIn } from "@/lib/format";
 import { styleMatchup } from "@/lib/style";
 import { SaveInsightButton } from "./SaveInsightButton";
+import { PickRationale } from "../predict/PickRationale";
 
 const ENGINE_VERSION = "VEX AI v3.2";
 
@@ -438,6 +439,7 @@ function KeyFactorsPanel({ a, b, result }: { a: Fighter; b: Fighter; result: Sim
   const items = [...(result.swingFactors ?? []).map((s) => (s.endsWith(".") ? s : s + ".")), ...keyFactors(a, b)].slice(0, 5);
   return (
     <SectionPanel title="Key Factors" icon="factors">
+      <PickRationale sim={result} a={a} b={b} className="mb-4" />
       <ul className="space-y-3">
         {items.map((t, i) => (
           <li key={i} className="flex items-start gap-2.5 text-sm text-fg">

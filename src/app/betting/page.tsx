@@ -12,7 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { ODDS_SOURCE, ODDS_OPEN_SOURCE } from "@/lib/data/odds.generated";
 import { getSeriesMap, kvEnabled, oddsApiEnabled } from "@/lib/odds-live";
 import { Flag } from "@/components/ui/Flag";
-import { noVigProbA, bestPrice, fmtOdds, toDecimal, pct, lastName, signClass } from "@/lib/format";
+import { noVigProbA, bestPrice, fmtOdds, toDecimal, pct, lastName, signClass, confidenceLabel } from "@/lib/format";
 
 // Re-read the live series periodically (ISR) so scheduled odds snapshots show up.
 export const revalidate = 1800;
@@ -127,9 +127,9 @@ export default async function BettingPage() {
       <div className="reveal mb-2.5 shrink-0">
         <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">The Edge Desk</h1>
         <p className="mt-1 max-w-4xl text-sm text-muted">
-          <strong className="text-fg">Real market moneylines</strong> ({ODDS_SOURCE}) beside Vex AI&apos;s win
-          probability; <strong className="text-edge">value signals</strong> flag where the model diverges from the
-          real no-vig market. Informational only — not betting advice. 21+.
+          <strong className="text-fg">Real market moneylines</strong> ({ODDS_SOURCE}) with the de-vigged implied
+          probability and Vex AI&apos;s pick. The exact win %, <strong className="text-edge">value lean</strong> and
+          EV/CLV tools are Pro. Informational only — not betting advice. 21+.
         </p>
       </div>
 
@@ -145,11 +145,14 @@ export default async function BettingPage() {
 
 // One bout's row block (label + value flag + the two fighters' lines).
 function BoutRow({ row }: { row: BoardRow }) {
-  const { e, m, a, b, sim, bestA, bestB, fairA, edge } = row;
-  const valueSide = Math.abs(edge) >= 0.04 ? (edge > 0 ? "a" : "b") : null;
+  const { e, m, a, b, sim, bestA, bestB, fairA } = row;
+  // Public board: real odds + de-vigged implied (market data) + the favoured
+  // side & qualitative confidence. Exact Vex AI % and the value lean are Pro.
+  const favored = sim.probA >= sim.probB ? a : b;
+  const confidence = confidenceLabel(Math.max(sim.probA, sim.probB));
   const sideRows = [
-    { f: a, odds: bestA, implied: fairA, vex: sim.probA, val: valueSide === "a" },
-    { f: b, odds: bestB, implied: 1 - fairA, vex: sim.probB, val: valueSide === "b" },
+    { f: a, odds: bestA, implied: fairA },
+    { f: b, odds: bestB, implied: 1 - fairA },
   ];
   return (
     <div className="border-b border-line-soft last:border-0">
@@ -157,18 +160,14 @@ function BoutRow({ row }: { row: BoardRow }) {
         <Link href={`/events/${e.slug}#${m.id}`} className="text-[11px] font-semibold uppercase tracking-wider text-muted hover:text-fg">
           {m.weightClass} · {m.rounds}rd{m.isTitle ? " · Title" : ""}
         </Link>
-        {valueSide ? (
-          <span className="rounded-full border border-edge/40 bg-edge/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-edge">
-            Value: {lastName((valueSide === "a" ? a : b).name)} +{pct(Math.abs(edge))}
-          </span>
-        ) : (
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-faint">No edge</span>
-        )}
+        <span className="rounded-full border border-edge/40 bg-edge/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-edge">
+          Vex AI: {lastName(favored.name)} · {confidence}
+        </span>
       </div>
-      {sideRows.map(({ f, odds, implied, vex, val }, i) => (
+      {sideRows.map(({ f, odds, implied }, i) => (
         <div
           key={i}
-          className={`grid grid-cols-[1.7fr_repeat(4,1fr)] items-center gap-2 px-5 py-1 ${val ? "bg-edge/5" : ""} ${i === 0 ? "pt-1.5" : "pb-2"}`}
+          className={`grid grid-cols-[1.7fr_repeat(3,1fr)] items-center gap-2 px-5 py-1 ${i === 0 ? "pt-1.5" : "pb-2"}`}
         >
           <Link href={`/fighters/${f.slug}`} className="flex min-w-0 items-center gap-2 hover:text-blood">
             <Flag emoji={f.flag} country={f.country} className="h-3 w-[18px] shrink-0 rounded-[2px] border border-black/40" />
@@ -177,7 +176,6 @@ function BoutRow({ row }: { row: BoardRow }) {
           </Link>
           <span className={`tnum text-right text-sm font-bold ${signClass(odds)}`}>{fmtOdds(odds)}</span>
           <span className="tnum text-right text-sm text-muted">{pct(implied)}</span>
-          <span className={`tnum text-right text-sm ${val ? "font-bold text-edge" : "text-fg"}`}>{pct(vex)}</span>
           <span className="tnum text-right text-sm text-fg/80">${(toDecimal(odds) * 100).toFixed(0)}</span>
         </div>
       ))}
@@ -213,18 +211,17 @@ function BoardSection({ rows, index, total, withDisclaimer }: { rows: BoardRow[]
       </div>
       <div className="overflow-x-auto">
         <div className="min-w-[720px]">
-          <div className="grid grid-cols-[1.7fr_repeat(4,1fr)] gap-2 border-b border-line px-5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-faint">
+          <div className="grid grid-cols-[1.7fr_repeat(3,1fr)] gap-2 border-b border-line px-5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-faint">
             <span>Fighter</span>
             <span className="text-right">Moneyline</span>
             <span className="text-right">Implied %</span>
-            <span className="text-right">Vex AI %</span>
             <span className="text-right">$100 returns</span>
           </div>
           {rows.map((r) => <BoutRow key={r.m.id} row={r} />)}
         </div>
       </div>
       {withDisclaimer && (
-        <div className="p-4"><Disclaimer>Moneylines are the real captured market line; Implied % is the de-vigged market probability; Vex AI % is our model. A &quot;Value&quot; flag marks where the model beats the market by ≥4 points — a research signal, NOT betting advice. 21+.</Disclaimer></div>
+        <div className="p-4"><Disclaimer>Moneylines are the real captured market line and Implied % is the de-vigged market probability. Vex AI&apos;s exact win probability and value lean are a Pro feature (see each fight&apos;s prediction page). Research signals, NOT betting advice. 21+.</Disclaimer></div>
       )}
     </Panel>
   );

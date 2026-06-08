@@ -5,7 +5,7 @@ import { getFighterById } from "@/lib/data/fighters";
 import { simulate } from "@/lib/sim";
 import { RelatedNews } from "@/components/live/RelatedNews";
 import { MatchupRow } from "@/components/fight/MatchupRow";
-import { lastName, recordString, pct, fmtOdds, bestPrice, signClass } from "@/lib/format";
+import { lastName, recordString, confidenceLabel, fmtOdds, bestPrice, signClass } from "@/lib/format";
 import { HeroFightAnimation } from "@/components/site/HeroFightAnimation";
 import { HeroKeyFactors } from "@/components/site/HeroKeyFactors";
 
@@ -63,7 +63,7 @@ export default function Home() {
       <p className="mt-4 max-w-[400px] text-sm leading-relaxed text-muted sm:text-base">
         {fa.name} ({recordString(fa.record)}) meets {fb.name} ({recordString(fb.record)}) in the{" "}
         {featured.weightClass} {featured.rounds}-round {featured.isMain ? "main event" : "bout"}. Vex AI
-        favors {lastName(featWinner.name)} at {pct(featConf)}.
+        favors {lastName(featWinner.name)} ({confidenceLabel(featConf)}).
       </p>
       <div className="mt-7 flex flex-wrap items-center gap-3">
         <Link href={`/events/${event.slug}#${featured.id}`} className="btn-flare flex items-center gap-2 rounded-md px-6 py-3 text-sm font-bold uppercase tracking-wide">
@@ -74,12 +74,12 @@ export default function Home() {
           Compare
         </Link>
       </div>
-      <HeroKeyFactors factors={featured.keyFactors.slice(0, 4)} />
+      <HeroKeyFactors factors={featured.keyFactors.filter((f) => !f.includes("%")).slice(0, 4)} />
       <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { v: recordString(fa.record), l: `${lastName(fa.name)} Record`, c: "text-fg" },
           { v: recordString(fb.record), l: `${lastName(fb.name)} Record`, c: "text-fg" },
-          { v: pct(featConf), l: "AI Confidence", c: "text-fg" },
+          { v: confidenceLabel(featConf), l: "Vex AI read", c: "text-edge" },
           { v: fmtOdds(featWinnerOdds), l: `${lastName(featWinner.name)} Best Price`, c: signClass(featWinnerOdds) },
         ].map((s) => (
           <div key={s.l} className="rounded-lg border border-line/60 bg-bg/70 px-3 py-3 backdrop-blur-sm">

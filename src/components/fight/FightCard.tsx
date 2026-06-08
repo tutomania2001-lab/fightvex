@@ -8,7 +8,7 @@ import type { Fighter, Matchup } from "@/lib/types";
 import { Flag } from "@/components/ui/Flag";
 import { ModelTag } from "@/components/ui/ModelTag";
 import { Badge } from "@/components/ui/Badge";
-import { bestPrice, cmToFtIn, cmToIn, fmtOdds, recordString, signClass } from "@/lib/format";
+import { bestPrice, cmToFtIn, cmToIn, fmtOdds, recordString, signClass, confidenceLabel } from "@/lib/format";
 
 const EASE = [0.4, 0, 0.2, 1] as const;
 
@@ -277,7 +277,7 @@ export function FightCard({ a, b, matchup, pick, bodyA, bodyB }: { a: Fighter; b
                     ) : pick ? (
                       <span className="text-[11px] text-muted">
                         Vex AI: <span className="font-bold text-fg">{pick.lastName}</span>{" "}
-                        <span className="tnum">{Math.round(pick.prob * 100)}%</span>
+                        <span className="text-edge">{confidenceLabel(pick.prob)}</span>
                       </span>
                     ) : null}
                   </div>

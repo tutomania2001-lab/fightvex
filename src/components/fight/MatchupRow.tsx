@@ -6,8 +6,7 @@ import { getMatchup } from "@/lib/data/events";
 import { simulate } from "@/lib/sim";
 import { Badge } from "../ui/Badge";
 import { Flag } from "../ui/Flag";
-import { ModelTag } from "../ui/ModelTag";
-import { recordString, impliedProb, noVigProbA, bestPrice, fmtOdds, pct, lastName, signClass } from "@/lib/format";
+import { recordString, bestPrice, fmtOdds, lastName, signClass, confidenceLabel } from "@/lib/format";
 
 export function MatchupRow({ matchup }: { matchup: Matchup }) {
   const a = getFighterById(matchup.fighterA)!;
@@ -16,8 +15,9 @@ export function MatchupRow({ matchup }: { matchup: Matchup }) {
 
   const bestA = bestPrice(matchup.odds.map((o) => o.priceA));
   const bestB = bestPrice(matchup.odds.map((o) => o.priceB));
-  const fairA = noVigProbA(bestA, bestB);
-  const edge = sim.probA - fairA; // Vex AI vs market
+  // Public-safe: favoured side + qualitative confidence (exact % + value lean are Pro).
+  const favored = sim.probA >= sim.probB ? a : b;
+  const confidence = confidenceLabel(Math.max(sim.probA, sim.probB));
   const eventSlug = getMatchup(matchup.id)?.event.slug ?? "";
 
   return (
@@ -51,8 +51,8 @@ export function MatchupRow({ matchup }: { matchup: Matchup }) {
           <div className="flex flex-col items-center pb-1">
             <span className="font-display text-xs font-bold text-muted">VS</span>
             <div className="mt-1 rounded-md border border-line bg-bg px-2 py-1 text-center">
-              <p className="text-[9px] uppercase tracking-wider text-muted">AI Conf.</p>
-              <p className="tnum text-sm font-bold text-fg">{pct(Math.max(sim.probA, sim.probB))}</p>
+              <p className="text-[9px] uppercase tracking-wider text-muted">Vex AI</p>
+              <p className="text-xs font-bold text-edge">{confidence}</p>
             </div>
           </div>
 
@@ -72,19 +72,12 @@ export function MatchupRow({ matchup }: { matchup: Matchup }) {
           </div>
         </div>
 
-        {/* Value indicator — odds & probabilities are model-implied, not ESPN/real lines */}
+        {/* Public pick (favoured side + confidence). Exact win %, value lean → Pro on /predict. */}
         <div className="mt-0 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
-          <p className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
-            <span>Vex AI: <span className="tnum text-blood">{pct(sim.probA)}</span> {lastName(a.name)} · Market (no-vig): <span className="tnum text-fg">{pct(fairA)}</span></span>
-            <ModelTag kind="odds" />
+          <p className="text-[11px] text-muted">
+            Vex AI pick: <span className="font-semibold text-fg">{lastName(favored.name)}</span> · <span className="text-edge">{confidence}</span>
           </p>
-          {Math.abs(edge) >= 0.04 ? (
-            <Badge variant={edge > 0 ? "edge" : "neutral"}>
-              {edge > 0 ? `Value signal: ${lastName(a.name)} +${pct(edge)}` : `Value signal: ${lastName(b.name)} +${pct(-edge)}`}
-            </Badge>
-          ) : (
-            <Badge variant="neutral">No strong edge</Badge>
-          )}
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-blood">Full read →</span>
         </div>
       </div>
     </Link>

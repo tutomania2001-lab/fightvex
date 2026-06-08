@@ -10,7 +10,7 @@ import { Flag } from "@/components/ui/Flag";
 import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { recordString, fmtOdds, noVigProbA, pct } from "@/lib/format";
+import { recordString, fmtOdds, noVigProbA, pct, cmToFtIn, cmToIn } from "@/lib/format";
 
 // Programmatic "X vs Y prediction" pages — one per real bout on every card.
 // High-intent organic landing pages: the Vex AI read (win %, method, round),
@@ -265,6 +265,32 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
           </ul>
         </Panel>
       )}
+
+      {/* Tale of the tape — real ESPN identity/record fields */}
+      <Panel className="reveal mt-6 p-6">
+        <h2 className="mb-3 font-display text-lg font-bold uppercase">Tale of the tape</h2>
+        <div className="overflow-hidden rounded-lg border border-line/60">
+          {[
+            { label: "Record", a: recordString(a.record), b: recordString(b.record) },
+            { label: "Age", a: a.age || "—", b: b.age || "—" },
+            { label: "Height", a: a.heightCm ? cmToFtIn(a.heightCm) : "—", b: b.heightCm ? cmToFtIn(b.heightCm) : "—" },
+            { label: "Reach", a: a.reachCm ? cmToIn(a.reachCm) : "—", b: b.reachCm ? cmToIn(b.reachCm) : "—" },
+            { label: "Stance", a: a.stance || "—", b: b.stance || "—" },
+            { label: "Ranking", a: a.title ? "Champion" : a.ranking !== undefined ? `#${a.ranking}` : "—", b: b.title ? "Champion" : b.ranking !== undefined ? `#${b.ranking}` : "—" },
+            { label: "KO/TKO wins", a: a.record.ko, b: b.record.ko },
+            { label: "Submission wins", a: a.record.sub, b: b.record.sub },
+          ].map((row, i) => (
+            <div key={row.label} className={`grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2 text-sm ${i % 2 ? "bg-bg/40" : ""}`}>
+              <span className="text-right font-semibold text-fg">{row.a}</span>
+              <span className="px-3 text-center text-[11px] uppercase tracking-wider text-muted">{row.label}</span>
+              <span className="text-left font-semibold text-fg">{row.b}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-2 flex justify-between px-3 text-[11px] uppercase tracking-wider text-muted">
+          <span>{last(a.name)}</span><span>{last(b.name)}</span>
+        </div>
+      </Panel>
 
       {/* CTA */}
       <div className="reveal mt-6 flex flex-col items-center gap-3 rounded-2xl panel p-6 text-center sm:flex-row sm:justify-between sm:text-left">

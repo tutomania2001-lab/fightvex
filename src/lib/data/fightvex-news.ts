@@ -8,6 +8,14 @@ export const FIGHTVEX_NEWS: FxNews[] = [
   {
     date: "2026-06-08",
     tag: "Feature",
+    title: "AI prediction pages for every bout",
+    body:
+      "Every upcoming UFC bout now has its own prediction page: the Vex AI pick and win %, the method-of-victory split, the likely round, real market odds with a value lean, a full tale-of-the-tape and the key factors — all in one place. Browse them on the new Predictions tab, or jump straight in from any fight card or fighter page. Transparent and backtested; informational only, not betting advice.",
+    href: "/predict",
+  },
+  {
+    date: "2026-06-08",
+    tag: "Feature",
     title: "Simpler pricing: one Pro plan at £10/mo",
     body:
       "We scrapped the tiers. Browse free, and a single Pro plan — £10/month — unlocks everything: unlimited 50,000-run simulations, full fighter profiles, the line-movement tracker, EV and no-vig calculators, the closing-line-value tool, the bankroll (Kelly) calculator and watchlist alerts. No Pro/Elite split, no add-ons. Cancel anytime. Anyone already subscribed keeps full access.",

@@ -6,7 +6,7 @@ import { simulate } from "@/lib/sim";
 import { Panel } from "@/components/ui/Panel";
 import { Badge } from "@/components/ui/Badge";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { lastName } from "@/lib/format";
+import { lastName, confidenceLabel } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "UFC Fight Predictions — Vex AI Picks for Every Bout",
@@ -27,10 +27,10 @@ export default function PredictHub() {
         const sim = simulate(a, b, { rounds: m.rounds, runs: 400, shortNoticeA: m.shortNoticeA, shortNoticeB: m.shortNoticeB, missedWeightA: m.missedWeightA, missedWeightB: m.missedWeightB });
         const favA = sim.probA >= 0.5;
         const fav = favA ? a : b;
-        const prob = Math.round(Math.max(sim.probA, sim.probB) * 100);
+        const confidence = confidenceLabel(Math.max(sim.probA, sim.probB));
         const slug = `${a.slug}-vs-${b.slug}`;
         items.push({ name: `${a.name} vs ${b.name}`, url: `https://fightvex.com/predict/${slug}` });
-        return { a, b, m, fav, prob, slug };
+        return { a, b, m, fav, confidence, slug };
       })
       .filter((r): r is NonNullable<typeof r> => r !== null);
     return { e, rows };
@@ -67,7 +67,7 @@ export default function PredictHub() {
               <Link href={`/events/${e.slug}`} className="text-sm text-blood hover:underline">Full card →</Link>
             </div>
             <div className="space-y-2">
-              {rows.map(({ a, b, m, fav, prob, slug }) => (
+              {rows.map(({ a, b, m, fav, confidence, slug }) => (
                 <Link
                   key={slug}
                   href={`/predict/${slug}`}
@@ -81,8 +81,8 @@ export default function PredictHub() {
                     </div>
                   </div>
                   <div className="shrink-0 text-right">
-                    <div className="text-[10px] uppercase tracking-wider text-muted">Vex AI</div>
-                    <div className="font-display text-sm font-bold">{lastName(fav.name)} <span className="text-edge">{prob}%</span></div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted">Vex AI pick</div>
+                    <div className="font-display text-sm font-bold">{lastName(fav.name)} <span className="text-edge">· {confidence}</span></div>
                   </div>
                 </Link>
               ))}

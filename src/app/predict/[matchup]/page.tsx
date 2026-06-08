@@ -10,7 +10,8 @@ import { Flag } from "@/components/ui/Flag";
 import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { recordString, fmtOdds, noVigProbA, pct, cmToFtIn, cmToIn } from "@/lib/format";
+import { recordString, fmtOdds, noVigProbA, pct, cmToFtIn, cmToIn, confidenceLabel } from "@/lib/format";
+import { ProPrediction } from "@/components/predict/ProPrediction";
 
 // Programmatic "X vs Y prediction" pages — one per real bout on every card.
 // High-intent organic landing pages: the Vex AI read (win %, method, round),
@@ -67,25 +68,20 @@ function read(r: Resolved) {
   const favA = sim.probA >= 0.5;
   const fav = favA ? r.a : r.b;
   const dog = favA ? r.b : r.a;
-  const favProb = Math.round(Math.max(sim.probA, sim.probB) * 100);
-  const method = favA ? sim.methodA : sim.methodB;
-  const total = method.ko + method.sub + method.dec || 1;
-  const split = {
-    ko: Math.round((method.ko / total) * 100),
-    sub: Math.round((method.sub / total) * 100),
-    dec: Math.round((method.dec / total) * 100),
-  };
-  return { sim, fav, dog, favA, favProb, split };
+  // Public-safe only: favoured side + a qualitative confidence label. The exact
+  // win %, method split, round and value lean are Pro (served via /api/predict).
+  const confidence = confidenceLabel(Math.max(sim.probA, sim.probB));
+  return { fav, dog, favA, confidence };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ matchup: string }> }): Promise<Metadata> {
   const { matchup } = await params;
   const r = resolve(matchup);
   if (!r) return { title: "Fight Prediction" };
-  const { fav, favProb, split } = read(r);
-  const how = split.dec >= split.ko && split.dec >= split.sub ? "decision" : split.ko >= split.sub ? "KO/TKO" : "submission";
+  const { fav, dog, confidence } = read(r);
+  const lead = confidence === "Toss-up" ? "it's a toss-up" : `${fav.name} is the ${confidence.toLowerCase()}`;
   const title = `${r.a.name} vs ${r.b.name} Prediction — Who Wins?`;
-  const description = `Vex AI prediction for ${r.a.name} vs ${r.b.name} at ${r.event.name}: ${fav.name} favored to win (${favProb}%), most likely by ${how}. Real odds, method-of-victory split and key factors — backtested, transparent. 21+. Not betting advice.`;
+  const description = `Vex AI's prediction for ${r.a.name} vs ${r.b.name} at ${r.event.name}: ${lead} over ${dog.name}. See the win probability, method-of-victory split, real odds and the full tale-of-the-tape — backtested, transparent. 21+. Not betting advice.`;
   return {
     title,
     description,
@@ -94,25 +90,8 @@ export async function generateMetadata({ params }: { params: Promise<{ matchup: 
   };
 }
 
-function Split({ split }: { split: { ko: number; sub: number; dec: number } }) {
-  const parts = [
-    { label: "KO/TKO", v: split.ko, c: "bg-blood" },
-    { label: "Submission", v: split.sub, c: "bg-amber" },
-    { label: "Decision", v: split.dec, c: "bg-edge" },
-  ];
-  return (
-    <div>
-      <div className="flex h-3 overflow-hidden rounded-full bg-line/40">
-        {parts.map((p) => <div key={p.label} className={p.c} style={{ width: `${p.v}%` }} />)}
-      </div>
-      <div className="mt-2 flex justify-between text-xs text-muted">
-        {parts.map((p) => <span key={p.label}>{p.label} <b className="text-fg">{p.v}%</b></span>)}
-      </div>
-    </div>
-  );
-}
 
-function FighterMini({ f, win }: { f: Fighter; win: number }) {
+function FighterMini({ f, favored }: { f: Fighter; favored: boolean }) {
   return (
     <Link href={`/fighters/${f.slug}`} className="group flex flex-col items-center text-center">
       <FighterAvatar fighter={f} size="lg" />
@@ -121,7 +100,7 @@ function FighterMini({ f, win }: { f: Fighter; win: number }) {
         <span className="font-display text-lg font-bold uppercase leading-none group-hover:text-blood">{f.name}</span>
       </div>
       <span className="mt-1 text-xs text-muted">{recordString(f.record)}</span>
-      <span className="mt-1 font-display text-2xl font-bold text-fg">{win}%</span>
+      {favored && <span className="mt-1.5 rounded-full bg-blood/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blood">Vex AI pick</span>}
     </Link>
   );
 }
@@ -131,27 +110,20 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
   const r = resolve(matchup);
   if (!r) notFound();
   const { event, m, a, b } = r;
-  const { sim, fav, dog, favA, favProb, split } = read(r);
-  const aWin = Math.round(sim.probA * 100);
-  const bWin = 100 - aWin;
+  const { fav, dog, favA, confidence } = read(r);
 
   const dateMs = new Date(event.date).getTime();
   const isPast = dateMs < Date.now() - 6 * 3.6e6;
   const dateLabel = new Date(event.date).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric", year: "numeric" });
 
-  // Real odds + value (first/consensus book) when present.
+  // Real market odds (public) + the no-vig implied probability (market math only).
   const line = m.odds[0];
   const fair = line ? noVigProbA(line.priceA, line.priceB) : null;
-  const edge = fair != null ? sim.probA - fair : null;
-  const valueSide = edge != null && Math.abs(edge) >= 0.04 ? (edge > 0 ? a : b) : null;
-
-  const howLabel = split.dec >= split.ko && split.dec >= split.sub ? "by decision" : split.ko >= split.sub ? "by KO/TKO" : "by submission";
-  const roundTxt = sim.headline.round ? ` (most likely round ${sim.headline.round})` : "";
 
   const faq = [
     {
       q: `Who will win ${a.name} vs ${b.name}?`,
-      a: `Vex AI favors ${fav.name} at ${favProb}% to beat ${dog.name}, most likely ${howLabel}${roundTxt}. It's a probability from a transparent, backtested simulation — not a guarantee. MMA is high-variance, so ${dog.name} winning is well within range.`,
+      a: `Vex AI makes ${confidence === "Toss-up" ? "this close to a coin-flip" : `${fav.name} the ${confidence.toLowerCase()}`} over ${dog.name}. The exact win probability, method-of-victory split and likely round are in the full read (Pro). It's a backtested estimate, not a guarantee — MMA is high-variance, so ${dog.name} winning is well within range.`,
     },
     {
       q: `How does Vex AI predict ${last(a.name)} vs ${last(b.name)}?`,
@@ -159,7 +131,7 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
     },
     ...(line ? [{
       q: `What are the odds for ${a.name} vs ${b.name}?`,
-      a: `Real market moneylines: ${a.name} ${fmtOdds(line.priceA)}, ${b.name} ${fmtOdds(line.priceB)}. The no-vig implied probability for ${a.name} is ${fair != null ? Math.round(fair * 100) : "–"}%, versus Vex AI's ${aWin}%${valueSide ? ` — a value lean toward ${valueSide.name}` : ""}.`,
+      a: `Real market moneylines: ${a.name} ${fmtOdds(line.priceA)}, ${b.name} ${fmtOdds(line.priceB)}. The no-vig implied probability for ${a.name} is ${fair != null ? Math.round(fair * 100) : "–"}%. Vex AI's own probability and any value lean vs the market are in the full read (Pro).`,
     }] : []),
   ];
 
@@ -209,59 +181,53 @@ export default async function PredictPage({ params }: { params: Promise<{ matchu
           {a.name} <span className="text-blood">vs</span> {b.name}: Prediction &amp; Pick
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
-          {isPast ? "Pre-fight " : ""}Vex AI read for this bout — win probability, the most likely method and round, real market odds and the key factors. Transparent simulation over real data; informational only, not betting advice.
+          {isPast ? "Pre-fight " : ""}Vex AI&apos;s read for this bout — the favoured fighter, real market odds, the tale-of-the-tape and key factors. The exact win %, method-of-victory split and market value lean are in the full read (Pro). Transparent simulation over real data; informational only, not betting advice.
         </p>
       </div>
 
-      {/* Verdict */}
+      {/* Verdict — public hook (favoured side + qualitative confidence, no exact %) */}
       <Panel className="reveal bg-cage-fine relative mt-6 overflow-hidden p-6 sm:p-8">
         <div className="spotlight absolute inset-0 opacity-50" />
         <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
-          <FighterMini f={a} win={aWin} />
+          <FighterMini f={a} favored={favA} />
           <span className="font-display text-sm font-bold uppercase text-muted">vs</span>
-          <FighterMini f={b} win={bWin} />
+          <FighterMini f={b} favored={!favA} />
         </div>
         <div className="relative mt-6 rounded-xl border border-line bg-bg/50 p-4 text-center">
           <p className="text-[11px] uppercase tracking-wider text-muted">Vex AI verdict</p>
           <p className="mt-1 font-display text-xl font-bold">
-            {fav.name} to win · <span className="text-blood">{favProb}%</span> · {howLabel}{roundTxt}
+            {confidence === "Toss-up" ? "Toss-up" : <>{fav.name} — <span className="text-blood">{confidence}</span></>}
           </p>
-          <p className="mt-1 text-xs text-muted">Confidence: {sim.variance === "LOW" ? "high" : sim.variance === "HIGH" ? "low (volatile matchup)" : "medium"}</p>
         </div>
       </Panel>
 
-      {/* Method + odds */}
-      <div className="reveal mt-6 grid gap-6 sm:grid-cols-2">
-        <Panel className="p-6">
-          <h2 className="mb-3 font-display text-lg font-bold uppercase">How {last(fav.name)} wins</h2>
-          <Split split={split} />
-          <p className="mt-3 text-xs text-muted">Method-of-victory split for {fav.name} across the simulations.</p>
-        </Panel>
-        <Panel className="p-6">
-          <h2 className="mb-3 font-display text-lg font-bold uppercase">Odds &amp; value</h2>
-          {line ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted">{a.name}</span><span className="font-semibold">{fmtOdds(line.priceA)}</span></div>
-              <div className="flex justify-between"><span className="text-muted">{b.name}</span><span className="font-semibold">{fmtOdds(line.priceB)}</span></div>
-              {fair != null && (
-                <div className="flex justify-between border-t border-line/60 pt-2"><span className="text-muted">No-vig implied ({last(a.name)})</span><span>{pct(fair)}</span></div>
-              )}
-              <div className="flex justify-between"><span className="text-muted">Vex AI ({last(a.name)})</span><span className="font-semibold text-edge">{pct(sim.probA)}</span></div>
-              {valueSide && <p className="mt-1 rounded-md border border-edge/40 bg-edge/10 px-3 py-2 text-xs text-edge">Value lean: {valueSide.name}</p>}
-              {m.oddsSource && <p className="pt-1 text-[10px] uppercase tracking-wider text-faint">{m.oddsSource}</p>}
-            </div>
-          ) : (
-            <p className="text-sm text-muted">No market line captured for this bout yet.</p>
-          )}
-        </Panel>
+      {/* Full read — Pro (exact win %, method, round, value lean) */}
+      <div className="reveal mt-6">
+        <h2 className="mb-3 font-display text-lg font-bold uppercase">The full read</h2>
+        <ProPrediction slug={slugFor(a, b)} />
       </div>
 
-      {/* Key factors */}
-      {m.keyFactors?.length > 0 && (
+      {/* Market odds — real, public market data */}
+      {line && (
+        <Panel className="reveal mt-6 p-6">
+          <h2 className="mb-3 font-display text-lg font-bold uppercase">Market odds</h2>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-muted">{a.name}</span><span className="font-semibold">{fmtOdds(line.priceA)}</span></div>
+            <div className="flex justify-between"><span className="text-muted">{b.name}</span><span className="font-semibold">{fmtOdds(line.priceB)}</span></div>
+            {fair != null && (
+              <div className="flex justify-between border-t border-line/60 pt-2"><span className="text-muted">No-vig implied ({last(a.name)})</span><span>{pct(fair)}</span></div>
+            )}
+            {m.oddsSource && <p className="pt-1 text-[10px] uppercase tracking-wider text-faint">{m.oddsSource}</p>}
+          </div>
+        </Panel>
+      )}
+
+      {/* Key factors (public; the 'Vex AI favors X at Y%' factor is filtered out) */}
+      {m.keyFactors?.some((f) => !f.includes("%")) && (
         <Panel className="reveal mt-6 p-6">
           <h2 className="mb-3 font-display text-lg font-bold uppercase">Key factors</h2>
           <ul className="space-y-2">
-            {m.keyFactors.map((f) => (
+            {m.keyFactors.filter((f) => !f.includes("%")).map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm">
                 <span className="mt-0.5 text-edge">›</span><span>{f}</span>
               </li>

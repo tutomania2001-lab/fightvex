@@ -64,3 +64,13 @@ export function hueFromString(s: string): number {
 export function lastName(name: string): string {
   return name.split(" ").slice(-1)[0];
 }
+
+// Public-safe qualitative read of a matchup — derived from the favored side's
+// win probability but WITHOUT revealing the exact number (that's a Pro detail).
+// `maxProb` is the favourite's win probability (0..1).
+export function confidenceLabel(maxProb: number): string {
+  if (maxProb < 0.55) return "Toss-up";
+  if (maxProb < 0.62) return "Slight lean";
+  if (maxProb < 0.72) return "Clear favorite";
+  return "Heavy favorite";
+}

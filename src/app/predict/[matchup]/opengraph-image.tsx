@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { allEvents } from "@/lib/data/events";
 import { getFighterById } from "@/lib/data/fighters";
 import { simulate } from "@/lib/sim";
+import { confidenceLabel } from "@/lib/format";
 import type { Fighter } from "@/lib/types";
 
 // Dynamic social share card per matchup-prediction page. Inherits the route's
@@ -34,8 +35,7 @@ export default async function Image({ params }: { params: Promise<{ matchup: str
     const sim = simulate(r.a, r.b, { rounds: r.rounds === 5 ? 5 : 3, runs: 800, shortNoticeA: r.snA, shortNoticeB: r.snB, missedWeightA: r.mwA, missedWeightB: r.mwB });
     const favA = sim.probA >= 0.5;
     const fav = favA ? r.a : r.b;
-    const prob = Math.round(Math.max(sim.probA, sim.probB) * 100);
-    verdict = `Vex AI favors ${fav.name.split(" ").slice(-1)[0]} - ${prob}%`;
+    verdict = `Vex AI: ${fav.name.split(" ").slice(-1)[0]} - ${confidenceLabel(Math.max(sim.probA, sim.probB))}`;
   }
 
   return new ImageResponse(

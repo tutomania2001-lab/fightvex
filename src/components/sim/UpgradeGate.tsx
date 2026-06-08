@@ -4,7 +4,7 @@ import Link from "next/link";
 
 // Shown when a free / logged-out user tries to run a new simulation. The
 // default preview run stays visible behind the overlay.
-export function UpgradeGate({ loggedIn, onClose }: { loggedIn: boolean; onClose: () => void }) {
+export function UpgradeGate({ loggedIn, onClose, usedFreeSim }: { loggedIn: boolean; onClose: () => void; usedFreeSim?: boolean }) {
   return (
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center bg-bg/80 p-4 backdrop-blur-sm"
@@ -29,11 +29,13 @@ export function UpgradeGate({ loggedIn, onClose }: { loggedIn: boolean; onClose:
           <rect x="5" y="11" width="14" height="10" rx="2" />
           <path d="M8 11V7a4 4 0 0 1 8 0v4" />
         </svg>
-        <h2 className="font-display text-2xl font-bold uppercase">Upgrade your plan</h2>
+        <h2 className="font-display text-2xl font-bold uppercase">{usedFreeSim ? "Free simulation used" : "Upgrade your plan"}</h2>
         <p className="mt-2 text-sm text-muted">
-          Running your own fight simulations is a Pro feature. The free preview shows one
-          sample matchup. Upgrade to simulate any fight, re-run with custom parameters and
-          save your insights.
+          {usedFreeSim
+            ? "That was your free simulation. Go Pro to simulate any fight — unlimited 50,000-run sims, custom parameters and saved insights."
+            : loggedIn
+              ? "Running your own fight simulations is a Pro feature. Go Pro to simulate any fight, re-run with custom parameters and save your insights."
+              : "Every account gets 1 free simulation. Log in to use yours, or go Pro for unlimited sims, custom parameters and saved insights."}
         </p>
         <div className="mt-6 space-y-3">
           <Link

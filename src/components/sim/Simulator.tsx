@@ -81,22 +81,45 @@ export function Simulator({
   const [nonce, setNonce] = useState(0);
   const [picking, setPicking] = useState<"A" | "B" | null>(null);
   const [gated, setGated] = useState(false);
+  const [freeRemaining, setFreeRemaining] = useState<number | null>(null); // free accounts get 1; -1 = unlimited
+  const [usedThisSession, setUsedThisSession] = useState(false);
 
   // When a known short-notice fighter is selected, default their short-notice
   // toggle ON so the simulator matches the auto-pick (the user can still toggle).
   useEffect(() => { setSnA(isShortNotice(aId ?? undefined)); }, [aId]);
   useEffect(() => { setSnB(isShortNotice(bId ?? undefined)); }, [bId]);
 
+  // How many real simulations this account may run (1 free per account; Pro = ∞).
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/sim/claim").then((r) => r.json()).then((d) => { if (alive) setFreeRemaining(typeof d.remaining === "number" ? d.remaining : 0); }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
   // Running a real simulation (selecting fighters, changing params, re-running)
   // is a paid feature. Free + logged-out users ONLY ever see the silhouette
   // preview — never an actual fight — and get an upgrade prompt on any control.
   const { user } = useAuth();
-  const canSimulate = user?.plan === "pro" || user?.plan === "elite";
+  const isPaid = user?.plan === "pro" || user?.plan === "elite";
+  // May START a new sim: Pro/Elite, or a free account with its 1 free sim left.
+  const canStartNew = isPaid || (freeRemaining ?? 0) > 0;
+  // May RENDER a real result: also true once the free sim is spent this session,
+  // so that one result stays on screen instead of reverting to the preview.
+  const canSimulate = canStartNew || usedThisSession;
 
-  // Wraps a control handler: blocks + prompts when the user can't simulate.
+  // Consume the free sim the first time a free account actually runs a matchup.
+  useEffect(() => {
+    if (isPaid || usedThisSession) return;
+    if (!aId || !bId || (freeRemaining ?? 0) <= 0) return;
+    setUsedThisSession(true);
+    setFreeRemaining(0);
+    fetch("/api/sim/claim", { method: "POST" }).catch(() => {});
+  }, [aId, bId, isPaid, usedThisSession, freeRemaining]);
+
+  // Wraps a control handler: blocks + prompts when the user can't start a new sim.
   function guard<A extends unknown[]>(fn: (...args: A) => void) {
     return (...args: A) => {
-      if (!canSimulate) {
+      if (!canStartNew) {
         setGated(true);
         return;
       }
@@ -219,7 +242,7 @@ export function Simulator({
         />
       )}
 
-      {gated && <UpgradeGate loggedIn={!!user} onClose={() => setGated(false)} />}
+      {gated && <UpgradeGate loggedIn={!!user} usedFreeSim={!!user && !isPaid && (usedThisSession || freeRemaining === 0)} onClose={() => setGated(false)} />}
     </div>
   );
 }

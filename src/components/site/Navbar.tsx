@@ -35,6 +35,7 @@ function PlanMark() {
 
 const LINKS = [
   { href: "/events", label: "Events" },
+  { href: "/predict", label: "Predictions" },
   { href: "/fighters", label: "Fighters" },
   { href: "/simulator", label: "Simulator" },
   { href: "/betting", label: "Bet" },

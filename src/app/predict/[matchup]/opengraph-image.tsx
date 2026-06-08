@@ -17,7 +17,7 @@ function resolve(slug: string): { a: Fighter; b: Fighter; rounds: number; snA: b
       const a = getFighterById(m.fighterA);
       const b = getFighterById(m.fighterB);
       if (!a || !b) continue;
-      if (`${a.slug}-vs-${b.slug}` === slug)
+      if (`${a.slug}-vs-${b.slug}` === slug || `${b.slug}-vs-${a.slug}` === slug)
         return { a, b, rounds: m.rounds, snA: !!m.shortNoticeA, snB: !!m.shortNoticeB, mwA: !!m.missedWeightA, mwB: !!m.missedWeightB };
     }
   }

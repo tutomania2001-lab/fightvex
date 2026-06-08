@@ -29,7 +29,9 @@ function resolve(slug: string): Resolved | null {
       const a = getFighterById(m.fighterA);
       const b = getFighterById(m.fighterB);
       if (!a || !b) continue;
-      if (slugFor(a, b) === slug) return { event, m, a, b };
+      // Accept either fighter order so an indexed URL still resolves if the
+      // data feed later flips fighterA/fighterB (canonical points to natural order).
+      if (slugFor(a, b) === slug || slugFor(b, a) === slug) return { event, m, a, b };
     }
   }
   return null;
@@ -87,8 +89,8 @@ export async function generateMetadata({ params }: { params: Promise<{ matchup: 
   return {
     title,
     description,
-    alternates: { canonical: `/predict/${matchup}` },
-    openGraph: { type: "article", title, description, url: `/predict/${matchup}` },
+    alternates: { canonical: `/predict/${slugFor(r.a, r.b)}` },
+    openGraph: { type: "article", title, description, url: `/predict/${slugFor(r.a, r.b)}` },
   };
 }
 

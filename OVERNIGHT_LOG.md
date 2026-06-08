@@ -98,3 +98,23 @@ Shipping safe/additive only; deploys now gated on build EXIT CODE (a grep-gated 
 - ✅ Upset Radar (/upsets): public page of bouts where Vex AI backs the betting underdog; sitemap + footer.
 - ✅ FAQ (/faq) with FAQPage schema; footer now links Predictions/Free Pick/Upset Radar/FAQ (internal-linking for indexing).
 - (next) Glossary, Pick'em vs AI, more SEO/discovery.
+
+### Session 3 — shipped (all live, build-exit-gated deploys)
+1. ✅ Shareable cards — ShareButton, branded free-pick OG card, upgraded prediction OG card, share buttons on free-pick + prediction pages.
+2. ✅ Upset Radar (/upsets) — bouts where Vex AI backs the betting underdog.
+3. ✅ FAQ (/faq) — FAQPage schema.
+4. ✅ Glossary (/glossary) — DefinedTermSet schema.
+5. ✅ Pick'em vs the AI (/play) — free game, KV-saved per account, /api/pickem, shows agreement with Vex.
+6. ✅ Home "Try it free" section — drives to Free Pick / Pick'em / Upset Radar.
+7. ✅ Footer + nav + sitemap wired for all new pages (internal linking for indexing).
+
+### Queued for next ticks (safe, no approval)
+- Pick'em v2: score vs real results + personal "you vs Vex" record + leaderboard.
+- Pick'em result share card ("I went X/Y vs Vex AI").
+- Embeddable "Vex AI pick" widget (backlinks).
+- Per-division accuracy (once enough graded picks).
+- Ongoing: index watch, /api/health, data completeness, FightVex News entries.
+
+### Still NEEDS APPROVAL (unchanged)
+- Trial-ending email + watchlist alerts are built but only SEND if RESEND_API_KEY is set (owner).
+- Any new keys, pricing/accuracy-claim changes, paid APIs.

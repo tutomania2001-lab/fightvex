@@ -9,8 +9,8 @@ Shipped + verified live tonight, all safe/additive: **(1)** programmatic matchup
 pages `/predict/<a>-vs-<b>` (+~80 indexable SEO pages, full schema, OG share cards),
 **(2)** a `/predict` hub + "Predictions" nav link, **(3)** PostHog conversion funnel events,
 **(4)** `/api/health` freshness probe, **(5)** fighter→prediction cross-links.
-One feature reverted cleanly (fighter OG image 500'd at runtime — no live breakage; needs
-debug, see Known issue). **Nothing needed your approval** — approval queue is empty.
+Also added **fighter OG share cards** (initially 500'd, root-caused & fixed — see below).
+**Nothing needed your approval** — approval queue is empty.
 Still open for you: bigger items (bet-logging ledger, free trial, model work) in the backlog.
 
 ## ✅ Shipped & verified live (fightvex.com)
@@ -23,8 +23,8 @@ Still open for you: bigger items (bet-logging ledger, free trial, model work) in
 - **"Predictions" top-nav link** — site-wide discoverability of the hub. ✔ live.
 - **Fighter → prediction cross-link** — each fighter page booked on an upcoming card shows a "Next fight: vs X · Prediction →" banner to that bout's /predict page. _(Deploying.)_
 
-## ⚠ Known issue (reverted, needs proper debug — NOT broken on the live site)
-- **Fighter OG share cards** — the per-fighter `opengraph-image` 500'd at runtime on Vercel (the matchup OG works fine). Root cause not obvious from the generic error (the failing fighter had no title/nickname, so it's a common-path failure — likely a font/runtime issue in the image route, needs `vercel logs` or a local `next start` repro). **Reverted** so fighter pages fall back to the working site-wide og.png — no live breakage. Revisit with logs.
+## ✔ Resolved — Fighter OG share cards (now live)
+- Per-fighter `opengraph-image` initially 500'd at runtime. **Root cause:** non-ASCII glyphs (the `·` middot and `★`) aren't in the default `next/og` font when the card is rendered **on-demand** on Vercel — satori throws. The matchup OGs only survived because they were pre-rendered at build (build-env font had the glyphs). **Fix:** use ASCII separators (`-`) and drop `★` in both OG cards. Verified 200 image/png across multiple fighters (incl. the one that failed). _(Lesson logged: keep `next/og` text ASCII-safe.)_
 
 ## Next up (safe)
 - Final full smoke test of all routes incl. new ones.

@@ -34,7 +34,7 @@ export default async function Image({ params }: { params: Promise<{ matchup: str
     const favA = sim.probA >= 0.5;
     const fav = favA ? r.a : r.b;
     const prob = Math.round(Math.max(sim.probA, sim.probB) * 100);
-    verdict = `Vex AI favors ${fav.name.split(" ").slice(-1)[0]} · ${prob}%`;
+    verdict = `Vex AI favors ${fav.name.split(" ").slice(-1)[0]} - ${prob}%`;
   }
 
   return new ImageResponse(
@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: Promise<{ matchup: str
         </div>
 
         <div style={{ color: "#6b7280", fontSize: 24 }}>
-          Transparent, backtested AI · real odds · fightvex.com
+          Transparent, backtested AI - real odds - fightvex.com
         </div>
       </div>
     ),

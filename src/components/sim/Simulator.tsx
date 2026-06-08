@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import posthog from "posthog-js";
 import type { Fighter } from "@/lib/types";
 import { simulate, type SimParams, type SimResult } from "@/lib/sim";
 import { torsoFor } from "@/lib/data/bodies.generated";
@@ -134,6 +135,14 @@ export function Simulator({
     return simulate(realA, realB, params);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aId, bId, rounds, snA, snB, runs, nonce, canSimulate]);
+
+  // Funnel analytics: one event per matchup actually simulated (Pro users).
+  useEffect(() => {
+    if (canSimulate && realA && realB) {
+      try { posthog.capture("simulation_run", { rounds }); } catch { /* best-effort analytics */ }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aId, bId, canSimulate]);
 
   return (
     <div className="space-y-5">

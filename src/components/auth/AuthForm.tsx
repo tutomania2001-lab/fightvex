@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 const inputCls =
@@ -39,6 +40,10 @@ export function AuthForm() {
         setError(j.error || "Something went wrong. Try again.");
         return;
       }
+      try {
+        posthog.identify(email);
+        posthog.capture(mode === "signup" ? "signup" : "login");
+      } catch { /* best-effort analytics */ }
       await refresh();
       router.push(next);
       router.refresh();

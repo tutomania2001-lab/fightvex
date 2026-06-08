@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PLAN_RANK, type Plan } from "@/lib/entitlements";
 
@@ -52,6 +53,7 @@ export function PlanButton({
     }
     setBusy(true);
     setError(null);
+    posthog.capture("checkout_started", { plan });
     try {
       const r = await fetch("/api/stripe/checkout", {
         method: "POST",

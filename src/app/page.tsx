@@ -130,6 +130,28 @@ export default function Home() {
           </Link>
         </div>,
 
+        /* ── Free hooks — drive to the no-cost surfaces ── */
+        <div key="free" className="space-y-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">No account? No problem</p>
+            <h2 className="mt-1 font-display text-4xl font-bold uppercase sm:text-5xl">Try it free</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href="/free-pick" className="panel panel-hover rounded-xl p-4">
+              <p className="font-display text-base font-bold uppercase text-edge">Free Pick</p>
+              <p className="mt-1 text-xs text-muted">This week&apos;s full Vex AI read — on the house.</p>
+            </Link>
+            <Link href="/play" className="panel panel-hover rounded-xl p-4">
+              <p className="font-display text-base font-bold uppercase text-blue">Pick&apos;em vs AI</p>
+              <p className="mt-1 text-xs text-muted">Predict the card — can you beat the model?</p>
+            </Link>
+            <Link href="/upsets" className="panel panel-hover rounded-xl p-4">
+              <p className="font-display text-base font-bold uppercase text-blood">Upset Radar</p>
+              <p className="mt-1 text-xs text-muted">Where Vex AI fades the favourite.</p>
+            </Link>
+          </div>
+        </div>,
+
         /* ── 4: Latest Intelligence — REAL ESPN news ── */
         <div key="research" className="space-y-4">
           <div>

@@ -36,7 +36,7 @@ export default function Image() {
 
         {/* matchup */}
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ color: "#9296a0", fontSize: 26, letterSpacing: 2 }}>{event.name}  -  {m.weightClass}</div>
+          <div style={{ color: "#9296a0", fontSize: 26, letterSpacing: 2 }}>{`${event.name}  -  ${m.weightClass}`}</div>
           <div style={{ color: "#f5f6f8", fontSize: 72, fontWeight: 800, lineHeight: 1.05, marginTop: 10 }}>{a.name}</div>
           <div style={{ color: "#5b606a", fontSize: 40, fontWeight: 800, lineHeight: 1.0, margin: "2px 0" }}>vs</div>
           <div style={{ color: "#f5f6f8", fontSize: 72, fontWeight: 800, lineHeight: 1.05 }}>{b.name}</div>
@@ -48,7 +48,7 @@ export default function Image() {
             <div style={{ color: "#9296a0", fontSize: 22, letterSpacing: 3, textTransform: "uppercase" }}>Vex AI pick</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 6 }}>
               <div style={{ color: "#f5f6f8", fontSize: 48, fontWeight: 800 }}>{last(fav.name)}</div>
-              <div style={{ color: "#2e90ff", fontSize: 56, fontWeight: 800 }}>{favPct}%</div>
+              <div style={{ color: "#2e90ff", fontSize: 56, fontWeight: 800 }}>{`${favPct}%`}</div>
               <div style={{ color: "#9296a0", fontSize: 30 }}>{mlabel}</div>
             </div>
           </div>

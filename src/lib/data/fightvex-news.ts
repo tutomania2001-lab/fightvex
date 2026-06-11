@@ -6,6 +6,14 @@ export interface FxNews { date: string; tag: NewsTag; title: string; body: strin
 
 export const FIGHTVEX_NEWS: FxNews[] = [
   {
+    date: "2026-06-11",
+    tag: "Feature",
+    title: "Annual Pro is now £100/yr",
+    body:
+      "Pro on annual billing is now £100 per year — about 17% less than paying £10 month by month, with the same 7-day free trial and everything unlocked. Monthly stays £10/mo, and existing subscribers keep whatever price they signed up at. Switch intervals anytime from the pricing page.",
+    href: "/pricing",
+  },
+  {
     date: "2026-06-08",
     tag: "Feature",
     title: "Predictions get their own home",

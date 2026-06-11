@@ -34,8 +34,8 @@ const QA: { q: string; a: React.ReactNode; plain: string }[] = [
   },
   {
     q: "What's free and what's Pro?",
-    plain: "Free accounts can browse fighters, cards and real odds, read the free pick of the week, and run one real simulation. Pro unlocks unlimited simulations, every fight's full prediction, all betting tools, the bet log and alerts, for £10 per month or £70 per year with a 7-day free trial.",
-    a: <>Free: browse fighters, cards and real odds, the <Link href="/free-pick" className="text-blue hover:underline">free pick of the week</Link>, and <b className="text-fg">one</b> real simulation. <Link href="/pricing" className="text-blue hover:underline">Pro</Link> unlocks unlimited sims, every full prediction, all betting tools, the bet log and alerts — £10/mo or £70/yr, with a 7-day free trial. Cancel anytime.</>,
+    plain: "Free accounts can browse fighters, cards and real odds, read the free pick of the week, and run one real simulation. Pro unlocks unlimited simulations, every fight's full prediction, all betting tools, the bet log and alerts, for £10 per month or £100 per year with a 7-day free trial.",
+    a: <>Free: browse fighters, cards and real odds, the <Link href="/free-pick" className="text-blue hover:underline">free pick of the week</Link>, and <b className="text-fg">one</b> real simulation. <Link href="/pricing" className="text-blue hover:underline">Pro</Link> unlocks unlimited sims, every full prediction, all betting tools, the bet log and alerts — £10/mo or £100/yr, with a 7-day free trial. Cancel anytime.</>,
   },
   {
     q: "How do I know the picks aren't back-dated?",

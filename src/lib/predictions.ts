@@ -53,6 +53,39 @@ async function loadAll(): Promise<Prediction[]> {
   return raws.filter(Boolean).map((r) => JSON.parse(r as string) as Prediction);
 }
 
+// Set of prediction ids for every bout in the CURRENT schedule, used to prefer
+// the record that still matches the live card when collapsing duplicates.
+function liveBoutIdSet(): Set<string> {
+  const s = new Set<string>();
+  for (const e of allEvents()) for (const m of e.matchups) s.add(predId(e.slug, m.id));
+  return s;
+}
+
+// Positional bout ids (`e2-b1`) change whenever the schedule front rolls forward
+// (a finished event drops off → every remaining event's index shifts → its bouts
+// re-log under new ids). Records are immutable and never deleted, so a single
+// physical fight accumulates several KV records over its lifetime. Collapse them
+// to one per fight (same event + same fighter pair) so picks aren't shown — or
+// counted — twice. Keep the canonical record: a graded result over a pending one,
+// then the id that still matches the live schedule, then the most recently logged.
+function preferred(a: Prediction, b: Prediction, live: Set<string>): Prediction {
+  if (!!a.graded !== !!b.graded) return a.graded ? a : b;
+  const aLive = live.has(predId(a.eventSlug, a.boutId));
+  const bLive = live.has(predId(b.eventSlug, b.boutId));
+  if (aLive !== bLive) return aLive ? a : b;
+  return new Date(a.loggedAt).getTime() >= new Date(b.loggedAt).getTime() ? a : b;
+}
+function dedupeByBout(preds: Prediction[], live: Set<string>): Prediction[] {
+  const best = new Map<string, Prediction>();
+  for (const p of preds) {
+    const pair = [p.aId, p.bId].sort().join("|");
+    const k = `${p.eventSlug}::${pair}`;
+    const cur = best.get(k);
+    best.set(k, cur ? preferred(cur, p, live) : p);
+  }
+  return [...best.values()];
+}
+
 export type MethodLabel = "KO/TKO" | "Submission" | "Decision";
 export type ActualMethod = MethodLabel | "Finish"; // "Finish" = real result was a finish but the source didn't distinguish KO vs sub
 
@@ -261,7 +294,9 @@ export async function getRecord(): Promise<AccuracyRecord> {
   if (!ids.length) return empty;
   const keys = ids.map(recKey);
   const raws = (await redis<(string | null)[]>(["MGET", ...keys])) ?? [];
-  const all: Prediction[] = raws.filter(Boolean).map((r) => JSON.parse(r as string));
+  const allRaw: Prediction[] = raws.filter(Boolean).map((r) => JSON.parse(r as string));
+  // Collapse churned-id duplicates so a single fight can't be counted twice.
+  const all = dedupeByBout(allRaw, liveBoutIdSet());
 
   // Honesty gate: a prediction counts only if it was logged strictly before the fight.
   const valid = all.filter((p) => p.graded && p.actualWinnerSide && new Date(p.loggedAt).getTime() < new Date(p.date).getTime());
@@ -387,7 +422,8 @@ export interface PastCard {
 // graded against the real result, so the page is honest by construction.
 export async function getPastPicks(): Promise<{ enabled: boolean; cards: PastCard[]; upcoming: UpcomingCard[]; pending: number; modelVersion: string }> {
   if (!authEnabled) return { enabled: false, cards: [], upcoming: [], pending: 0, modelVersion: MODEL_VERSION };
-  const all = await loadAll();
+  // Collapse churned-id duplicates (see dedupeByBout) so a fight appears once.
+  const all = dedupeByBout(await loadAll(), liveBoutIdSet());
   const valid = all.filter((p) => p.graded && p.actualWinnerSide && new Date(p.loggedAt).getTime() < new Date(p.date).getTime());
   const pendingPicks = all.filter((p) => !p.graded);
   const pending = pendingPicks.length;

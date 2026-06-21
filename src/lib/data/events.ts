@@ -14,30 +14,14 @@ import { REAL_EVENTS, type RawBout } from "./espn.generated";
 import { realOddsFor, ODDS_SOURCE, ODDS_CAPTURED } from "./odds.generated";
 import { getFighterById } from "./fighters";
 import { isShortNotice, missedWeight, injured } from "./context.override";
-import { impliedProb } from "../format";
 import { simulate } from "../sim";
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-const noVigA = (priceA: number, priceB: number) => {
-  const a = impliedProb(priceA), b = impliedProb(priceB);
-  return a / (a + b);
-};
 
 function probToAmerican(p: number): number {
   p = clamp(p, 0.03, 0.97);
   const raw = p >= 0.5 ? -(100 * p) / (1 - p) : (100 * (1 - p)) / p;
   return Math.round(raw / 5) * 5; // round to nearest 5 like a real book
-}
-
-function lineHistory(end: number, points = 8): { t: string; impliedA: number }[] {
-  const start = clamp(end - 0.04, 0.05, 0.95);
-  const out = [];
-  for (let i = 0; i < points; i++) {
-    const f = i / (points - 1);
-    const v = start + (end - start) * f + (i % 2 === 0 ? 0.005 : -0.005);
-    out.push({ t: `T-${points - i}d`, impliedA: Math.round(v * 1000) / 1000 });
-  }
-  return out;
 }
 
 function styleOf(ko: number, sub: number, wins: number): "striker" | "grappler" | "all-round" {
@@ -68,11 +52,9 @@ function buildMatchup(bout: RawBout): Matchup | null {
   const real = realOddsFor(bout.id);
   let odds: OddsLine[];
   let oddsSource: string | undefined;
-  let lineEndA: number; // implied prob the line-movement chart converges to
   if (real) {
     odds = [{ book: "Consensus", region: "US", priceA: real.oddsA, priceB: real.oddsB, capturedAt: ODDS_CAPTURED }];
     oddsSource = `${ODDS_SOURCE} · ${ODDS_CAPTURED}`;
-    lineEndA = noVigA(real.oddsA, real.oddsB);
   } else {
     const vig = 1.045;
     const vA = clamp(pA * vig, 0.03, 0.97);
@@ -90,7 +72,6 @@ function buildMatchup(bout: RawBout): Matchup | null {
       priceB: baseB + (baseB < 0 ? d : -d),
       capturedAt: "T-1d",
     }));
-    lineEndA = pA;
   }
 
   // model-driven key factors
@@ -133,8 +114,6 @@ function buildMatchup(bout: RawBout): Matchup | null {
     injuredB,
     odds,
     oddsSource,
-    lineHistory: lineHistory(lineEndA),
-    publicSentimentA: Math.round(clamp(pA * 100 + (sim.variance === "HIGH" ? -4 : 4), 12, 88)),
     keyFactors: factors.slice(0, 4),
   };
 }

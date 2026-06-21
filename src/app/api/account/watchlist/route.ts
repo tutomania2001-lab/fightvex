@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { listWatch, addWatch, removeWatch } from "@/lib/account-data";
+import { badOrigin } from "@/lib/origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const me = await currentUser();
   if (!me) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   let b: { fighterId?: string; name?: string };
@@ -28,10 +31,12 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const me = await currentUser();
   if (!me) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   const fighterId = new URL(req.url).searchParams.get("fighterId");
   if (!fighterId) return NextResponse.json({ error: "Missing fighter." }, { status: 400 });
-  const watchlist = await removeWatch(me.id, fighterId);
+  const watchlist = await removeWatch(me.id, str(fighterId, 80));
   return NextResponse.json({ watchlist });
 }

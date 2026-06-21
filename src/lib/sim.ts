@@ -355,7 +355,13 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   const chaos = (a.stats.kdAvg + b.stats.kdAvg) / 2 + (a.stats.finishRate + b.stats.finishRate) / 200;
   const variance: SimResult["variance"] = chaos > 1.7 ? "HIGH" : chaos > 1.0 ? "MEDIUM" : "LOW";
 
-  const seed = seedFrom(a.id, b.id, params.rounds, params.runs ?? 0, params.shortNoticeA ? 1 : 0, params.shortNoticeB ? 1 : 0);
+  // Order-independent seed: swapping the corners must not change the random draws,
+  // otherwise simulate(a,b) and simulate(b,a) disagree by seed noise. Canonicalise
+  // the two fighters by id and pass their flags in that fixed order.
+  const [sIdLo, sIdHi, sSnLo, sSnHi] = a.id <= b.id
+    ? [a.id, b.id, params.shortNoticeA ? 1 : 0, params.shortNoticeB ? 1 : 0]
+    : [b.id, a.id, params.shortNoticeB ? 1 : 0, params.shortNoticeA ? 1 : 0];
+  const seed = seedFrom(sIdLo, sIdHi, params.rounds, params.runs ?? 0, sSnLo, sSnHi);
   const rng = makeRng(seed);
 
   // ---- Style-aware Monte Carlo (the realistic layer) ----
@@ -404,7 +410,11 @@ export function simulate(a: Fighter, b: Fighter, params: SimParams): SimResult {
   // walk-forward backtest of 3,289 bouts this beat the transparent model alone on
   // both accuracy (~62%→64%) and log-loss (bootstrap-significant). The
   // transparent model still drives the radar / method / round / explanations.
-  const gbmP = gbmProbA(a, b, subA, subB, mcProbA, rA, rB);
+  // Symmetrise the GBM: decision-tree ensembles are NOT antisymmetric in the
+  // feature vector, so gbmProbA(a,b) !== 1 - gbmProbA(b,a) (measured ~6.7pp gap),
+  // which would flip the favoured side based purely on corner order. Average both
+  // orientations so the blended probability is corner-invariant.
+  const gbmP = 0.5 * (gbmProbA(a, b, subA, subB, mcProbA, rA, rB) + (1 - gbmProbA(b, a, subB, subA, 1 - mcProbA, rB, rA)));
   // Live-record calibration: a monotonic Platt correction fit on our own graded
   // picks (sample-size shrunk → identity until the record is large enough). It
   // only nudges confidence, never the favored side. Default fit is a no-op.

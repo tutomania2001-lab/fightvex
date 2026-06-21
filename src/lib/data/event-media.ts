@@ -13,7 +13,9 @@ import type { FightEvent } from "../types";
 // Exact slug -> image (use for one-off, event-specific art).
 export const EVENT_HERO: Record<string, string> = {
   "ufc-fight-night-muhammad-vs-bonfim": "/events/ufc-fight-night-muhammad-vs-bonfim.jpg",
-  "ufc-fight-night-kape-vs-horiguchi": "/events/ufc-fight-night-kape-vs-horiguchi.jpg",
+  // ESPN re-slugged this card with a "-2" suffix; key must match the live slug or
+  // the curated art silently falls through to the generic backdrop.
+  "ufc-fight-night-kape-vs-horiguchi-2": "/events/ufc-fight-night-kape-vs-horiguchi.jpg",
   "ufc-329-mcgregor-vs-holloway-2": "/events/ufc-329-mcgregor-vs-holloway-2.jpg",
 };
 

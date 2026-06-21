@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { hasAccess } from "@/lib/entitlements";
 import { listBets, addBet, updateBet, deleteBet, type Bet } from "@/lib/account-data";
+import { badOrigin } from "@/lib/origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +26,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const g = await gate();
   if (g.error) return g.error;
   let b: { selection?: string; stake?: number; oddsTaken?: number; boutId?: string };
@@ -45,6 +48,8 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const g = await gate();
   if (g.error) return g.error;
   let b: { id?: string; result?: string | null; closingOdds?: number | null };
@@ -74,9 +79,11 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const g = await gate();
   if (g.error) return g.error;
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing bet." }, { status: 400 });
-  return NextResponse.json({ bets: await deleteBet(g.me.id, id) });
+  return NextResponse.json({ bets: await deleteBet(g.me.id, str(id, 80)) });
 }

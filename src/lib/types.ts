@@ -128,8 +128,6 @@ export interface Matchup {
   odds: OddsLine[];
   /** Set when `odds` are REAL web-sourced market lines (e.g. "Market consensus · Jun 2026"). Undefined => model-implied. */
   oddsSource?: string;
-  lineHistory: { t: string; impliedA: number }[];
-  publicSentimentA?: number;
   keyFactors: string[];
 }
 
@@ -147,25 +145,3 @@ export interface FightEvent {
   matchups: Matchup[];
 }
 
-export type ImpactDimension =
-  | "Striking"
-  | "Grappling"
-  | "Cardio"
-  | "Durability"
-  | "Preparation"
-  | "Betting Market";
-
-export interface InsightCard {
-  id: string;
-  headline: string;
-  summary: string;
-  fighterSlug?: string;
-  eventSlug?: string;
-  type: "Announcement" | "Injury" | "Weigh-in" | "Odds" | "Camp" | "Replacement" | "Analysis";
-  source: string;
-  sourceType: "Licensed API" | "Official" | "Public Record" | "News (attributed)" | "User-submitted";
-  recency: string;
-  confidence: Confidence;
-  impact: ImpactDimension[];
-  impactScore: number;
-}

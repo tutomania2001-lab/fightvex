@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { listInsights, saveInsight, deleteInsight } from "@/lib/account-data";
+import { badOrigin } from "@/lib/origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const me = await currentUser();
   if (!me) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
 
@@ -45,10 +48,12 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const me = await currentUser();
   if (!me) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id." }, { status: 400 });
-  await deleteInsight(me.id, id);
+  await deleteInsight(me.id, str(id, 120));
   return NextResponse.json({ ok: true });
 }

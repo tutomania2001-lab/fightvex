@@ -14,7 +14,7 @@
 //                            outcome fields are appended only at grading)
 // ============================================================
 import { redis, authEnabled } from "./auth";
-import { allEvents, getMatchup } from "./data/events";
+import { allEvents, upcomingEvents, getEvent } from "./data/events";
 import { getFighterById } from "./data/fighters";
 import { simulate } from "./sim";
 import { getCareerHistory, type CareerFight } from "./espn-live";
@@ -25,7 +25,7 @@ import { commitCard, canonicalCard, invalidateCommitment, type CommitPick } from
 // v3.2 — real layoff (months since last bout), division-aware finish hazards,
 // and strength-of-schedule in the Competition signal. Bumping the version re-logs
 // every upcoming pick with the new engine (pre-fight, so still honest).
-const MODEL_VERSION = "vex-v3.2-layoff-division-sos";
+const MODEL_VERSION = "vex-v3.3-corner-symmetric";
 const INDEX_KEY = "pred:index";
 const recKey = (id: string) => `pred:${id}`;
 // Stored prediction id is namespaced by event slug so positional bout ids (b1..)
@@ -61,13 +61,15 @@ function liveBoutIdSet(): Set<string> {
   return s;
 }
 
-// Positional bout ids (`e2-b1`) change whenever the schedule front rolls forward
+// A single physical fight accumulates several KV records over its lifetime:
+// positional bout ids (`e2-b1`) change whenever the schedule front rolls forward
 // (a finished event drops off → every remaining event's index shifts → its bouts
-// re-log under new ids). Records are immutable and never deleted, so a single
-// physical fight accumulates several KV records over its lifetime. Collapse them
-// to one per fight (same event + same fighter pair) so picks aren't shown — or
-// counted — twice. Keep the canonical record: a graded result over a pending one,
-// then the id that still matches the live schedule, then the most recently logged.
+// re-log under new ids), AND ESPN sometimes re-slugs an event (e.g. adds "-2").
+// Records are immutable and never deleted, so collapse them by the fight's real
+// identity — the fighter pair on the fight's day, which is slug- and id-agnostic
+// (the same two fighters can't meet twice on one day). Keep the canonical record:
+// a graded result over a pending one, then the id that still matches the live
+// schedule, then the most recently logged.
 function preferred(a: Prediction, b: Prediction, live: Set<string>): Prediction {
   if (!!a.graded !== !!b.graded) return a.graded ? a : b;
   const aLive = live.has(predId(a.eventSlug, a.boutId));
@@ -75,11 +77,13 @@ function preferred(a: Prediction, b: Prediction, live: Set<string>): Prediction 
   if (aLive !== bLive) return aLive ? a : b;
   return new Date(a.loggedAt).getTime() >= new Date(b.loggedAt).getTime() ? a : b;
 }
+function fightKey(p: Prediction): string {
+  return `${[p.aId, p.bId].sort().join("|")}::${(p.date || "").slice(0, 10)}`;
+}
 function dedupeByBout(preds: Prediction[], live: Set<string>): Prediction[] {
   const best = new Map<string, Prediction>();
   for (const p of preds) {
-    const pair = [p.aId, p.bId].sort().join("|");
-    const k = `${p.eventSlug}::${pair}`;
+    const k = fightKey(p);
     const cur = best.get(k);
     best.set(k, cur ? preferred(cur, p, live) : p);
   }
@@ -118,13 +122,28 @@ function modalMethod(m: { ko: number; sub: number; dec: number }): MethodLabel {
   return "Decision";
 }
 
-// Map a real result's free-text method to a family. Returns null if unknown.
+// Map a real result's free-text method to a family. Returns null if unknown OR
+// if the result is a DQ / No-Contest (neither a method the model can be "right"
+// about — those bouts should be excluded from method scoring, not mislabeled).
 function methodFamily(m: string | null | undefined): ActualMethod | null {
   if (!m) return null;
   const s = m.toLowerCase();
+  // DQ / No-Contest first — otherwise "DQ (illegal knee)" wrongly matches KO below.
+  if (s.includes("dq") || s.includes("disqualif") || s.includes("no contest") || s.includes("no-contest") || s.includes("nc")) return null;
   if (s.includes("decision")) return "Decision";
-  if (s.includes("submission") || s.includes("choke") || s.includes("lock") || s.includes("-bar") || s.includes("armbar") || s.includes("triangle") || s.includes("guillotine") || s.includes("tap")) return "Submission";
-  if (s.includes("tko") || /\bko\b/.test(s) || s.includes("knockout") || s.includes("punch") || s.includes("kick") || s.includes("elbow") || s.includes("knee")) return "KO/TKO";
+  if (
+    s.includes("submission") || s.includes("choke") || s.includes("guillotine") ||
+    s.includes("triangle") || s.includes("armbar") || s.includes("-bar") || s.includes("kneebar") ||
+    s.includes("kimura") || s.includes("americana") || s.includes("omoplata") ||
+    s.includes("anaconda") || s.includes("d'arce") || s.includes("darce") || s.includes("ezekiel") ||
+    s.includes("heel hook") || s.includes("heel-hook") || s.includes("ankle lock") || s.includes("lock") ||
+    s.includes("crucifix") || s.includes("twister") || s.includes("von flue") || s.includes("tap") || s.includes("verbal")
+  ) return "Submission";
+  if (
+    s.includes("tko") || /\bko\b/.test(s) || s.includes("knockout") || s.includes("punch") ||
+    s.includes("kick") || s.includes("elbow") || s.includes("knee") || s.includes("slam") ||
+    s.includes("fist") || s.includes("strikes") || s.includes("doctor") || s.includes("stoppage") || s.includes("retirement")
+  ) return "KO/TKO";
   if (s.includes("finish")) return "Finish"; // ESPN generic "Finish · Rd N" — KO vs sub not exposed
   return null;
 }
@@ -151,12 +170,20 @@ export async function fetchBoutResult(
   if (new Date(fightDateISO).getTime() > nowMs - 6 * 3600_000) return null; // wait ~6h past start
   const hist = await getCareerHistory(aId).catch(() => [] as CareerFight[]);
   const t = new Date(fightDateISO).getTime();
-  const wantLast = lastName(bName).toLowerCase();
+  // Match the opponent strictly to avoid grading against the WRONG fight (common
+  // last names — Silva/Souza/Oliveira — collide). Accept only: a slug match, OR a
+  // full normalized-name match. A bare last-name match is too weak to grade on.
+  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z\s]/g, "").replace(/\s+/g, " ").trim();
+  const wantFull = norm(bName);
+  const DAY = 24 * 3600_000;
   const f = hist.find((x) => {
-    const oppMatch = (bSlug && x.opponentSlug === bSlug) || lastName(x.opponent).toLowerCase() === wantLast;
-    if (!oppMatch) return false;
-    if (!x.date) return true;
-    return Math.abs(new Date(x.date).getTime() - t) < 12 * 24 * 3600_000;
+    const slugMatch = !!(bSlug && x.opponentSlug === bSlug);
+    const nameMatch = norm(x.opponent) === wantFull;
+    if (!slugMatch && !nameMatch) return false;
+    // Always require date proximity (±5 days). A slug match with no date is trusted;
+    // a name-only match with no date is NOT (too risky), so it's rejected below.
+    if (!x.date) return slugMatch;
+    return Math.abs(new Date(x.date).getTime() - t) < 5 * DAY;
   });
   if (!f || f.win === null) return null;
   return { winnerIsA: f.win, method: methodFamily(f.method) };
@@ -246,11 +273,17 @@ export async function gradeDue(nowMs: number): Promise<{ graded: number; pending
     else if (actualMethod === "Finish") correctMethod = p.predMethod === "Decision" ? false : null; // we know it wasn't a decision; can't verify which finish
     // Closing line for CLV: latest live odds snapshot if we have one, else the
     // static captured line. Best-effort — CLV just skips picks with no line.
+    // Resolve the bout within ITS OWN event: positional ids like "b1" collide
+    // across events, so a global getMatchup("b1") could pull a DIFFERENT fight's
+    // odds. If the event has rolled off the schedule, skip CLV rather than guess.
     let closeNoVigA: number | undefined;
     try {
-      const series = (await getSeriesMap([p.boutId]))[p.boutId];
-      if (series && series.length) closeNoVigA = noVigProbA(series[series.length - 1].a, series[series.length - 1].b);
-      else closeNoVigA = noVigFromOdds(getMatchup(p.boutId)?.matchup.odds) ?? undefined;
+      const mu = getEvent(p.eventSlug)?.matchups.find((m) => m.id === p.boutId);
+      if (mu) {
+        const series = (await getSeriesMap([p.boutId]))[p.boutId];
+        if (series && series.length) closeNoVigA = noVigProbA(series[series.length - 1].a, series[series.length - 1].b);
+        else closeNoVigA = noVigFromOdds(mu.odds) ?? undefined;
+      }
     } catch { /* odds optional */ }
     const next: Prediction = { ...p, graded: true, gradedAt: new Date(nowMs).toISOString(), actualWinnerSide, actualMethod, correctWinner, correctMethod, closeNoVigA };
     await redis(["SET", recKey(id), JSON.stringify(next)]);
@@ -422,33 +455,41 @@ export interface PastCard {
 // graded against the real result, so the page is honest by construction.
 export async function getPastPicks(): Promise<{ enabled: boolean; cards: PastCard[]; upcoming: UpcomingCard[]; pending: number; modelVersion: string }> {
   if (!authEnabled) return { enabled: false, cards: [], upcoming: [], pending: 0, modelVersion: MODEL_VERSION };
-  // Collapse churned-id duplicates (see dedupeByBout) so a fight appears once.
-  const all = dedupeByBout(await loadAll(), liveBoutIdSet());
+  const rawAll = await loadAll();
+  // Collapse churned-id / re-slugged duplicates (see dedupeByBout) so a fight
+  // appears once in the settled record and the stats.
+  const all = dedupeByBout(rawAll, liveBoutIdSet());
   const valid = all.filter((p) => p.graded && p.actualWinnerSide && new Date(p.loggedAt).getTime() < new Date(p.date).getTime());
-  const pendingPicks = all.filter((p) => !p.graded);
-  const pending = pendingPicks.length;
 
-  // Locked-in picks for fights that haven't happened yet — grouped by card,
-  // soonest first. Proof the model committed BEFORE the result.
-  const byUpcoming = new Map<string, UpcomingCard>();
-  for (const p of pendingPicks) {
-    let c = byUpcoming.get(p.eventSlug);
-    if (!c) { c = { eventName: p.eventName, eventSlug: p.eventSlug, date: p.date, picks: [] }; byUpcoming.set(p.eventSlug, c); }
-    c.picks.push({
-      boutId: p.boutId,
-      a: pickFighter(p.aId, p.aName, p.aSlug), b: pickFighter(p.bId, p.bName, p.bSlug),
-      pickSide: p.predWinnerSide, probA: p.predProbA,
-      confidence: p.predWinnerSide === "A" ? p.predProbA : 1 - p.predProbA,
-      aName: p.aName, bName: p.bName,
-      pickName: p.predWinnerSide === "A" ? p.aName : p.bName,
-      pickProb: p.predWinnerSide === "A" ? p.predProbA : 1 - p.predProbA,
-      predMethod: p.predMethod,
-    });
+  // Locked-in picks for fights that haven't happened yet. Built from the CURRENT
+  // schedule (not stored slugs/ids) so renamed events and churned positional bout
+  // ids can't resurface stale or cross-event records: for each upcoming bout we
+  // surface only its own live, logged, ungraded pick — exactly one per fight.
+  const byId = new Map(rawAll.map((p) => [predId(p.eventSlug, p.boutId), p] as const));
+  const upcoming: UpcomingCard[] = [];
+  for (const e of upcomingEvents()) {
+    const picks: UpcomingPick[] = [];
+    for (const m of e.matchups) {
+      const p = byId.get(predId(e.slug, m.id));
+      if (!p || p.graded) continue;
+      picks.push({
+        boutId: p.boutId,
+        a: pickFighter(p.aId, p.aName, p.aSlug), b: pickFighter(p.bId, p.bName, p.bSlug),
+        pickSide: p.predWinnerSide, probA: p.predProbA,
+        confidence: p.predWinnerSide === "A" ? p.predProbA : 1 - p.predProbA,
+        aName: p.aName, bName: p.bName,
+        pickName: p.predWinnerSide === "A" ? p.aName : p.bName,
+        pickProb: p.predWinnerSide === "A" ? p.predProbA : 1 - p.predProbA,
+        predMethod: p.predMethod,
+      });
+    }
+    if (!picks.length) continue;
+    // Main event (bout b1) first, then co-main, etc. — the card's running order.
+    picks.sort((x, y) => boutOrder(x.boutId) - boutOrder(y.boutId));
+    upcoming.push({ eventName: e.name, eventSlug: e.slug, date: e.date, picks });
   }
-  const upcoming = [...byUpcoming.values()].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  // Order each card by bout position so the MAIN EVENT (bout b1) is always first,
-  // then co-main, etc. — the card's real running order, not win probability.
-  for (const c of upcoming) c.picks.sort((x, y) => boutOrder(x.boutId) - boutOrder(y.boutId));
+  upcoming.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // soonest first
+  const pending = upcoming.reduce((s, c) => s + c.picks.length, 0);
 
   const byCard = new Map<string, PastCard>();
   for (const p of valid) {

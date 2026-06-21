@@ -41,6 +41,15 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["*.trycloudflare.com"],
   poweredByHeader: false, // don't advertise the framework/version
   reactStrictMode: true,
+  // External image hosts the app sources (ESPN headshots/flags, flagcdn flags).
+  // Without these, any <Image> pointed at an external URL throws at runtime; the
+  // app currently dodges that with raw <img>, so this future-proofs the pipeline.
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "a.espncdn.com" },
+      { protocol: "https", hostname: "flagcdn.com" },
+    ],
+  },
   // opentimestamps/bitcore-lib must not be bundled (it throws on double-load) —
   // keep it an external server-only require, loaded lazily by the commit layer.
   serverExternalPackages: ["opentimestamps"],

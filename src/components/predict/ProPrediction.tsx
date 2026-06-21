@@ -92,8 +92,8 @@ export function ProPrediction({ slug }: { slug: string }) {
           <span className={!aLead ? "text-fg" : "text-muted"}>{data.bName.split(" ").slice(-1)[0]} {data.bWin}%</span>
         </div>
         <div className="mt-2 flex h-3 overflow-hidden rounded-full bg-line/40">
-          <div className="bg-blue" style={{ width: `${data.aWin}%` }} />
-          <div className="bg-blood" style={{ width: `${data.bWin}%` }} />
+          <div className="bg-blood" style={{ width: `${data.aWin}%` }} />
+          <div className="bg-blue" style={{ width: `${data.bWin}%` }} />
         </div>
         <p className="mt-2 text-xs text-muted">
           Vex AI favors <b className="text-fg">{data.favName}</b> at {data.favWin}%

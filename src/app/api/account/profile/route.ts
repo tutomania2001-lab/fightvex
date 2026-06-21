@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { validateName } from "@/lib/auth";
 import { updateProfileName } from "@/lib/supabase/profile";
+import { badOrigin } from "@/lib/origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,6 +10,8 @@ export const dynamic = "force-dynamic";
 // Update editable profile fields (currently: name). Email is immutable here
 // because it's the account key / Stripe customer email.
 export async function PATCH(req: Request) {
+  const csrf = badOrigin(req);
+  if (csrf) return csrf;
   const me = await currentUser();
   if (!me) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
 

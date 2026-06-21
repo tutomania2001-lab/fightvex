@@ -102,6 +102,10 @@ export async function POST(req: Request) {
       if (userId) await setPlan(userId, "free");
     }
   } catch (e) {
+    // Release the idempotency claim BEFORE returning 500 — otherwise Stripe's retry
+    // would see the key still set and short-circuit as a "duplicate" without ever
+    // applying the plan change, permanently stranding a paying customer on free.
+    await redis(["DEL", `stripe:evt:${event.id}`]).catch(() => {});
     // Alert + surface a 500 so Stripe retries delivery (money path — never silent).
     await reportError("stripe.webhook", e, { eventId: event.id, type: event.type });
     return NextResponse.json({ error: String(e) }, { status: 500 });

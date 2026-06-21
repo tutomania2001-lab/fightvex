@@ -49,17 +49,11 @@ export function classnames(...xs: (string | false | null | undefined)[]): string
   return xs.filter(Boolean).join(" ");
 }
 export function bestPrice(prices: number[]): number {
-  return prices.reduce((best, p) => (toDecimal(p) > toDecimal(best) ? p : best), prices[0]);
-}
-export function initials(name: string): string {
-  const parts = name.split(" ").filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-export function hueFromString(s: string): number {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return h;
+  // Skip non-finite / zero prices and guard the empty case (reduce with no seed
+  // throws on []; reduce seeded with prices[0]=undefined silently kept garbage).
+  const valid = prices.filter((p) => Number.isFinite(p) && p !== 0);
+  if (!valid.length) return NaN; // callers treat NaN/falsy as "no line"
+  return valid.reduce((best, p) => (toDecimal(p) > toDecimal(best) ? p : best));
 }
 export function lastName(name: string): string {
   return name.split(" ").slice(-1)[0];
